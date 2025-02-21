@@ -1,0 +1,78 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String  @id @default(cuid()) @map("_id")
+  name      String
+  email     String  @unique
+  avatar    String
+  testSeries TestSeries[]
+  testAttempts TestAttempt[]
+  createdAt DateTime @default(now())
+}
+model TestSeries {
+    id        String  @id @default(cuid()) @map("_id")
+  title     String
+  questions Question[] 
+  testAttempts TestAttempt[]
+  createdAt DateTime   @default(now())
+  duration Int
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String   
+}
+
+model Question {
+    id        String  @id @default(cuid()) @map("_id")
+  text         String
+  answer       String
+  testSeriesId String
+  testSeries   TestSeries @relation(fields: [testSeriesId], references: [id], onDelete: Cascade)
+  answers     Answer[]
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  options      Option[]
+}
+
+model Option {
+    id        String  @id @default(cuid()) @map("_id")
+  text       String
+  questionId String 
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  answers    Answer[]
+  createdAt  DateTime @default(now())
+}
+
+model TestAttempt {
+    id        String  @id @default(cuid()) @map("_id")
+  userId       String
+  testSeriesId String
+  startedAt    DateTime @default(now())
+  completedAt  DateTime?
+  score        Int?     @default(0)
+  
+  user         User       @relation(fields: [userId], references: [id])
+  testSeries   TestSeries @relation(fields: [testSeriesId], references: [id])
+  answers      Answer[]
+
+  @@index([userId, testSeriesId])
+}
+
+model Answer {
+    id        String  @id @default(cuid()) @map("_id")
+  testAttemptId String
+  questionId    String
+  optionId      String
+  isCorrect     Boolean
+
+  testAttempt   TestAttempt @relation(fields: [testAttemptId], references: [id])
+  question      Question    @relation(fields: [questionId], references: [id])
+  option        Option      @relation(fields: [optionId], references: [id])
+
+  @@index([testAttemptId, questionId])
+}
