@@ -12,7 +12,6 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Spotlight } from "@/components/ui/spotlight-new";
-import { PlaceholdersAndVanishInput } from "@/components/ui/placeholders-and-vanish-input";
 import { AuroraText } from "@/components/magicui/aurora-text";
 import {
   Accordion,
@@ -20,7 +19,7 @@ import {
 } from "@/components/ui/accordion";
 import { Data } from "@/lib/type";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import AnimatedGradientTextDemo from "@/components/custom/animated-topage";
 import { CreateTest } from "@/lib/actions";
 
@@ -29,7 +28,6 @@ export default function DifficultySelector() {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   // const [customInput, setCustomInput] = useState("");
   // const [difficulty, setDifficulty] = useState("");
-  const { toast } = useToast();
 
   const placeholders = [
     "10th ncert math 1st chapter",
@@ -43,35 +41,31 @@ export default function DifficultySelector() {
   // };
 
   const handleSubmit = () => {
-    toast({
-      title: "Feature not implemented",
-      description: "Will be implemented soon.. because this is paid",
-    });
+    toast.info("This feature is under development.");
   };
   const dbFunctionCall = async () => {
     if (!textareaRef.current?.value) {
-      toast({
-        title: "Error",
-        description: "Input field is empty. Please enter some data.",
-        variant: "destructive",
-      });
-
+      toast.error("Please enter valid JSON data.");
       return;
     }
 
     try {
       const data: Data = JSON.parse(textareaRef.current.value);
-      await CreateTest(data);
-      toast({title: "Test Created", description: "Test has been created successfully."});
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
+      toast.promise(
+        // Your existing CreateTest function wrapped in a promise
+        () => CreateTest(data),
+        {
+          loading: 'Creating test...',
+          success: () => 'Test has been created successfully.',
+          error: 'Failed to create test'
+        }
+      );
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-      console.log(error.message)
-      toast({
-        title: "Invalid JSON Format",
-        description: "Please enter valid JSON data.",
-        variant: "destructive",
-      });
-      // console.error("JSON Parse Error:", error);
+      toast.error('Please enter valid JSON data.');
+      throw new Error(error);
     }
   };
 

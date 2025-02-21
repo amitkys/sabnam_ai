@@ -3,8 +3,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/provider/theme-provider";
 import SessionWrapper from "@/components/sessionProvider";
 import { inter } from "@/config/fonts";
-
-
+import ToasterWrapper from "@/components/ToasterWrapper"; 
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -19,16 +18,10 @@ export default function RootLayout({
   return (
     <SessionWrapper>
       <html lang="en" suppressHydrationWarning>
-        <body
-          className={`${inter.className} antialiased`}
-        >
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
+        <body className={`${inter.className} antialiased`}>
+          <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
             {children}
+            <ToasterWrapper /> 
           </ThemeProvider>
         </body>
       </html>
