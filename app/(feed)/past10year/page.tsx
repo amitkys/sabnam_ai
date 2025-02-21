@@ -44,7 +44,7 @@ export default function Page() {
   const url = `/past10year?topic=${topic}&clas=${clas}&subject=${subject}`;
   return (
     <ContentLayout title="Previous Year">
-      <Breadcrumb>
+      <Breadcrumb className="ml-3">
         <BreadcrumbList>
           <BreadcrumbItem>
             <BreadcrumbLink asChild>
