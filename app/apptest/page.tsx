@@ -1,11 +1,10 @@
-"use client";
 
-import { toast } from "sonner";
-
+import { Spinner } from "@/components/custom/spinner";
 export default function Page() {
   return (
-    <div className="min-h-screen flex items-center justify-centerj w-full">
-    <button onClick={() => toast.info("Operation successfully done")}>click on me</button>
+    <div className="min-h-screen flex items-center justify-center">
+
+    <Spinner variant="primary" size="xl" />
     </div>
   )
 }
