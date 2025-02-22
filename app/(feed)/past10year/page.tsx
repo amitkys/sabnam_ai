@@ -25,6 +25,7 @@ import {
   BreadcrumbSeparator
 } from "@/components/ui/breadcrumb";
 import Link from "next/link";
+import { Spinner } from "@/components/custom/spinner";
 // Type definition for the TestSeriesResponse
 interface TestSeriesResponse {
   data: {
@@ -177,8 +178,8 @@ function ContentPage() {
       {shouldFetch && (
         <div ref={testSeriesRef} className="mt-8">
           {isLoading && (
-            <div className="flex justify-center items-center">
-              <Loader2 className="h-8 w-8 animate-spin" />
+            <div className="flex justify-center  items-center flex-col space-y-2">
+              <Spinner variant="primary" size="xl" />
               <span className="ml-2 text-xl">Loading test series...</span>
             </div>
           )}

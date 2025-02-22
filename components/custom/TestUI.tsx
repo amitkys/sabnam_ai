@@ -40,8 +40,9 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { CreateTestAttempt } from "@/lib/actions";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import "katex/dist/katex.min.css"; // Import KaTeX styles
+import { Spinner } from "./spinner";
 
 const StartScreen = ({
   onStart,
@@ -230,11 +231,7 @@ export default function QuizInterface({
         action === "solved" &&
         !selectedAnswers[data.questions[currentQuestion].id]
       ) {
-        toast({
-          title: "No answer selected",
-          description: "Select an answer, otherwise press Skip button",
-          variant: "destructive",
-        });
+       toast.warning("Option not selected to save");
 
         return;
       }
@@ -286,18 +283,20 @@ export default function QuizInterface({
       })),
     };
 
+    toast.promise(() => CreateTestAttempt(submissionData), {
+      loading: "Submitting test...",
+      success: "Test submitted successfully",
+      error: "Failed to submit test",
+    })
+
     const testAttempId = await CreateTestAttempt(submissionData);
 
-    setIsSubmitting(false);
     await exitFullscreen();
 
     if (testAttempId) {
       router.push(`/analysis/${testAttempId}`);
-      toast({
-        title: "Test Submitted",
-        description: "Test सफलतापूर्वक दर्ज कर लिया गया 🎉",
-      });
     }
+    setIsSubmitting(false);
   }, [data.testseries.id, session?.user?.id, startTime, selectedAnswers, exitFullscreen, router]);
 
   const handleAnswerSelect = useCallback(
@@ -362,7 +361,12 @@ export default function QuizInterface({
 
   // Loading state check
   if (status === "loading") {
-    return <div>please wait</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center flex-col space-y-2">
+        <Spinner variant="primary" size="xl" />
+        <p>Fetching Test..</p>
+      </div>
+    );
   }
 
   // Start screen check
