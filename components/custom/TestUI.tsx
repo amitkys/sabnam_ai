@@ -290,6 +290,7 @@ export default function QuizInterface({
     })
 
     const testAttempId = await CreateTestAttempt(submissionData);
+    toast.info("Calculating Scores..");
 
     await exitFullscreen();
 

@@ -16,6 +16,9 @@ example: {
 example: {
   "text": "The fraction $\\frac{x+1}{x-1}$ represents..."
 }
+4. Even you write simple question (may be in math or any other subject): it's good practice to use 
+using $ delimiters and double backslashes for LaTeX commands
+
 Because I have function that will:
 Normalize all math delimiters to use $
 Properly escape backslashes
