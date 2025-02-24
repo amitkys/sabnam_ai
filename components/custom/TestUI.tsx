@@ -130,14 +130,16 @@ const QuestionCard = memo(function QuestionCard(props: {
 
   return (
     <Card className="bg-transparent border p-6 dark:border-gray-700">
-      <h2 className="text-lg mb-4 font-bold flex items-center">
-        <span className="text-muted-foreground mr-2 text-base">
+      <div className="flex mb-2">
+        <span className="text-muted-foreground mr-2 mt-0.5 text-base">
           {currentNumber}/{totalQuestions}.
         </span>
-        <Markdown rehypePlugins={[rehypeKatex]} remarkPlugins={[remarkMath]}>
-          {question.text}
-        </Markdown>
-      </h2>
+        <h2 className="text-base lg:text-lg  font-bold">
+          <Markdown rehypePlugins={[rehypeKatex]} remarkPlugins={[remarkMath]}>
+            {question.text}
+          </Markdown>
+        </h2>
+      </div>
 
       <RadioGroup
         className="space-y-3"
