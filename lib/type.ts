@@ -16,8 +16,8 @@ example: {
 example: {
   "text": "The fraction $\\frac{x+1}{x-1}$ represents..."
 }
-4. Even you write simple question (may be in math or any other subject): it's good practice to use 
-using $ delimiters and double backslashes for LaTeX commands
+4. Even you write simple question (may be in math or any other subject, with any variable or any equation): it's good practice to use 
+using $ delimiters and double backslashes for LaTeX commands (with any sambol prefix and postfix, if required, in question, for example, triangle, etc...)
 
 Because I have function that will:
 Normalize all math delimiters to use $
@@ -149,6 +149,21 @@ you will increase difficulty level in each set. give all question in json format
 */
 
 /* Good, keep in mind question quality is important, asked all types of question in objective, keep increase difficulty, also keep in mind json format rules. */
+
+/*
+I will give you some questions and options in json format (with some markdown syntax)
+
+you have to do 2 things:
+
+first, check, is the answer key value have even have in options
+if have,
+check this answer is right or wrong,
+
+if right, you will say: everything is fine
+if not you will give right answer for my json data
+
+I will give me 5 set, each set have 10 question, are you ready ?
+*/
 
 export interface Data {
   testseries: {
