@@ -111,9 +111,7 @@ function CardWithForm() {
   };
 
   const subjects10th = [
-    "Physics",
-    "Chemistry",
-    "Biology",
+    "Science",
     "Math",
     "Hindi",
     "Sanskrit",
