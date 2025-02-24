@@ -203,7 +203,10 @@ function CardWithForm() {
         </Select>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={handleFinalSubmit}>
+          <AlertDialogAction 
+            onClick={handleFinalSubmit}
+            disabled={!currentSelection.subject} // Disable if no subject selected
+          >
             Confirm
           </AlertDialogAction>
         </AlertDialogFooter>

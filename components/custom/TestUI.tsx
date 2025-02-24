@@ -123,15 +123,19 @@ const QuestionCard = memo(function QuestionCard(props: {
   question: any;
   currentNumber: number;
   selectedAnswer: string;
+  totalQuestions: number;
   onAnswerSelect: (optionId: string, optionText: string) => void;
 }) {
-  const { question, currentNumber, selectedAnswer, onAnswerSelect } = props;
+  const { question, currentNumber, selectedAnswer, onAnswerSelect, totalQuestions } = props;
 
   return (
     <Card className="bg-transparent border p-6 dark:border-gray-700">
-      <h2 className={`text-lg mb-4 font-bold`}>
+      <h2 className="text-lg mb-4 font-bold flex items-center">
+        <span className="text-muted-foreground mr-2 text-base">
+          {currentNumber}/{totalQuestions}.
+        </span>
         <Markdown rehypePlugins={[rehypeKatex]} remarkPlugins={[remarkMath]}>
-          {`${currentNumber}. ${question.text}`}
+          {question.text}
         </Markdown>
       </h2>
 
@@ -231,7 +235,7 @@ export default function QuizInterface({
         action === "solved" &&
         !selectedAnswers[data.questions[currentQuestion].id]
       ) {
-       toast.warning("Option not selected to save");
+        toast.warning("Option not selected to save");
 
         return;
       }
@@ -416,6 +420,7 @@ export default function QuizInterface({
               <Card className="bg-card text-card-foreground border border-border">
                 <QuestionCard
                   currentNumber={currentQuestion + 1}
+                  totalQuestions={data.questions.length}
                   question={data.questions[currentQuestion]}
                   selectedAnswer={
                     selectedAnswers[data.questions[currentQuestion].id]
