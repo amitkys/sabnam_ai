@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/no-explicit-any */
+
 "use client";
 
 import type {
@@ -15,6 +15,9 @@ import Markdown from "react-markdown";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+
+import { Spinner } from "./spinner";
 
 import { useFullscreen } from "@/hooks/use-fullscreen";
 import { Button } from "@/components/ui/button";
@@ -40,9 +43,8 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { CreateTestAttempt } from "@/lib/actions";
-import { toast } from "sonner";
+
 import "katex/dist/katex.min.css"; // Import KaTeX styles
-import { Spinner } from "./spinner";
 
 const StartScreen = ({
   onStart,
@@ -110,7 +112,7 @@ const Timer = memo(({ initialTime }: { initialTime: number }) => {
 
   return (
     <div className="text-center border rounded-md py-1 px-3 dark:border-gray-700">
-      timer: {formatTime(timeLeft)}
+      {formatTime(timeLeft)}
     </div>
   );
 });
@@ -126,7 +128,13 @@ const QuestionCard = memo(function QuestionCard(props: {
   totalQuestions: number;
   onAnswerSelect: (optionId: string, optionText: string) => void;
 }) {
-  const { question, currentNumber, selectedAnswer, onAnswerSelect, totalQuestions } = props;
+  const {
+    question,
+    currentNumber,
+    selectedAnswer,
+    onAnswerSelect,
+    totalQuestions,
+  } = props;
 
   return (
     <Card className="bg-transparent border p-6 dark:border-gray-700">
@@ -293,9 +301,10 @@ export default function QuizInterface({
       loading: "Submitting test...",
       success: "Test submitted successfully",
       error: "Failed to submit test",
-    })
+    });
 
     const testAttempId = await CreateTestAttempt(submissionData);
+
     toast.info("Calculating Scores..");
 
     await exitFullscreen();
@@ -304,7 +313,14 @@ export default function QuizInterface({
       router.push(`/analysis/${testAttempId}`);
     }
     setIsSubmitting(false);
-  }, [data.testseries.id, session?.user?.id, startTime, selectedAnswers, exitFullscreen, router]);
+  }, [
+    data.testseries.id,
+    session?.user?.id,
+    startTime,
+    selectedAnswers,
+    exitFullscreen,
+    router,
+  ]);
 
   const handleAnswerSelect = useCallback(
     (questionId: string, optionId: string, optionText: string) => {
@@ -370,7 +386,7 @@ export default function QuizInterface({
   if (status === "loading") {
     return (
       <div className="min-h-screen flex items-center justify-center flex-col space-y-2">
-        <Spinner variant="primary" size="xl" />
+        <Spinner size="xl" variant="primary" />
         <p>Fetching Test..</p>
       </div>
     );
@@ -393,27 +409,55 @@ export default function QuizInterface({
           {/* Timer and Exit */}
           <div className="flex justify-between items-center">
             <Timer initialTime={data.testseries.duration} />
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button variant="destructive">Exit</Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>
-                    Are you sure you want to exit?
-                  </AlertDialogTitle>
-                  <AlertDialogDescription>
-                    Your progress will be lost if you exit now.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction onClick={handleExit}>
-                    Exit
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
+            <div className="flex space-x-2">
+              {/* Submit button moved to top right, next to Exit */}
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button disabled={isSubmitting} variant="default">
+                    {isSubmitting ? "Please wait.." : "Submit"}
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>
+                      Are you sure you want to submit?
+                    </AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Once submitted, you won&apos;t be able to change your
+                      answers.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleSubmit}>
+                      Submit
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="destructive">Exit</Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>
+                      Are you sure you want to exit?
+                    </AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Your progress will be lost if you exit now.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleExit}>
+                      Exit
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </div>
           </div>
 
           <div className="flex flex-col lg:flex-row gap-6 flex-grow">
@@ -422,12 +466,12 @@ export default function QuizInterface({
               <Card className="bg-card text-card-foreground border border-border">
                 <QuestionCard
                   currentNumber={currentQuestion + 1}
-                  totalQuestions={data.questions.length}
                   question={data.questions[currentQuestion]}
                   selectedAnswer={
                     selectedAnswers[data.questions[currentQuestion].id]
                       ?.selectedAnswer || ""
                   }
+                  totalQuestions={data.questions.length}
                   onAnswerSelect={(optionId, optionText) =>
                     handleAnswerSelect(
                       data.questions[currentQuestion].id,
@@ -515,14 +559,14 @@ export default function QuizInterface({
             </div>
           </div>
 
-          {/* Action Buttons */}
+          {/* Action Buttons - Submit button removed from here */}
           <div className="fixed bottom-0 left-0 right-0 bg-background border-t border-border p-4">
             <div className="max-w-7xl mx-auto">
               <div className="flex flex-col sm:flex-row gap-2">
                 {/* Save & Next */}
                 <Button
                   className="flex-1 order-1 sm:order-3"
-                  variant="secondary"
+                  variant="default"
                   onClick={() => handleQuestionAction("solved")}
                 >
                   Save & next
@@ -545,35 +589,6 @@ export default function QuizInterface({
                 >
                   Skip
                 </Button>
-
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <Button
-                      className="flex-1 order-4 sm:order-4" // Order 4 on both small and larger screens
-                      disabled={isSubmitting}
-                      variant="default"
-                    >
-                      {isSubmitting ? "Please wait.." : "Submit"}
-                    </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>
-                        Are you sure you want to submit?
-                      </AlertDialogTitle>
-                      <AlertDialogDescription>
-                        Once submitted, you won&apos;t be able to change your
-                        answers.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
-                      <AlertDialogAction onClick={handleSubmit}>
-                        Submit
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
               </div>
             </div>
           </div>
