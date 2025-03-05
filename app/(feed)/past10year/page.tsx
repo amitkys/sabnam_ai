@@ -105,7 +105,7 @@ function ContentPage() {
   const testSeriesRef = useRef<HTMLDivElement>(null);
 
   const years = Array.from({ length: 13 }, (_, i) => 2024 - i);
-  
+
 
   const {
     data: testSeriesData,
@@ -163,11 +163,14 @@ function ContentPage() {
               onClick={handleFindTest}
             >
               {isLoading ? (
-                <Loader2 className="h-6 w-6 animate-spin" />
+                <>
+                  Please wait <Spinner variant={"primary"} />
+                </>
               ) : (
                 "Find Test"
               )}
             </Button>
+
             {testSeriesData?.data.length == 0 && (
               <p className="text-red-500 text-center mt-2">Test Not Found</p>
             )}

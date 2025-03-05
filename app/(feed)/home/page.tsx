@@ -1,9 +1,11 @@
 "use client";
 
 import type React from "react"; // Added import for React
+
 import { useState } from "react";
 import { Book, GraduationCap, School } from "lucide-react";
 import { useRouter } from "next/navigation"; // Import useRouter for navigation
+
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -29,7 +31,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
 import { ContentLayout } from "@/components/admin-panel/content-layout";
 import {
   Breadcrumb,
@@ -56,18 +57,16 @@ export default function Page() {
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
-            <BreadcrumbLink href="/" aria-current="page">
+            <BreadcrumbLink aria-current="page" href="/">
               Sabnam
             </BreadcrumbLink>
           </BreadcrumbItem>
         </BreadcrumbList>
-      </Breadcrumb> 
+      </Breadcrumb>
       <CardWithForm />
     </ContentLayout>
   );
 }
-
-
 
 function CardWithForm() {
   const router = useRouter(); // Initialize the router
@@ -201,9 +200,9 @@ function CardWithForm() {
         </Select>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction 
-            onClick={handleFinalSubmit}
+          <AlertDialogAction
             disabled={!currentSelection.subject} // Disable if no subject selected
+            onClick={handleFinalSubmit}
           >
             Confirm
           </AlertDialogAction>
