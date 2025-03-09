@@ -2,8 +2,8 @@
 
 import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { Loader2 } from "lucide-react";
 import useSWR from "swr";
+import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -22,9 +22,8 @@ import {
   BreadcrumbItem,
   BreadcrumbLink,
   BreadcrumbList,
-  BreadcrumbSeparator
+  BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import Link from "next/link";
 import { Spinner } from "@/components/custom/spinner";
 // Type definition for the TestSeriesResponse
 interface TestSeriesResponse {
@@ -32,9 +31,12 @@ interface TestSeriesResponse {
     id: string;
     title: string;
     duration: number;
+    hasAttempted: boolean;
+    lastScore: number | null;
+    isCompleted: boolean;
+    totalQuestions: number;
   }[];
 }
-
 
 export default function Page() {
   const searchParams = useSearchParams();
@@ -43,6 +45,7 @@ export default function Page() {
   const subject = searchParams.get("subject");
 
   const url = `/past10year?topic=${topic}&clas=${clas}&subject=${subject}`;
+
   return (
     <ContentLayout title="Previous Year">
       <Breadcrumb className="ml-3">
@@ -63,10 +66,7 @@ export default function Page() {
       <ContentPage />
     </ContentLayout>
   );
-
 }
-
-
 
 // TestSeriesCard component
 const TestSeriesCard = ({
@@ -85,10 +85,24 @@ const TestSeriesCard = ({
       <p className="text-sm text-muted-foreground">
         Duration: {testSeries.duration} minutes
       </p>
+      <p className="text-sm text-muted-foreground">
+        Questions: {testSeries.totalQuestions}
+      </p>
+      {testSeries.hasAttempted && (
+        <p className="text-sm text-muted-foreground">
+          Last Score: {testSeries.lastScore}
+        </p>
+      )}
     </CardContent>
     <CardFooter>
       <Link passHref href={`/test/${testSeries.id}`}>
-        <Button className="max-w-7xl">Start Test</Button>
+        {testSeries.hasAttempted ? (
+          <Button className="max-w-7xl" variant="outline">
+            Re-Attempt
+          </Button>
+        ) : (
+          <Button className="max-w-7xl">Start Test</Button>
+        )}
       </Link>
     </CardFooter>
   </Card>
@@ -105,7 +119,6 @@ function ContentPage() {
   const testSeriesRef = useRef<HTMLDivElement>(null);
 
   const years = Array.from({ length: 13 }, (_, i) => 2024 - i);
-
 
   const {
     data: testSeriesData,
@@ -164,7 +177,7 @@ function ContentPage() {
             >
               {isLoading ? (
                 <>
-                  Please wait <Spinner variant={"primary"} />
+                  Please wait <Spinner size={"sm"} variant={"primary"} />
                 </>
               ) : (
                 "Find Test"
@@ -182,7 +195,7 @@ function ContentPage() {
         <div ref={testSeriesRef} className="mt-8">
           {isLoading && (
             <div className="flex justify-center  items-center flex-col space-y-2">
-              <Spinner variant="primary" size="xl" />
+              <Spinner size="xl" variant="primary" />
               <span className="ml-2 text-xl">Loading test series...</span>
             </div>
           )}

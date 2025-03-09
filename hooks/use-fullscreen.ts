@@ -1,3 +1,4 @@
+/*
 import { useState, useCallback } from 'react';
 
 export const useFullscreen = () => {
@@ -44,3 +45,35 @@ export const useFullscreen = () => {
     exitFullscreen
   };
 };
+
+*/
+
+import { useCallback } from 'react';
+
+export function useFullscreen() {
+  const enterFullscreen = useCallback(async () => {
+    try {
+      if (document.documentElement.requestFullscreen) {
+        await document.documentElement.requestFullscreen();
+        return true;
+      }
+    } catch (error) {
+      console.error('Failed to enter fullscreen:', error);
+      return false;
+    }
+  }, []);
+
+  const exitFullscreen = useCallback(async () => {
+    try {
+      if (document.fullscreenElement && document.exitFullscreen) {
+        await document.exitFullscreen();
+        return true;
+      }
+    } catch (error) {
+      console.error('Failed to exit fullscreen:', error);
+      return false;
+    }
+  }, []);
+
+  return { enterFullscreen, exitFullscreen };
+}

@@ -231,6 +231,10 @@ export interface TestSeriesResponse {
     id: string;
     title: string;
     duration: number;
+    hasAttempted: boolean;
+    lastScore: number | null;
+    isCompleted: boolean;
+    totalQuestions: number;
   }>;
 }
 

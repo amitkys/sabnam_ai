@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 
-import QuizInterface from "@/components/custom/TestUI";
+import QuizInterface from "@/components/quiz/QuizInterface";
 import { GetTestSeries } from "@/lib/actions";
 import { FetchedTestSeriesData } from "@/lib/type";
 import { Spinner } from "@/components/custom/spinner";
@@ -27,8 +27,7 @@ export default async function Page(props: { params: Params }) {
 function Loading() {
   return (
     <div className="min-h-screen flex items-center justify-center flex-col space-y-2">
-
-      <Spinner variant="primary" size="xl" />
+      <Spinner size="xl" variant="primary" />
       <p>Fetching Test..</p>
     </div>
   );
