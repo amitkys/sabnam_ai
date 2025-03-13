@@ -50,11 +50,11 @@ export function getMenuList(pathname: string): Group[] {
           icon: SquarePen,
           submenus: [
             {
-              href: "/posts",
+              href: "/bseb/10th",
               label: "10th"
             },
             {
-              href: "/posts/new",
+              href: "/bseb/12th",
               label: "12th"
             }
           ]

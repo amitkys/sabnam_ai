@@ -15,31 +15,31 @@ import { Button } from "@/components/ui/button";
 const subjects = [
   {
     title: "Physics",
-    url: "/ncert/10th/physics", // Updated URL
+    url: "/bseb/10th/physics", // Updated URL
   },
   {
     title: "Chemistry",
-    url: "/ncert/10th/chemistry", // Updated URL
+    url: "/bseb/10th/chemistry", // Updated URL
   },
   {
     title: "Biology",
-    url: "/ncert/10th/biology", // Updated URL
+    url: "/bseb/10th/biology", // Updated URL
   },
   {
     title: "Math",
-    url: "/ncert/10th/math", // Updated URL
+    url: "/bseb/10th/math", // Updated URL
   },
   {
     title: "Hindi",
-    url: "/ncert/10th/hindi", // Updated URL
+    url: "/bseb/10th/hindi", // Updated URL
   },
   {
     title: "Sanskrit",
-    url: "/ncert/10th/sanskrit", // Updated URL
+    url: "/bseb/10th/sanskrit", // Updated URL
   },
   {
     title: "Social Science",
-    url: "/ncert/10th/social-science", // Updated URL
+    url: "/bseb/10th/social-science", // Updated URL
   },
 ];
 
