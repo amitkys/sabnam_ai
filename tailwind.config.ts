@@ -1,4 +1,5 @@
 import type { Config } from "tailwindcss";
+
 import animatePlugin from "tailwindcss-animate"; // Import the plugin
 
 export default {
@@ -10,6 +11,10 @@ export default {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ["Inter", "ui-sans-serif", "system-ui"],
+        serif: ["Noto Serif Devanagari", "ui-serif", "Georgia"],
+      },
       colors: {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
@@ -78,18 +83,18 @@ export default {
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        "spinner": "spinner 1s linear infinite",
+        spinner: "spinner 1s linear infinite",
       },
     },
     keyframes: {
       spinner: {
-        '0%': { opacity: '1' },
-        '10%': { opacity: '0.7' },
-        '20%': { opacity: '0.3' },
-        '35%': { opacity: '0.2' },
-        '50%': { opacity: '0.1' },
-        '75%': { opacity: '0.05' },
-        '100%': { opacity: '0' },
+        "0%": { opacity: "1" },
+        "10%": { opacity: "0.7" },
+        "20%": { opacity: "0.3" },
+        "35%": { opacity: "0.2" },
+        "50%": { opacity: "0.1" },
+        "75%": { opacity: "0.05" },
+        "100%": { opacity: "0" },
       },
     },
   },

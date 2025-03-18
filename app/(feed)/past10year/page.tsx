@@ -6,6 +6,7 @@ import useSWR from "swr";
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
+import { TestSeriesCard } from "@/components/ui/TestSeriesCard";
 import {
   Card,
   CardContent,
@@ -13,7 +14,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { toast } from "@/hooks/use-toast";
 import { fetcher } from "@/lib/utils";
 import { ContentLayout } from "@/components/admin-panel/content-layout";
@@ -68,46 +68,6 @@ export default function Page() {
   );
 }
 
-// TestSeriesCard component
-const TestSeriesCard = ({
-  testSeries,
-}: {
-  testSeries: TestSeriesResponse["data"][0];
-}) => (
-  <Card className="w-full mx-auto">
-    <CardHeader className="relative">
-      <Badge className="absolute top-2 right-2" variant="secondary">
-        Free
-      </Badge>
-      <CardTitle className="text-lg">{testSeries.title}</CardTitle>
-    </CardHeader>
-    <CardContent>
-      <p className="text-sm text-muted-foreground">
-        Duration: {testSeries.duration} minutes
-      </p>
-      <p className="text-sm text-muted-foreground">
-        Questions: {testSeries.totalQuestions}
-      </p>
-      {testSeries.hasAttempted && (
-        <p className="text-sm text-muted-foreground">
-          Last Score: {testSeries.lastScore}
-        </p>
-      )}
-    </CardContent>
-    <CardFooter>
-      <Link passHref href={`/test/${testSeries.id}`}>
-        {testSeries.hasAttempted ? (
-          <Button className="max-w-7xl" variant="outline">
-            Re-Attempt
-          </Button>
-        ) : (
-          <Button className="max-w-7xl">Start Test</Button>
-        )}
-      </Link>
-    </CardFooter>
-  </Card>
-);
-
 // Main Page component
 function ContentPage() {
   const searchParams = useSearchParams();
@@ -126,7 +86,7 @@ function ContentPage() {
     isLoading,
   } = useSWR<TestSeriesResponse>(
     shouldFetch && selectedYear
-      ? `/api/user?topic=${topic}&subject=${subject}&class=${clas}&year=${selectedYear}`
+      ? `/api/past10thyear?topic=${topic}&subject=${subject}&class=${clas}&year=${selectedYear}`
       : null,
     fetcher,
   );

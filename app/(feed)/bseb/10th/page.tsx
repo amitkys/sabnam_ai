@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import Link from "next/link";
+import { GoHome } from "react-icons/go";
 
 import {
   Card,
@@ -10,6 +11,39 @@ import {
   CardContent,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { ContentLayout } from "@/components/admin-panel/content-layout";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbSeparator,
+  BreadcrumbPage,
+} from "@/components/ui/breadcrumb";
+
+export default function Page() {
+  return (
+    <ContentLayout title="Account">
+      <Breadcrumb className="ml-5 lg:ml-3">
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink asChild>
+              <Link href="/">
+                {" "}
+                <GoHome className="text-lg" />{" "}
+              </Link>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>10th</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
+      <Content />
+    </ContentLayout>
+  );
+}
 
 // Static data for subjects
 const subjects = [
@@ -43,7 +77,7 @@ const subjects = [
   },
 ];
 
-const SubjectSelector = () => {
+const Content = () => {
   const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
 
   // Handle subject selection
@@ -56,7 +90,7 @@ const SubjectSelector = () => {
     subjects.find((sub) => sub.title === selectedSubject)?.url || "#";
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-4">
+    <div className="flex flex-col items-center justify-center mt-8 lg:mt-12">
       {/* Large Card */}
       <Card className="w-full max-w-2xl">
         <CardHeader>
@@ -70,7 +104,7 @@ const SubjectSelector = () => {
           {subjects.map((subject, index) => (
             <Button
               key={index}
-              className="w-full text-lg py-6"
+              className="w-full text-base lg:text-lg py-6"
               variant={
                 selectedSubject === subject.title ? "default" : "outline"
               }
@@ -97,5 +131,3 @@ const SubjectSelector = () => {
     </div>
   );
 };
-
-export default SubjectSelector;
