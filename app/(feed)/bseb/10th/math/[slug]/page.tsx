@@ -2,6 +2,7 @@
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { GoHome } from "react-icons/go";
+import useSWR from "swr";
 
 import { ContentLayout } from "@/components/admin-panel/content-layout";
 import {
@@ -12,6 +13,8 @@ import {
   BreadcrumbSeparator,
   BreadcrumbPage,
 } from "@/components/ui/breadcrumb";
+import { TestSeriesResponse } from "@/lib/type";
+import { fetcher } from "@/lib/utils";
 
 export default function Page() {
   const params = useParams();
@@ -46,20 +49,30 @@ export default function Page() {
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
-      <Content slug={params.slug} />
+      <Content chapterName={params.slug} />
     </ContentLayout>
   );
 }
 
 interface ContentProps {
-  slug: string | string[] | undefined;
+  chapterName: string | string[] | undefined;
 }
 
-function Content({ slug }: ContentProps) {
+function Content({ chapterName }: ContentProps) {
+  const {
+    data: testSeriesData,
+    error,
+    isLoading,
+  } = useSWR<TestSeriesResponse>(
+    `/api/math?claas=10th&subject=math&chapter=${chapterName}`,
+    fetcher,
+  );
+
+  console.log(testSeriesData);
+
   return (
     <div className="min-h-[calc(100vh-56px-64px-20px-24px-56px-48px)] flex items-center justify-center">
-      {/* <Spinner variant="primary" size="xl" /> */}
-      <div>Soon you will see test series for {slug}</div>
+      <div>Soon you will see test series for {chapterName}</div>
     </div>
   );
 }

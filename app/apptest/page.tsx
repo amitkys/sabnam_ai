@@ -1,7 +1,15 @@
+"use client";
+
+import { useState } from "react";
+
+import { Button } from "@/components/ui/button";
+
 export default function Page() {
+  const [count, setCount] = useState(0);
+
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center">
-      <h1 className="text-3xl font-bold">Apptest</h1>
+    <div>
+      <Button onClick={() => setCount(count + 1)}>{count} time click</Button>
     </div>
   );
 }
