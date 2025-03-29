@@ -26,7 +26,7 @@ import {
 } from "@/components/ui/breadcrumb";
 import { Spinner } from "@/components/custom/spinner";
 // Type definition for the TestSeriesResponse
-interface TestSeriesResponse {
+export interface TestSeriesResponse {
   data: {
     id: string;
     title: string;

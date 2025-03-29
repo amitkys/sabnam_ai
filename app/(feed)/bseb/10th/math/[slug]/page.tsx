@@ -13,8 +13,21 @@ import {
   BreadcrumbSeparator,
   BreadcrumbPage,
 } from "@/components/ui/breadcrumb";
-import { TestSeriesResponse } from "@/lib/type";
 import { fetcher } from "@/lib/utils";
+import { Spinner } from "@/components/custom/spinner";
+import { TestSeriesCard } from "@/components/ui/TestSeriesCard";
+
+export interface TestSeriesResponse {
+  data: {
+    id: string;
+    title: string;
+    duration: number;
+    hasAttempted: boolean;
+    lastScore: number | null;
+    isCompleted: boolean;
+    totalQuestions: number;
+  }[];
+}
 
 export default function Page() {
   const params = useParams();
@@ -68,11 +81,29 @@ function Content({ chapterName }: ContentProps) {
     fetcher,
   );
 
-  console.log(testSeriesData);
+  if (isLoading) {
+    return (
+      <div className="min-h-[calc(100vh-56px-64px-20px-24px-56px-48px)] flex items-center justify-center">
+        <Spinner size={"lg"} variant={"primary"} />
+        <span className="ml-3 text-base">Loading Test</span>
+      </div>
+    );
+  }
+  if (error) {
+    <div className="min-h-[calc(100vh-56px-64px-20px-24px-56px-48px)] flex items-center justify-center">
+      <span className="ml-3 text-base">Something went wrong</span>
+    </div>;
+  }
 
   return (
-    <div className="min-h-[calc(100vh-56px-64px-20px-24px-56px-48px)] flex items-center justify-center">
-      <div>Soon you will see test series for {chapterName}</div>
+    <div className="container mx-auto px-4 py-8 lg:py-24">
+      {testSeriesData && testSeriesData.data && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {testSeriesData.data.map((testSeries) => (
+            <TestSeriesCard key={testSeries.id} testSeries={testSeries} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
