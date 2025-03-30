@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { GoHome } from "react-icons/go";
@@ -15,6 +15,7 @@ import {
   BreadcrumbSeparator,
   BreadcrumbPage,
 } from "@/components/ui/breadcrumb";
+import { Spinner } from "@/components/custom/spinner";
 
 export default function Page() {
   return (
@@ -71,20 +72,14 @@ const mathChapters = [
 ];
 
 const Content = () => {
-  const [selectedChapter, setSelectedChapter] = useState<string | null>(null);
+  const [loadingChapter, setLoadingChapter] = useState<string | null>(null);
   const router = useRouter();
 
   // Handle chapter selection and redirect
   const handleChapterSelect = (chapterUrl: string) => {
-    setSelectedChapter(chapterUrl);
+    setLoadingChapter(chapterUrl);
+    router.push(`/bseb/10th/math/${chapterUrl}`);
   };
-
-  // Effect to handle redirection when a chapter is selected
-  useEffect(() => {
-    if (selectedChapter) {
-      router.push(`/bseb/10th/math/${selectedChapter}`);
-    }
-  }, [selectedChapter, router]);
 
   return (
     <div className="flex flex-col items-center justify-center mt-6">
@@ -101,10 +96,14 @@ const Content = () => {
             <Button
               key={index}
               className="w-full text-base lg:text-lg py-6 font-serif"
-              variant={selectedChapter === chapter.url ? "default" : "outline"}
+              disabled={loadingChapter === chapter.url}
+              variant={loadingChapter === chapter.url ? "default" : "outline"}
               onClick={() => handleChapterSelect(chapter.url)}
             >
-              {chapter.title}
+              <span>{chapter.title}</span>
+              {loadingChapter === chapter.url && (
+                <Spinner className="" size={"default"} variant={"muted"} />
+              )}
             </Button>
           ))}
         </CardContent>

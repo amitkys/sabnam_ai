@@ -85,7 +85,9 @@ function Content({ chapterName }: ContentProps) {
     return (
       <div className="min-h-[calc(100vh-56px-64px-20px-24px-56px-48px)] flex items-center justify-center">
         <Spinner size={"lg"} variant={"primary"} />
-        <span className="ml-3 text-base">Loading Test</span>
+        <span className="ml-3 text-base">
+          Loading Test for <b>{chapterName}</b>
+        </span>
       </div>
     );
   }

@@ -1,15 +1,13 @@
 "use client";
 
-import { useState } from "react";
-
+import { Spinner } from "@/components/custom/spinner";
 import { Button } from "@/components/ui/button";
 
 export default function Page() {
-  const [count, setCount] = useState(0);
-
   return (
-    <div>
-      <Button onClick={() => setCount(count + 1)}>{count} time click</Button>
-    </div>
+    <Button disabled>
+      Hello world
+      <Spinner size={"default"} variant={"default"} />
+    </Button>
   );
 }
