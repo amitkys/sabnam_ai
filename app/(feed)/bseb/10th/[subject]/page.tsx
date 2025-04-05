@@ -23,7 +23,7 @@ export default function Page() {
   const { subject } = useParams();
 
   return (
-    <ContentLayout title="">
+    <ContentLayout title="BSEB">
       <Breadcrumb className="ml-5 lg:ml-3">
         <BreadcrumbList>
           <BreadcrumbItem>

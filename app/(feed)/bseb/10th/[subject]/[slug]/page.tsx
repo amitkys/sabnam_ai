@@ -95,6 +95,16 @@ function Content({ chapterName }: ContentProps) {
     fetcher,
   );
 
+  if (testSeriesData?.data.length == 0) {
+    return (
+      <div className="min-h-[calc(100vh-56px-64px-20px-24px-56px-48px)] flex items-center justify-center">
+        <span className="ml-3 text-base">
+          Question Set is not uploaded for this Suject
+        </span>
+      </div>
+    );
+  }
+
   if (isLoading) {
     return (
       <div className="min-h-[calc(100vh-56px-64px-20px-24px-56px-48px)] flex items-center justify-center">

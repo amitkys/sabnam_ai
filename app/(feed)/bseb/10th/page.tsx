@@ -23,7 +23,7 @@ import {
 
 export default function Page() {
   return (
-    <ContentLayout title="Account">
+    <ContentLayout title="BSEB">
       <Breadcrumb className="ml-5 lg:ml-3">
         <BreadcrumbList>
           <BreadcrumbItem>
