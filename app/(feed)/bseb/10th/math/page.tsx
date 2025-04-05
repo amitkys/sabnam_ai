@@ -38,7 +38,7 @@ export default function Page() {
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbPage>Math-chapters</BreadcrumbPage>
+            <BreadcrumbPage>Math</BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
@@ -58,10 +58,10 @@ const mathChapters = [
   { title: "समांतर श्रेढ़ियाँ", url: "arithmetic-progressions" },
   { title: "त्रिभुज", url: "triangles" },
   { title: "निर्देशांक ज्यामिति", url: "coordinate-geometry" },
-  { title: "त्रिकोणमिति का परिचय", url: "introduction-to-trigonometry" },
+  { title: "त्रिकोणमिति का परिचय", url: "trigonometry" },
   {
     title: "त्रिकोणमिति के कुछ अनुप्रयोग",
-    url: "some-applications-of-trigonometry",
+    url: "application-of-trigonometry",
   },
   { title: "वृत्त", url: "circles" },
   { title: "रचनाएँ", url: "constructions" },

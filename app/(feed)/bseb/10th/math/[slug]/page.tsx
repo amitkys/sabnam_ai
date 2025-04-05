@@ -1,5 +1,5 @@
 "use client";
-import { useParams } from "next/navigation";
+import { useParams, usePathname } from "next/navigation";
 import Link from "next/link";
 import { GoHome } from "react-icons/go";
 import useSWR from "swr";
@@ -31,9 +31,13 @@ export interface TestSeriesResponse {
 
 export default function Page() {
   const params = useParams();
+  const pathName = usePathname();
+  const pathSegments = pathName.split("/").filter(Boolean);
+
+  const [board, className, subject, chapterSlug] = pathSegments;
 
   return (
-    <ContentLayout title="">
+    <ContentLayout title="BSEB">
       <Breadcrumb className="ml-5 lg:ml-3">
         <BreadcrumbList>
           <BreadcrumbItem>
@@ -47,24 +51,34 @@ export default function Page() {
           <BreadcrumbSeparator />
           <BreadcrumbItem>
             <BreadcrumbLink asChild>
-              <Link href="/bseb/10th">10th</Link>
+              <Link href={`/${board}/${className}`}>
+                {formatSegment(className)}
+              </Link>
             </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
             <BreadcrumbLink asChild>
-              <Link href="/bseb/10th/math">Math-chapters</Link>
+              <Link href={`/${board}/${className}/${subject}`}>
+                {formatSegment(subject)}
+              </Link>
             </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbPage>{params.slug}</BreadcrumbPage>
+            <BreadcrumbPage>{formatSegment(chapterSlug)}</BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
       <Content chapterName={params.slug} />
     </ContentLayout>
   );
+}
+
+function formatSegment(segment: string) {
+  return segment
+    .replace(/-/g, " ")
+    .replace(/\b\w/g, (char) => char.toUpperCase());
 }
 
 interface ContentProps {
