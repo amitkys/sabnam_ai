@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { GoHome } from "react-icons/go";
 
@@ -16,8 +16,12 @@ import {
   BreadcrumbPage,
 } from "@/components/ui/breadcrumb";
 import { Spinner } from "@/components/custom/spinner";
-
+import { subjectChapterMap } from "@/lib/subjects/subject";
+import SubjectNotFound from "@/components/custom/subject-not-found";
+import { ISubject } from "@/lib/type";
 export default function Page() {
+  const { subject } = useParams();
+
   return (
     <ContentLayout title="">
       <Breadcrumb className="ml-5 lg:ml-3">
@@ -38,47 +42,29 @@ export default function Page() {
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbPage>Math</BreadcrumbPage>
+            <BreadcrumbPage className="capitalize">{subject}</BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
-      <Content />
+      <Content subjectName={subject} />
     </ContentLayout>
   );
 }
-// Chapters for Math
-const mathChapters = [
-  { title: "वास्तविक संख्याएं", url: "real-numbers" },
-  { title: "बहुपद", url: "polynomials" },
-  {
-    title: "दो चर वाले रैखिक समीकरण",
-    url: "linear-equations-in-two-variables",
-  },
-  { title: "द्विघात समीकरण", url: "quadratic-equations" },
-  { title: "समांतर श्रेढ़ियाँ", url: "arithmetic-progressions" },
-  { title: "त्रिभुज", url: "triangles" },
-  { title: "निर्देशांक ज्यामिति", url: "coordinate-geometry" },
-  { title: "त्रिकोणमिति का परिचय", url: "trigonometry" },
-  {
-    title: "त्रिकोणमिति के कुछ अनुप्रयोग",
-    url: "application-of-trigonometry",
-  },
-  { title: "वृत्त", url: "circles" },
-  { title: "रचनाएँ", url: "constructions" },
-  { title: "वृत्तों से संबंधित क्षेत्रफल", url: "areas-related-to-circles" },
-  { title: "पृष्ठीय क्षेत्रफल और आयतन", url: "surface-areas-and-volumes" },
-  { title: "सांख्यिकी", url: "statistics" },
-  { title: "प्रायिकता", url: "probability" },
-];
-
-const Content = () => {
+const Content = ({ subjectName }: ISubject) => {
   const [loadingChapter, setLoadingChapter] = useState<string | null>(null);
   const router = useRouter();
+
+  const chapters = subjectChapterMap[subjectName as string];
+
+  // Handle invalid subject
+  if (!chapters) {
+    return <SubjectNotFound subjectName={subjectName} />;
+  }
 
   // Handle chapter selection and redirect
   const handleChapterSelect = (chapterUrl: string) => {
     setLoadingChapter(chapterUrl);
-    router.push(`/bseb/10th/math/${chapterUrl}`);
+    router.push(`/bseb/10th/${subjectName}/${chapterUrl}`);
   };
 
   return (
@@ -86,13 +72,13 @@ const Content = () => {
       {/* Large Card */}
       <Card className="w-full max-w-4xl">
         <CardHeader>
-          <CardTitle className="text-2xl font-bold text-center">
-            Math Chapters
+          <CardTitle className="text-2xl font-bold text-center capitalize">
+            {subjectName} Chapters
           </CardTitle>
         </CardHeader>
         {/* Chapter Buttons */}
         <CardContent className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          {mathChapters.map((chapter, index) => (
+          {chapters.map((chapter, index) => (
             <Button
               key={index}
               className="w-full text-base lg:text-lg py-6 font-serif"

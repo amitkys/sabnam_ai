@@ -137,10 +137,6 @@ export interface Data {
 }
 */
 
-
-
-
-
 /*
 
 give me 50 objective question <query> in 5 set each set will have 10 questions, questions should be most frequent asked in exam
@@ -219,10 +215,9 @@ export interface Answer {
   selectedAnswer: string; // User selected option text
 }
 
-
 export interface CustomProps {
-    heading: string;
-    data: string | number;
+  heading: string;
+  data: string | number;
 }
 
 export interface TestSeriesResponse {
@@ -264,4 +259,8 @@ export interface UserType {
   name?: string | null; // Allow null
   email?: string | null; // Allow null
   image?: string | null; // Allow null
+}
+
+export interface ISubject {
+  subjectName: string | string[] | undefined;
 }
