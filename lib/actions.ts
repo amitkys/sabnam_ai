@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use server";
 import { Data, FetchedTestSeriesData, TestAttemptSubmission } from "@/lib/type";
 import prisma from "@/lib/db";
@@ -38,7 +37,7 @@ export async function CreateTest(data: Data) {
 }
 
 export async function GetTestSeries(
-  id: string,
+  id: string
 ): Promise<FetchedTestSeriesData | null> {
   // await new Promise((resolve) => setTimeout(resolve, 2000));
   try {
@@ -92,7 +91,7 @@ export async function CreateTestAttempt(data: TestAttemptSubmission) {
     // Calculate the score based on correct answers
     const score = data.answers.reduce(
       (acc, answer) => (answer.isCorrect ? acc + 1 : acc),
-      0,
+      0
     );
 
     const testAttempt = await prisma.testAttempt.create({
@@ -239,5 +238,27 @@ export async function getUserTestSummary(userId: string) {
     throw error;
   } finally {
     await prisma.$disconnect();
+  }
+}
+
+export async function getTestAttemptId(id: string) {
+  // testSeriesId
+  try {
+    const session = await GetServerSessionHere();
+    const testAttempt = await prisma.testAttempt.create({
+      data: {
+        userId: session.user.id,
+        testSeriesId: id,
+        startedAt: new Date(),
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    return testAttempt.id;
+  } catch (error: any) {
+    console.error("Error creating test attempt:", error);
+    throw new Error("Failed to create test attempt");
   }
 }

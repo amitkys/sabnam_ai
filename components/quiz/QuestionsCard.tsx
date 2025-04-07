@@ -1,6 +1,7 @@
 import Markdown from "react-markdown";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
+
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
@@ -52,7 +53,7 @@ export const QuestionCard = ({
         value={selectedAnswer}
         onValueChange={(value) => {
           const option = question.options.find(
-            (o: { text: string }) => o.text === value
+            (o: { text: string }) => o.text === value,
           );
 
           if (option) {
@@ -70,7 +71,7 @@ export const QuestionCard = ({
               className={cn(
                 "flex items-center space-x-2 rounded-lg border border-border p-4",
                 "hover:bg-accent hover:text-accent-foreground",
-                "transition-colors duration-200"
+                "transition-colors duration-200",
               )}
             >
               <RadioGroupItem id={`option-${idx}`} value={option.text} />
