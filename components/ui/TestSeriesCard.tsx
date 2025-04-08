@@ -1,6 +1,10 @@
 "use client";
-import { useRouter } from "next/navigation";
 
+import { useRouter } from "next/navigation";
+import { useState, useCallback } from "react";
+import { toast } from "sonner";
+
+import { Loader } from "@/components/ui/loader";
 import { TestSeriesResponse } from "@/lib/type";
 import {
   Card,
@@ -18,14 +22,22 @@ export const TestSeriesCard = ({
 }: {
   testSeries: TestSeriesResponse["data"][0];
 }) => {
-  const route = useRouter();
-  const handleNavigation = async () => {
-    const testAttemptId = await getTestAttemptId(testSeries.id);
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
 
-    console.log("attemp id", testAttemptId);
+  const handleNavigation = useCallback(async () => {
+    try {
+      setLoading(true);
+      const testAttemptId = await getTestAttemptId(testSeries.id);
 
-    route.push(`/test/${testSeries.id}/${testAttemptId}`);
-  };
+      router.push(`/test/${testSeries.id}/${testAttemptId}`);
+    } catch (error) {
+      toast.error("Failed to get test attempt ID");
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  }, [testSeries.id, router]);
 
   return (
     <Card className="w-full mx-auto">
@@ -51,10 +63,19 @@ export const TestSeriesCard = ({
       <CardFooter>
         <Button
           className="max-w-7xl w-full"
+          disabled={loading}
           variant={testSeries.hasAttempted ? "outline" : "default"}
           onClick={handleNavigation}
         >
-          {testSeries.hasAttempted ? "Re-Attempt" : "Start Test"}
+          {loading ? (
+            <div>
+              <Loader size="small" variant="spin" />
+            </div>
+          ) : testSeries.hasAttempted ? (
+            "Re-Attempt"
+          ) : (
+            "Start Test"
+          )}
         </Button>
       </CardFooter>
     </Card>

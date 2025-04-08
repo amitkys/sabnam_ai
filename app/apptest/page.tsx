@@ -1,6 +1,12 @@
-"use client";
+import { Button } from "@/components/ui/button";
+import { Loader } from "@/components/ui/loader";
 
-import { Spinner } from "@/components/custom/spinner";
 export default function Page() {
-  return <Spinner size={"default"} variant={"muted"} />;
+  return (
+    <div>
+      <Button disabled>
+        Hello <Loader size="small" variant="ring" />
+      </Button>
+    </div>
+  );
 }
