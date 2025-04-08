@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { InteractiveGridPattern } from "@/components/magicui/interactive-grid-pattern";
 import { NeonGradientCard } from "@/components/magicui/neon-gradient-card";
 import { cn } from "@/lib/utils";
-import { Spinner } from "@/components/custom/spinner";
+import { Loader } from "@/components/ui/loader";
 
 export default function NeonGradientCardDemo() {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -29,8 +29,8 @@ export default function NeonGradientCardDemo() {
     status === "authenticated"
   ) {
     return (
-      <div className="min-h-screen flex items-center justify-center flex-col space-y-2">
-        <Spinner variant="primary" size="xl" />
+      <div className="min-h-screen flex items-center justify-center  space-x-2">
+        <Loader size="small" variant="spin" />
         <p>Authentication...</p>
       </div>
     );
@@ -41,7 +41,7 @@ export default function NeonGradientCardDemo() {
       <InteractiveGridPattern
         className={cn(
           "[mask-image:radial-gradient(400px_circle_at_center,white,transparent)]",
-          "inset-x-0 inset-y-[-30%] h-[200%] skew-y-12"
+          "inset-x-0 inset-y-[-30%] h-[200%] skew-y-12",
         )}
       />
       <NeonGradientCard className="max-w-sm items-center justify-center text-center">
@@ -52,5 +52,3 @@ export default function NeonGradientCardDemo() {
     </div>
   );
 }
-
-

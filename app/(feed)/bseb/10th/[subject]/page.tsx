@@ -15,10 +15,11 @@ import {
   BreadcrumbSeparator,
   BreadcrumbPage,
 } from "@/components/ui/breadcrumb";
-import { Spinner } from "@/components/custom/spinner";
+import { Loader } from "@/components/ui/loader";
 import { subjectChapterMap } from "@/lib/subjects/subject";
 import SubjectNotFound from "@/components/custom/subject-not-found";
 import { ISubject } from "@/lib/type";
+
 export default function Page() {
   const { subject } = useParams();
 
@@ -29,8 +30,7 @@ export default function Page() {
           <BreadcrumbItem>
             <BreadcrumbLink asChild>
               <Link href="/">
-                {" "}
-                <GoHome className="text-lg" />{" "}
+                <GoHome className="text-lg" />
               </Link>
             </BreadcrumbLink>
           </BreadcrumbItem>
@@ -50,6 +50,7 @@ export default function Page() {
     </ContentLayout>
   );
 }
+
 const Content = ({ subjectName }: ISubject) => {
   const [loadingChapter, setLoadingChapter] = useState<string | null>(null);
   const router = useRouter();
@@ -88,7 +89,7 @@ const Content = ({ subjectName }: ISubject) => {
             >
               <span>{chapter.title}</span>
               {loadingChapter === chapter.url && (
-                <Spinner className="" size={"default"} variant={"muted"} />
+                <Loader size="small" variant="spin" />
               )}
             </Button>
           ))}

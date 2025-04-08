@@ -14,7 +14,7 @@ import {
   BreadcrumbPage,
 } from "@/components/ui/breadcrumb";
 import { fetcher } from "@/lib/utils";
-import { Spinner } from "@/components/custom/spinner";
+import { Loader } from "@/components/ui/loader";
 import { TestSeriesCard } from "@/components/ui/TestSeriesCard";
 
 export interface TestSeriesResponse {
@@ -43,8 +43,7 @@ export default function Page() {
           <BreadcrumbItem>
             <BreadcrumbLink asChild>
               <Link href="/">
-                {" "}
-                <GoHome className="text-lg" />{" "}
+                <GoHome className="text-lg" />
               </Link>
             </BreadcrumbLink>
           </BreadcrumbItem>
@@ -99,7 +98,7 @@ function Content({ chapterName }: ContentProps) {
     return (
       <div className="min-h-[calc(100vh-56px-64px-20px-24px-56px-48px)] flex items-center justify-center">
         <span className="ml-3 text-base">
-          Question Set is not uploaded for this Suject
+          Question Set is not uploaded for this Subject
         </span>
       </div>
     );
@@ -108,17 +107,20 @@ function Content({ chapterName }: ContentProps) {
   if (isLoading) {
     return (
       <div className="min-h-[calc(100vh-56px-64px-20px-24px-56px-48px)] flex items-center justify-center">
-        <Spinner size={"lg"} variant={"primary"} />
+        <Loader size="small" variant="spin" />
         <span className="ml-3 text-base">
           Loading Test for <b>{chapterName}</b>
         </span>
       </div>
     );
   }
+
   if (error) {
-    <div className="min-h-[calc(100vh-56px-64px-20px-24px-56px-48px)] flex items-center justify-center">
-      <span className="ml-3 text-base">Something went wrong</span>
-    </div>;
+    return (
+      <div className="min-h-[calc(100vh-56px-64px-20px-24px-56px-48px)] flex items-center justify-center">
+        <span className="ml-3 text-base">Something went wrong</span>
+      </div>
+    );
   }
 
   return (

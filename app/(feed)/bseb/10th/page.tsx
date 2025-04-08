@@ -20,6 +20,7 @@ import {
   BreadcrumbSeparator,
   BreadcrumbPage,
 } from "@/components/ui/breadcrumb";
+import { Loader } from "@/components/ui/loader";
 
 export default function Page() {
   return (
@@ -29,8 +30,7 @@ export default function Page() {
           <BreadcrumbItem>
             <BreadcrumbLink asChild>
               <Link href="/">
-                {" "}
-                <GoHome className="text-lg" />{" "}
+                <GoHome className="text-lg" />
               </Link>
             </BreadcrumbLink>
           </BreadcrumbItem>
@@ -47,51 +47,33 @@ export default function Page() {
 
 // Static data for subjects
 const subjects = [
-  {
-    title: "Physics",
-    url: "/bseb/10th/physics", // Updated URL
-  },
-  {
-    title: "Chemistry",
-    url: "/bseb/10th/chemistry", // Updated URL
-  },
-  {
-    title: "Biology",
-    url: "/bseb/10th/biology", // Updated URL
-  },
-  {
-    title: "Math",
-    url: "/bseb/10th/math", // Updated URL
-  },
-  {
-    title: "Hindi",
-    url: "/bseb/10th/hindi", // Updated URL
-  },
-  {
-    title: "Sanskrit",
-    url: "/bseb/10th/sanskrit", // Updated URL
-  },
-  {
-    title: "Social Science",
-    url: "/bseb/10th/social-science", // Updated URL
-  },
+  { title: "Physics", url: "/bseb/10th/physics" },
+  { title: "Chemistry", url: "/bseb/10th/chemistry" },
+  { title: "Biology", url: "/bseb/10th/biology" },
+  { title: "Math", url: "/bseb/10th/math" },
+  { title: "Hindi", url: "/bseb/10th/hindi" },
+  { title: "Sanskrit", url: "/bseb/10th/sanskrit" },
+  { title: "Social Science", url: "/bseb/10th/social-science" },
 ];
 
 const Content = () => {
   const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
 
-  // Handle subject selection
   const handleSubjectSelect = (subject: string) => {
     setSelectedSubject(subject);
+    setLoading(false); // reset loader on new selection
   };
 
-  // Get the URL for the selected subject
+  const handleExploreClick = () => {
+    setLoading(true);
+  };
+
   const selectedSubjectUrl =
     subjects.find((sub) => sub.title === selectedSubject)?.url || "#";
 
   return (
     <div className="flex flex-col items-center justify-center mt-8 lg:mt-12">
-      {/* Large Card */}
       <Card className="w-full max-w-2xl">
         <CardHeader>
           <CardTitle className="text-2xl font-bold text-center">
@@ -99,7 +81,6 @@ const Content = () => {
           </CardTitle>
         </CardHeader>
 
-        {/* Small Buttons for Subjects */}
         <CardContent className="grid grid-cols-2 lg:grid-cols-2 gap-4">
           {subjects.map((subject, index) => (
             <Button
@@ -115,14 +96,22 @@ const Content = () => {
           ))}
         </CardContent>
 
-        {/* Full-width Button */}
         <CardFooter className="mt-6">
           {selectedSubject ? (
-            <Button asChild className="w-full text-lg py-6" size={"lg"}>
-              <Link href={selectedSubjectUrl}>Explore {selectedSubject}</Link>
+            <Button
+              asChild
+              className="w-full text-lg py-6 flex items-center justify-center gap-2"
+              disabled={loading}
+              size="lg"
+              onClick={handleExploreClick}
+            >
+              <Link href={selectedSubjectUrl}>
+                {loading && <Loader size="small" variant="spin" />}
+                Explore {selectedSubject}
+              </Link>
             </Button>
           ) : (
-            <Button disabled className="w-full text-lg py-6" size={"lg"}>
+            <Button disabled className="w-full text-lg py-6" size="lg">
               Explore Subject
             </Button>
           )}
