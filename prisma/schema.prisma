@@ -67,6 +67,7 @@ model Answer {
     id        String  @id @default(cuid()) @map("_id")
   testAttemptId String
   questionId    String
+  markAs       String?
   optionId      String
   isCorrect     Boolean
 

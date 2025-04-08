@@ -23,6 +23,7 @@ interface ResponseData {
       id: string;
       questionId: string;
       optionId: string;
+      markAs: string | null;
       isCorrect: boolean;
     }[];
     testSeries: {
@@ -86,6 +87,7 @@ export async function POST(req: NextRequest) {
           select: {
             id: true,
             questionId: true,
+            markAs: true,
             optionId: true,
             isCorrect: true,
           },

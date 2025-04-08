@@ -23,6 +23,7 @@ export default function QuizInterface({
 }: {
   TestSeriesData: FetchedTestSeriesData;
 }) {
+  console.log(TestSeriesData);
   const router = useRouter();
   const { data: session, status } = useSession();
   const { enterFullscreen, exitFullscreen } = useFullscreen();
@@ -48,7 +49,7 @@ export default function QuizInterface({
   // Set test data
   useEffect(() => {
     if (TestSeriesData) {
-      setTestData(TestSeriesData);
+      // setTestData(TestSeriesData);
     }
   }, [TestSeriesData, setTestData]);
 
@@ -129,10 +130,6 @@ export default function QuizInterface({
 
       toast.success("Test submitted successfully");
 
-      // Clear persisted state after submission
-      const storageKey = `quiz-state-${testData.testseries.id}`;
-
-      localStorage.removeItem(storageKey);
       setIsSubmitting(false);
 
       await exitFullscreen();
