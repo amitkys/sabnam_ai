@@ -1,10 +1,11 @@
 "use client";
 
+import type { FetchedTestSeriesData, TestAttemptSubmission } from "@/lib/type";
+
 import { useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import type { FetchedTestSeriesData, TestAttemptSubmission } from "@/lib/type";
 
 import { useQuizStore } from "@/lib/store/useQuizStore";
 import { useFullscreen } from "@/hooks/use-fullscreen";
@@ -12,10 +13,7 @@ import { Card } from "@/components/ui/card";
 import { Spinner } from "@/components/custom/spinner";
 import { CreateTestAttempt } from "@/lib/actions";
 import { StartScreen } from "@/components/quiz/startScreen";
-import { QuizHeader } from "@/components/quiz/QuizHeader";
 import { QuestionCard } from "@/components/quiz/QuestionsCard";
-import { QuestionNavigation } from "@/components/quiz/QuestionNavigation";
-import { QuizActions } from "@/components/quiz/QuizActions";
 
 export default function QuizInterface({
   TestSeriesData,
@@ -43,7 +41,6 @@ export default function QuizInterface({
     isSubmitting,
     setIsSubmitting,
     startTime,
-    resetQuiz,
   } = useQuizStore();
 
   // Set test data and storage key dynamically
@@ -51,16 +48,13 @@ export default function QuizInterface({
     setTestData(TestSeriesData);
   }, [TestSeriesData, setTestData]);
 
-
   // Handle test start
   const handleStart = async () => {
     try {
       await enterFullscreen();
-      resetQuiz(); // Reset state when starting a new test
       startTest();
     } catch (error) {
       console.error("Failed to enter fullscreen:", error);
-      resetQuiz();
       startTest();
     }
   };
@@ -84,12 +78,13 @@ export default function QuizInterface({
       !selectedAnswers[testData?.questions[currentQuestion].id || ""]
     ) {
       toast.warning("Option not selected to save");
+
       return;
     }
 
     setQuestionStatus(currentQuestion, action);
     setCurrentQuestion(
-      Math.min(currentQuestion + 1, (testData?.questions.length || 1) - 1)
+      Math.min(currentQuestion + 1, (testData?.questions.length || 1) - 1),
     );
   };
 
@@ -98,11 +93,12 @@ export default function QuizInterface({
     if (!testData) return;
 
     const currentQuestionData = testData.questions[currentQuestion];
+
     setAnswer(
       currentQuestionData.id,
       optionId,
       optionText,
-      currentQuestionData.answer
+      currentQuestionData.answer,
     );
   };
 
@@ -126,12 +122,13 @@ export default function QuizInterface({
 
     try {
       const testAttemptId = await CreateTestAttempt(submissionData);
+
       toast.success("Test submitted successfully");
 
       // Clear persisted state after submission
       const storageKey = `quiz-state-${testData.testseries.id}`;
+
       localStorage.removeItem(storageKey);
-      resetQuiz();
       setIsSubmitting(false);
 
       await exitFullscreen();
@@ -183,7 +180,8 @@ export default function QuizInterface({
                   currentNumber={currentQuestion + 1}
                   question={testData.questions[currentQuestion]}
                   selectedAnswer={
-                    selectedAnswers[testData.questions[currentQuestion].id]?.selectedAnswer || ""
+                    selectedAnswers[testData.questions[currentQuestion].id]
+                      ?.selectedAnswer || ""
                   }
                   totalQuestions={testData.questions.length}
                   onAnswerSelect={handleAnswerSelect}
