@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { getServerSession } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 
@@ -44,7 +43,7 @@ export const authOptions = {
         }
       }
 
-      return session;
+      return Promise.resolve(session);
     },
   },
   pages: {

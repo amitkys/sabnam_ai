@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest, NextResponse } from "next/server";
 
 import prisma from "@/lib/db";
@@ -6,7 +5,6 @@ import prisma from "@/lib/db";
 export async function GET(req: NextRequest, context: any) {
   const { params } = context;
   const { userId } = await params;
-  console.log("user Id from backend",userId);
 
   try {
     const userTests = await prisma.testAttempt.findMany({
@@ -27,7 +25,6 @@ export async function GET(req: NextRequest, context: any) {
         },
       },
     });
-    console.log("im here");
 
     const testSummary = userTests.map((test) => {
       const totalMarks = test.testSeries.questions.length;

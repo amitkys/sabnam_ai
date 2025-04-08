@@ -1,12 +1,10 @@
-import { Button } from "@/components/ui/button";
-import { Loader } from "@/components/ui/loader";
+import loggerSession from "@/lib/actions";
+export default async function Page() {
+  await loggerSession();
 
-export default function Page() {
   return (
     <div>
-      <Button disabled>
-        Hello <Loader size="small" variant="ring" />
-      </Button>
+      <p>user name </p>
     </div>
   );
 }

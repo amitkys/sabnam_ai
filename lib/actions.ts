@@ -5,9 +5,6 @@ import { GetServerSessionHere } from "@/auth.config";
 export async function CreateTest(data: Data) {
   const session = await GetServerSessionHere();
 
-  // console.log(data);
-  // console.log("backend session user id", session.user.id);
-
   try {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const testSeries = await prisma.testSeries.create({
@@ -261,4 +258,10 @@ export async function getTestAttemptId(id: string) {
     console.error("Error creating test attempt:", error);
     throw new Error("Failed to create test attempt");
   }
+}
+
+export default async function loggerSession() {
+  const session = await GetServerSessionHere();
+
+  console.log(session.user.id);
 }
