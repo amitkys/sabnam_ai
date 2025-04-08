@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { getTestAttemptId } from "@/lib/actions";
+// import { getTestAttemptId } from "@/lib/actions";
 
 export const TestSeriesCard = ({
   testSeries,
@@ -28,9 +28,10 @@ export const TestSeriesCard = ({
   const handleNavigation = useCallback(async () => {
     try {
       setLoading(true);
-      const testAttemptId = await getTestAttemptId(testSeries.id);
+      // const testAttemptId = await getTestAttemptId(testSeries.id);
 
-      router.push(`/test/${testSeries.id}/${testAttemptId}`);
+      // router.push(`/test/${testSeries.id}/${testAttemptId}`);
+      router.push(`/test/${testSeries.id}`);
     } catch (error) {
       toast.error("Failed to get test attempt ID");
       throw error;

@@ -6,11 +6,12 @@ import { FetchedTestSeriesData } from "@/lib/type";
 import { Spinner } from "@/components/custom/spinner";
 
 // Define the type for the component's props
-type Params = Promise<{ id: string }>;
+type Params = Promise<{ testId: string }>;
 
 export default async function Page(props: { params: Params }) {
   const params = await props.params;
-  const id = params.id;
+
+  const id = params.testId;
   const TestSeriesData: FetchedTestSeriesData | null = await GetTestSeries(id);
 
   if (!TestSeriesData) {
