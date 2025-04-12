@@ -6,7 +6,7 @@ import { FetchedTestSeriesData } from "@/lib/type";
 import QuizInterface from "@/components/quiz/QuizInterface";
 
 // Fetcher function for SWR
-export const fetcher = (url: string): Promise<FetchedTestSeriesData> =>
+const fetcher = (url: string): Promise<FetchedTestSeriesData> =>
   fetch(url).then((res) => res.json());
 
 export default function Page() {

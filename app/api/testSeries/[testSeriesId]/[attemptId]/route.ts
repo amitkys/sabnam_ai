@@ -7,15 +7,12 @@ import { FetchedTestSeriesData } from "@/lib/type";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { testSeriesId: string; attemptId: string } }
+  { params }: { params: Promise<{ testSeriesId: string; attemptId: string }> }
 ) {
   try {
     const { testSeriesId, attemptId } = await params;
     const session = await getServerSession(authOptions);
     const userId = session.user.id;
-
-    console.log(testSeriesId, attemptId, userId);
-    console.log("userId", userId);
 
     // Validate required fields
     if (!testSeriesId || !attemptId) {
@@ -85,6 +82,7 @@ export async function GET(
 
     return NextResponse.json(response);
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error("Error fetching test data:", error);
 
     return NextResponse.json(
