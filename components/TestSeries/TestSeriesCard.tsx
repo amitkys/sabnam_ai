@@ -16,7 +16,6 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { getTestAttemptId } from "@/lib/actions";
-// import { getTestAttemptId } from "@/lib/actions";
 
 export const TestSeriesCard = ({
   testSeries,
@@ -27,17 +26,20 @@ export const TestSeriesCard = ({
   const [loading, setLoading] = useState(false);
 
   const handleNavigation = useCallback(async () => {
-    try {
-      setLoading(true);
-      const testAttemptId = await getTestAttemptId(testSeries.id);
+    setLoading(true);
 
-      router.push(`/test/${testSeries.id}/${testAttemptId}`);
-    } catch (error) {
-      toast.error("Failed to get test attempt ID");
-      throw error;
-    } finally {
-      setLoading(false);
-    }
+    await toast.promise(
+      getTestAttemptId(testSeries.id).then((testAttemptId) => {
+        router.push(`/test/${testSeries.id}/${testAttemptId}`);
+      }),
+      {
+        loading: "A new test on the way...",
+        success: "You are ready to go!",
+        error: "Failed to create test attempt",
+      },
+    );
+
+    setLoading(false);
   }, [testSeries.id, router]);
 
   return (
@@ -69,9 +71,10 @@ export const TestSeriesCard = ({
           onClick={handleNavigation}
         >
           {loading ? (
-            <div>
+            <>
               <Loader size="small" variant="spin" />
-            </div>
+              <span className="ml-2">Loading...</span>
+            </>
           ) : testSeries.hasAttempted ? (
             "Re-Attempt"
           ) : (
