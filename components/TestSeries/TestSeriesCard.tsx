@@ -26,20 +26,25 @@ export const TestSeriesCard = ({
   const [loading, setLoading] = useState(false);
 
   const handleNavigation = useCallback(async () => {
-    setLoading(true);
+    try {
+      setLoading(true);
 
-    await toast.promise(
-      getTestAttemptId(testSeries.id).then((testAttemptId) => {
-        router.push(`/test/${testSeries.id}/${testAttemptId}`);
-      }),
-      {
-        loading: "A new test on the way...",
-        success: "You are ready to go!",
-        error: "Failed to create test attempt",
-      },
-    );
+      const testAttemptId = await getTestAttemptId(testSeries.id);
 
-    setLoading(false);
+      toast.promise(
+        Promise.resolve(), // Empty promise since we already have the result
+        {
+          loading: "A new test on the way...",
+          success: "You are ready to go!",
+          error: "Failed to create test attempt",
+        },
+      );
+
+      router.push(`/test/${testSeries.id}/${testAttemptId}`);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (error: any) {
+      toast.error("Failed to create test attempt");
+    }
   }, [testSeries.id, router]);
 
   return (
@@ -71,12 +76,11 @@ export const TestSeriesCard = ({
           onClick={handleNavigation}
         >
           {loading ? (
-            <>
+            <div className="flex items-center justify-center">
               <Loader size="small" variant="spin" />
-              <span className="ml-2">Loading...</span>
-            </>
+            </div>
           ) : testSeries.hasAttempted ? (
-            "Re-Attempt"
+            "Start New test"
           ) : (
             "Start Test"
           )}

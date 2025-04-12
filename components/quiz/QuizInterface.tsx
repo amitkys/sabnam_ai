@@ -44,7 +44,6 @@ export default function QuizInterface({
     startTest,
     isSubmitting,
     setIsSubmitting,
-    startTime,
   } = useQuizStore();
 
   // Set test data

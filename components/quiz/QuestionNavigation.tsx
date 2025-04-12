@@ -10,11 +10,11 @@ type QuestionStatusType = "solved" | "later" | "skipped";
 const getStatusColor = (status: QuestionStatusType | undefined) => {
   switch (status) {
     case "solved":
-      return "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300";
+      return "bg-green-100 text-green-700 dark:bg-green-600/30 dark:text-green-300";
     case "later":
-      return "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300";
+      return "bg-blue-100 text-blue-700 dark:bg-blue-600/30 dark:text-blue-300";
     case "skipped":
-      return "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300";
+      return "bg-red-100 text-red-700 dark:bg-red-600/30 dark:text-red-300";
     default:
       return "bg-background text-foreground";
   }
@@ -138,7 +138,7 @@ export const QuestionNavigation = ({
                   "hover:bg-accent hover:text-accent-foreground",
                   "focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
                   getStatusColor(status),
-                  isCurrent && !status && "ring-2 ring-white",
+                  isCurrent && "ring-2 ring-white", // Always apply ring for current question
                 )}
                 variant="outline"
                 onClick={() => onQuestionSelect(idx)}
