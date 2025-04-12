@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 
 import prisma from "@/lib/db";
 import { authOptions } from "@/auth.config";
+import { FetchedTestSeriesData } from "@/lib/type";
 
 // Define TypeScript interfaces based on your schema
 interface RequestBody {
@@ -10,44 +11,13 @@ interface RequestBody {
   attemptId: string;
 }
 
-// Response type
-interface ResponseData {
-  testAttempt: {
-    id: string;
-    userId: string;
-    testSeriesId: string;
-    startedAt: Date;
-    completedAt: Date | null;
-    score: number | null;
-    answers: {
-      id: string;
-      questionId: string;
-      optionId: string;
-      isCorrect: boolean;
-    }[];
-    testSeries: {
-      id: string;
-      title: string;
-      duration: number;
-      createdAt: Date;
-      questions: {
-        id: string;
-        text: string;
-        answer: string;
-        options: {
-          id: string;
-          text: string;
-        }[];
-      }[];
-    };
-  } | null;
-}
-
 export async function POST(req: NextRequest) {
   try {
     const { testSeriesId, attemptId }: RequestBody = await req.json();
     const session = await getServerSession(authOptions);
     const userId = session.user.id;
+
+    console.log(testSeriesId, attemptId, userId);
 
     // Validate required fields
     if (!testSeriesId || !attemptId) {
@@ -86,6 +56,7 @@ export async function POST(req: NextRequest) {
           select: {
             id: true,
             questionId: true,
+            markAs: true,
             optionId: true,
             isCorrect: true,
           },
@@ -110,7 +81,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Prepare response
-    const response: ResponseData = {
+    const response: FetchedTestSeriesData = {
       testAttempt,
     };
 

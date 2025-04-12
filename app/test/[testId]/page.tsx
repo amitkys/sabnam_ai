@@ -1,5 +1,5 @@
+/*
 import { Suspense } from "react";
-
 import QuizInterface from "@/components/quiz/QuizInterface";
 import { GetTestSeries } from "@/lib/actions";
 import { FetchedTestSeriesData } from "@/lib/type";
@@ -10,9 +10,10 @@ type Params = Promise<{ testId: string }>;
 
 export default async function Page(props: { params: Params }) {
   const params = await props.params;
-
   const id = params.testId;
   const TestSeriesData: FetchedTestSeriesData | null = await GetTestSeries(id);
+
+  console.log(TestSeriesData?.questions);
 
   if (!TestSeriesData) {
     return <div>No Data Found</div>;
@@ -32,4 +33,9 @@ function Loading() {
       <p>Fetching Test..</p>
     </div>
   );
+}
+*/
+
+export default function Page() {
+  return <div>Hello</div>;
 }

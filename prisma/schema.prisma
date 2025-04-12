@@ -67,12 +67,13 @@ model Answer {
     id        String  @id @default(cuid()) @map("_id")
   testAttemptId String
   questionId    String
-  optionId      String
+  markAs       String?
+  optionId      String?
   isCorrect     Boolean
 
   testAttempt   TestAttempt @relation(fields: [testAttemptId], references: [id])
   question      Question    @relation(fields: [questionId], references: [id])
-  option        Option      @relation(fields: [optionId], references: [id])
+  option        Option?      @relation(fields: [optionId], references: [id])
 
   @@index([testAttemptId, questionId])
 }

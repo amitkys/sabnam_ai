@@ -1,5 +1,5 @@
 "use server";
-import { Data, FetchedTestSeriesData, TestAttemptSubmission } from "@/lib/type";
+import { Data, TestAttemptSubmission } from "@/lib/type";
 import prisma from "@/lib/db";
 import { GetServerSessionHere } from "@/auth.config";
 export async function CreateTest(data: Data) {
@@ -33,53 +33,53 @@ export async function CreateTest(data: Data) {
   }
 }
 
-export async function GetTestSeries(
-  id: string
-): Promise<FetchedTestSeriesData | null> {
-  // await new Promise((resolve) => setTimeout(resolve, 2000));
-  try {
-    const testSeries = await prisma.testSeries.findUnique({
-      where: {
-        id: id,
-      },
-      include: {
-        questions: {
-          include: {
-            options: true,
-          },
-        },
-      },
-    });
+// export async function GetTestSeries(
+//   id: string
+// ): Promise<FetchedTestSeriesData | null> {
+//   // await new Promise((resolve) => setTimeout(resolve, 2000));
+//   try {
+//     const testSeries = await prisma.testSeries.findUnique({
+//       where: {
+//         id: id,
+//       },
+//       include: {
+//         questions: {
+//           include: {
+//             options: true,
+//           },
+//         },
+//       },
+//     });
 
-    if (!testSeries) {
-      return null;
-    }
+//     if (!testSeries) {
+//       return null;
+//     }
 
-    // Constructing the response in the Data interface format
-    return {
-      testseries: {
-        id: testSeries.id,
-        title: testSeries.title,
-        duration: testSeries.duration * 60, // sending into second (stored was into minute)
-      },
-      questions: testSeries.questions.map((question) => ({
-        id: question.id,
-        text: question.text,
-        // Assuming 'answer' is the correct answer text, not the answer ID
-        answer: question.answer,
-        options: question.options.map((option) => ({
-          id: option.id,
-          text: option.text,
-        })),
-      })),
-    };
-  } catch (error) {
-    console.error("Error fetching test series:", error);
-    throw error; // or handle the error as needed
-  } finally {
-    await prisma.$disconnect();
-  }
-}
+//     // Constructing the response in the Data interface format
+//     return {
+//       testseries: {
+//         id: testSeries.id,
+//         title: testSeries.title,
+//         duration: testSeries.duration * 60, // sending into second (stored was into minute)
+//       },
+//       questions: testSeries.questions.map((question) => ({
+//         id: question.id,
+//         text: question.text,
+//         // Assuming 'answer' is the correct answer text, not the answer ID
+//         answer: question.answer,
+//         options: question.options.map((option) => ({
+//           id: option.id,
+//           text: option.text,
+//         })),
+//       })),
+//     };
+//   } catch (error) {
+//     console.error("Error fetching test series:", error);
+//     throw error; // or handle the error as needed
+//   } finally {
+//     await prisma.$disconnect();
+//   }
+// }
 
 export async function CreateTestAttempt(data: TestAttemptSubmission) {
   console.log(data);
@@ -120,7 +120,7 @@ export async function CreateTestAttempt(data: TestAttemptSubmission) {
   }
 }
 
-export async function getTestSeriesDetailsForUser(testAttemptId: string) {
+export async function getAnalysisForTestAttempt(testAttemptId: string) {
   // await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulate database delay to mimic real-world conditions
   try {
     // Fetch the TestAttempt using the provided testAttemptId. This query includes:
@@ -178,7 +178,7 @@ export async function getTestSeriesDetailsForUser(testAttemptId: string) {
           // Map through all answers given in this attempt, providing:
           answers: testAttempt.answers.map((answer) => ({
             questionId: answer.questionId, // The question this answer pertains to
-            userAnswer: answer.option.text, // The text of the option chosen by the user
+            userAnswer: answer.option?.text, // The text of the option chosen by the user
             isCorrect: answer.isCorrect, // Boolean indicating if the answer was correct
           })),
         },
@@ -264,4 +264,63 @@ export default async function loggerSession() {
   const session = await GetServerSessionHere();
 
   console.log(session.user.id);
+}
+
+type SaveQuestionResponseParams = {
+  testAttemptId: string;
+  questionId: string;
+  optionId?: string | null;
+  markAs: "solved" | "later" | "skipped";
+  isCorrect?: boolean;
+};
+
+export async function SaveQuestionResponse({
+  testAttemptId,
+  questionId,
+  optionId,
+  markAs,
+  isCorrect,
+}: SaveQuestionResponseParams) {
+  try {
+    // Check if an answer for this question already exists
+    const existingAnswer = await prisma.answer.findFirst({
+      where: {
+        testAttemptId,
+        questionId,
+      },
+    });
+
+    if (existingAnswer) {
+      // Update existing answer
+      await prisma.answer.update({
+        where: {
+          id: existingAnswer.id,
+        },
+        data: {
+          markAs,
+          optionId: optionId || null,
+          isCorrect:
+            isCorrect !== undefined ? isCorrect : existingAnswer.isCorrect,
+        },
+      });
+    } else {
+      // Create new answer
+      await prisma.answer.create({
+        data: {
+          testAttemptId,
+          questionId,
+          markAs,
+          optionId: optionId || null,
+          isCorrect: isCorrect !== undefined ? isCorrect : false,
+        },
+      });
+    }
+
+    // Return success indicator
+    return { success: true };
+  } catch (error) {
+    console.error("Error saving question response:", error);
+
+    return { success: false, error: "Failed to save response" };
+  }
 }

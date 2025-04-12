@@ -1,108 +1,80 @@
 {
-  "testseries": {
-    "title": "10th Math real-numbers",
-    "duration": 600
-  },
-  "questions": [
-    {
-      "text": "$84$ और $90$ का महत्तम समापवर्तक (HCF) क्या है?",
-      "answer": "$6$",
-      "options": [
-        { "text": "$2$" },
-        { "text": "$3$" },
-        { "text": "$6$" },
-        { "text": "$9$" }
+  "testAttempt": {
+    "id": "cm98vmyqi0001jv04sdj9w9lj",
+    "userId": "cm73nauzn0000czlp3fp7jv1l",
+    "testSeriesId": "cm8ugjts30001cz02z5siz7xz",
+    "startedAt": "2025-04-08T19:11:28.192Z",
+    "completedAt": "2025-04-08T19:11:59.739Z",
+    "score": 4,
+    "testSeries": {
+      "id": "cm8ugjts30001cz02z5siz7xz",
+      "title": "10th Math real-numbers",
+      "duration": 600,
+      "createdAt": "2025-03-29T17:00:52.994Z",
+      "questions": [
+        {
+          "id": "cm8ugjts40002cz02pgxjia2n",
+          "text": "$84$ और $90$ का महत्तम समापवर्तक (HCF) क्या है?",
+          "answer": "$6$",
+          "options": [
+            {
+              "id": "cm8ugjts40003cz027p8ly9xi",
+              "text": "$2$"
+            },
+            {
+              "id": "cm8ugjts40004cz02a391vwks",
+              "text": "$3$"
+            },
+            {
+              "id": "cm8ugjts40005cz02yi0q6s52",
+              "text": "$6$"
+            },
+            {
+              "id": "cm8ugjts40006cz02tirm7q41",
+              "text": "$9$"
+            }
+          ]
+        },
+        {
+          "id": "cm8ugjts5001bcz02gj3trfjl",
+          "text": "अपूर्णांक $\frac{8}{12}$ का सबसे सरल रूप क्या होगा?",
+          "answer": "$\frac{2}{3}$",
+          "options": [
+            {
+              "id": "cm8ugjts5001ccz02ewmv8yj0",
+              "text": "$\frac{3}{4}$"
+            },
+            {
+              "id": "cm8ugjts5001dcz024gxfcof7",
+              "text": "$\frac{2}{3}$"
+            },
+            {
+              "id": "cm8ugjts5001ecz020yoz82m4",
+              "text": "$\frac{4}{5}$"
+            },
+            {
+              "id": "cm8ugjts5001fcz0221xkdg07",
+              "text": "$\frac{1}{2}$"
+            }
+          ]
+        }
       ]
     },
-    {
-      "text": "यदि किसी संख्या को $4$ और $6$ से विभाजित करने पर शेषफल $3$ आता है, तो वह संख्या क्या हो सकती है?",
-      "answer": "$15$",
-      "options": [
-        { "text": "$12$" },
-        { "text": "$15$" },
-        { "text": "$18$" },
-        { "text": "$21$" }
-      ]
-    },
-    {
-      "text": "यदि $a$ और $b$ परस्पर अभाज्य (co-prime) हैं, तो उनका महत्तम समापवर्तक (HCF) क्या होगा?",
-      "answer": "$1$",
-      "options": [
-        { "text": "$a$" },
-        { "text": "$b$" },
-        { "text": "$1$" },
-        { "text": "$a+b$" }
-      ]
-    },
-    {
-      "text": "$36$ और $48$ का लघुत्तम समापवर्त्य (LCM) क्या होगा?",
-      "answer": "$144$",
-      "options": [
-        { "text": "$72$" },
-        { "text": "$108$" },
-        { "text": "$144$" },
-        { "text": "$180$" }
-      ]
-    },
-    {
-      "text": "किसी अभाज्य संख्या का केवल कितने गुणनखंड होते हैं?",
-      "answer": "$2$",
-      "options": [
-        { "text": "$1$" },
-        { "text": "$2$" },
-        { "text": "$3$" },
-        { "text": "$4$" }
-      ]
-    },
-    {
-      "text": "$210$ को इसके अभाज्य गुणनखंडों के गुणनफल के रूप में कैसे लिखा जा सकता है?",
-      "answer": "$2 \times 3 \times 5 \times 7$",
-      "options": [
-        { "text": "$2 \times 5 \times 7$" },
-        { "text": "$2 \times 3 \times 5 \times 7$" },
-        { "text": "$3 \times 5 \times 7$" },
-        { "text": "$2 \times 3 \times 7$" }
-      ]
-    },
-    {
-      "text": "यदि दो संख्याएँ $15$ और $35$ हैं, तो उनका HCF और LCM का गुणनफल क्या होगा?",
-      "answer": "$15 \times 35$",
-      "options": [
-        { "text": "$15 \times 30$" },
-        { "text": "$15 \times 35$" },
-        { "text": "$20 \times 35$" },
-        { "text": "$25 \times 30$" }
-      ]
-    },
-    {
-      "text": "यदि $HCF(30, 18) = d$ और $LCM(30, 18) = l$ हो, तो $d \times l$ का मान क्या होगा?",
-      "answer": "$30 \times 18$",
-      "options": [
-        { "text": "$30 \times 10$" },
-        { "text": "$30 \times 12$" },
-        { "text": "$30 \times 18$" },
-        { "text": "$30 \times 24$" }
-      ]
-    },
-    {
-      "text": "यदि कोई संख्या $2^3 \times 3^2 \times 5^1$ के रूप में व्यक्त की जाती है, तो वह संख्या क्या होगी?",
-      "answer": "$360$",
-      "options": [
-        { "text": "$180$" },
-        { "text": "$240$" },
-        { "text": "$360$" },
-        { "text": "$480$" }
-      ]
-    },
-    {
-      "text": "अपूर्णांक $\frac{8}{12}$ का सबसे सरल रूप क्या होगा?",
-      "answer": "$\frac{2}{3}$",
-      "options": [
-        { "text": "$\frac{3}{4}$" },
-        { "text": "$\frac{2}{3}$" },
-        { "text": "$\frac{4}{5}$" },
-        { "text": "$\frac{1}{2}$" }
-      ]
-    }
-  ]
+    "answers": [
+      {
+        "id": "cm98vmyqi0003jv041hfcl0no",
+        "questionId": "cm8ugjts40002cz02pgxjia2n",
+        "markAs": null,
+        "optionId": "cm8ugjts40005cz02yi0q6s52",
+        "isCorrect": true
+      },
+      {
+        "id": "cm98vmyqi000cjv04qwxbp3m1",
+        "questionId": "cm8ugjts5001bcz02gj3trfjl",
+        "markAs": null,
+        "optionId": "cm8ugjts5001fcz0221xkdg07",
+        "isCorrect": false
+      }
+    ]
+  }
 }
