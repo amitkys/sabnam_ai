@@ -4,36 +4,33 @@ import prisma from "@/lib/db";
 import { GetServerSessionHere } from "@/auth.config";
 
 export async function GET(req: NextRequest) {
-  const { searchParams } = new URL(req.url);
-  const topic = searchParams.get("topic");
-  const subject = searchParams.get("subject");
-  const className = searchParams.get("class");
-  const year = searchParams.get("year");
-  const session = await GetServerSessionHere();
-  const userId = session.user.id;
-
-  // Check if all required parameters are provided
-  if (!topic || !subject || !className || !year) {
-    return Response.json(
-      {
-        success: false,
-        error: "Not getting enough data to fetch Previous test series",
-      },
-      { status: 400 },
-    );
-  }
-
-  if (!userId) {
-    return Response.json(
-      {
-        success: false,
-        error: "Not getting enough data to fetch Previous test series",
-      },
-      { status: 400 },
-    );
-  }
-
   try {
+    const { searchParams } = new URL(req.url);
+    const topic = searchParams.get("topic");
+    const subject = searchParams.get("subject");
+    const className = searchParams.get("class");
+    const year = searchParams.get("year");
+    const session = await GetServerSessionHere();
+    const userId = session.user.id;
+
+    if (!topic || !subject || !className || !year) {
+      return Response.json(
+        {
+          message: "Required data not provided",
+        },
+        { status: 400 },
+      );
+    }
+
+    if (!userId) {
+      return Response.json(
+        {
+          message: "user not authenticated",
+        },
+        { status: 400 },
+      );
+    }
+
     // Construct the pattern for matching the test series title
     const titlePattern =
       `Prev ${topic} ${subject} ${className}-${year}`.toLowerCase();
@@ -68,7 +65,7 @@ export async function GET(req: NextRequest) {
       },
     });
 
-// Map the response to include attempt status, last score, and question count
+    // Map the response to include attempt status, last score, and question count
     const responseData = testSeries.map((series) => {
       const hasAttempted = series.testAttempts.length > 0;
       const lastScore = hasAttempted ? series.testAttempts[0].score : null;
@@ -87,16 +84,16 @@ export async function GET(req: NextRequest) {
       };
     });
 
-    return Response.json({
-      success: true,
-      data: responseData,
-    });
+    return Response.json(
+      {
+        data: responseData,
+      },
+      { status: 200 },
+    );
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error("Error fetching test series:", error);
 
-    return Response.json(
-      { success: false, error: "Failed to fetch test series" },
-      { status: 500 },
-    );
+    return Response.json({ message: "Internal server error" }, { status: 500 });
   }
 }

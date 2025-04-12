@@ -4,6 +4,7 @@ import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import useSWR from "swr";
 import Link from "next/link";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { TestSeriesCard } from "@/components/TestSeries/TestSeriesCard";
@@ -14,7 +15,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { toast } from "@/hooks/use-toast";
 import { fetcher } from "@/lib/utils";
 import { ContentLayout } from "@/components/admin-panel/content-layout";
 import {
@@ -25,6 +25,7 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Spinner } from "@/components/custom/spinner";
+import { Loader } from "@/components/ui/loader";
 // Type definition for the TestSeriesResponse
 export interface TestSeriesResponse {
   data: {
@@ -92,10 +93,6 @@ function ContentPage() {
   );
 
   useEffect(() => {
-    if (testSeriesData?.data && testSeriesData.data.length > 0) {
-      toast({ title: "Test Found" });
-    }
-
     testSeriesRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [testSeriesData]);
 
@@ -104,6 +101,12 @@ function ContentPage() {
       setShouldFetch(true);
     }
   };
+
+  useEffect(() => {
+    if (error) {
+      toast.error(error.message || "Unexpected error");
+    }
+  }, [error]);
 
   return (
     <div className="container mx-auto px-4 py-8 lg:py-24">
@@ -154,14 +157,19 @@ function ContentPage() {
       {shouldFetch && (
         <div ref={testSeriesRef} className="mt-8">
           {isLoading && (
-            <div className="flex justify-center  items-center flex-col space-y-2">
-              <Spinner size="xl" variant="primary" />
-              <span className="ml-2 text-xl">Loading test series...</span>
+            <div className="flex justify-center items-center">
+              <Loader size="small" variant="spin" />
+              <span className="ml-2">Loading test series...</span>
             </div>
           )}
           {error && (
-            <div className="text-center text-red-500">
-              Error loading test series data. Please try again.
+            <div className="text-center ">
+              <p className="text-center text-red-500">
+                Error loading test series data. Please try again.
+              </p>
+              <Link className="underline" href={"/home"}>
+                Return to home page
+              </Link>
             </div>
           )}
           {testSeriesData && testSeriesData.data && (

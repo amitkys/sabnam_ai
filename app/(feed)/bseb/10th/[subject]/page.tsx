@@ -84,13 +84,13 @@ const Content = ({ subjectName }: ISubject) => {
               key={index}
               className="w-full text-base lg:text-lg py-6 font-serif"
               disabled={loadingChapter === chapter.url}
-              variant={loadingChapter === chapter.url ? "default" : "outline"}
+              variant={"outline"}
               onClick={() => handleChapterSelect(chapter.url)}
             >
-              <span>{chapter.title}</span>
               {loadingChapter === chapter.url && (
                 <Loader size="small" variant="spin" />
               )}
+              <span>{chapter.title}</span>
             </Button>
           ))}
         </CardContent>
