@@ -14,10 +14,10 @@ export default function Page() {
 
   const parts = pathname.split("/");
 
-  // const testSeriesId = parts[2];
-  // const testAttemptId = parts[3];
-  const testSeriesId = "cm8ugjts30001cz02z5siz7xz";
-  const testAttemptId = "cm98vmyqi0001jv04sdj9w9lj";
+  const testSeriesId = parts[2];
+  const testAttemptId = parts[3];
+  // const testSeriesId = "cm8ugjts30001cz02z5siz7xz";
+  // const testAttemptId = "cm98vmyqi0001jv04sdj9w9lj";
 
   if (!testSeriesId || !testAttemptId) {
     alert("URL is missing");
