@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/breadcrumb";
 import { fetcher } from "@/lib/utils";
 import { Loader } from "@/components/ui/loader";
-import { TestSeriesCard } from "@/components/ui/TestSeriesCard";
+import { TestSeriesCard } from "@/components/TestSeries/TestSeriesCard";
 
 export interface TestSeriesResponse {
   data: {
@@ -69,7 +69,7 @@ export default function Page() {
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
-      <Content chapterName={params.slug} />
+      <Content chapterName={params.slug} subjectName={subject} />
     </ContentLayout>
   );
 }
@@ -82,15 +82,16 @@ function formatSegment(segment: string) {
 
 interface ContentProps {
   chapterName: string | string[] | undefined;
+  subjectName: string | string[] | undefined;
 }
 
-function Content({ chapterName }: ContentProps) {
+function Content({ chapterName, subjectName }: ContentProps) {
   const {
     data: testSeriesData,
     error,
     isLoading,
   } = useSWR<TestSeriesResponse>(
-    `/api/math?claas=10th&subject=math&chapter=${chapterName}`,
+    `/api/math?claas=10th&subject=${subjectName}&chapter=${chapterName}`,
     fetcher,
   );
 
@@ -118,7 +119,7 @@ function Content({ chapterName }: ContentProps) {
   if (error) {
     return (
       <div className="min-h-[calc(100vh-56px-64px-20px-24px-56px-48px)] flex items-center justify-center">
-        <span className="ml-3 text-base">Something went wrong</span>
+        <span className="ml-3 text-base">{error.message}</span>
       </div>
     );
   }

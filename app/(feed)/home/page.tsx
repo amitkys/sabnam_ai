@@ -4,7 +4,7 @@ import type React from "react"; // Added import for React
 
 import { useState } from "react";
 import { Book, GraduationCap, School } from "lucide-react";
-import { useRouter } from "next/navigation"; // Import useRouter for navigation
+import { useRouter } from "next/navigation";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";

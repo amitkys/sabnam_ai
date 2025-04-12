@@ -174,7 +174,7 @@ export interface Data {
     }[];
   }[];
 }
-
+// Types for: user giving test
 export interface FetchedTestSeriesData {
   testAttempt: {
     id: string;
@@ -212,8 +212,8 @@ export interface FetchedTestSeriesData {
 export interface TestAttemptSubmission {
   testSeriesId: string;
   userId: string;
-  startedAt: string; // ISO string timestamp
-  completedAt: string; // ISO string timestamp
+  startedAt: string;
+  completedAt: string;
   answers: TestAnswer[];
 }
 

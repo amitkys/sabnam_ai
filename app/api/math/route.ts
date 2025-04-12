@@ -4,35 +4,33 @@ import { GetServerSessionHere } from "@/auth.config";
 import prisma from "@/lib/db";
 
 export async function GET(req: NextRequest) {
-  const { searchParams } = new URL(req.url);
-  const claas = searchParams.get("claas");
-  const subject = searchParams.get("subject");
-  const chapter = searchParams.get("chapter");
-  const session = await GetServerSessionHere();
-  const userId = session.user.id;
-
-  if (!claas || !subject || !chapter) {
-    return Response.json(
-      {
-        success: false,
-        error: "Not getting enough data to fetch Test-Series",
-      },
-      { status: 400 }
-    );
-  }
-
-  if (!userId) {
-    return Response.json(
-      {
-        success: false,
-        error: "User not found",
-      },
-      { status: 400 }
-    );
-  }
-
   try {
-    const titlePattern = `10th Math ${chapter}`;
+    const { searchParams } = new URL(req.url);
+    const claas = searchParams.get("claas");
+    const subject = searchParams.get("subject");
+    const chapter = searchParams.get("chapter");
+    const session = await GetServerSessionHere();
+    const userId = session.user.id;
+
+    if (!claas || !subject || !chapter) {
+      return Response.json(
+        {
+          message: "Required data not provided",
+        },
+        { status: 400 },
+      );
+    }
+
+    if (!userId) {
+      return Response.json(
+        {
+          message: "User not found",
+        },
+        { status: 400 },
+      );
+    }
+
+    const titlePattern = `${claas} ${subject} ${chapter}`;
 
     const testSeries = await prisma.testSeries.findMany({
       where: {
@@ -82,13 +80,21 @@ export async function GET(req: NextRequest) {
       };
     });
 
-    return Response.json({
-      success: true,
-      data: responseData,
-    });
+    return Response.json(
+      {
+        data: responseData,
+      },
+      { status: 200 },
+    );
   } catch (error) {
-    console.log("Error fetching test series", error);
-  }
+    // eslint-disable-next-line no-console
+    console.log(error);
 
-  return Response.json({ name: "working good" });
+    return Response.json(
+      {
+        message: `Unexpected error occured while fetching Test Series`,
+      },
+      { status: 500 },
+    );
+  }
 }

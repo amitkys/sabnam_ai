@@ -45,7 +45,7 @@ export default function Page() {
   );
 }
 
-// Static data for subjects
+// data for subjects
 const subjects = [
   { title: "Physics", url: "/bseb/10th/physics" },
   { title: "Chemistry", url: "/bseb/10th/chemistry" },

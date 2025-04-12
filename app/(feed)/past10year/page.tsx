@@ -6,7 +6,7 @@ import useSWR from "swr";
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
-import { TestSeriesCard } from "@/components/ui/TestSeriesCard";
+import { TestSeriesCard } from "@/components/TestSeries/TestSeriesCard";
 import {
   Card,
   CardContent,
