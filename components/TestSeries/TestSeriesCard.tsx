@@ -26,8 +26,12 @@ export const TestSeriesCard = ({
   const [loading, setLoading] = useState(false);
 
   const handleNavigation = useCallback(async () => {
+    const toastId = "test-loading-toast";
+
     try {
       setLoading(true);
+      // Create a toast with a specific ID
+      toast.loading("A new test on the way...", { id: toastId });
 
       const testAttemptId = await getTestAttemptId(testSeries.id);
 
@@ -39,11 +43,12 @@ export const TestSeriesCard = ({
           error: "Failed to create test attempt",
         },
       );
-
       router.push(`/test/${testSeries.id}/${testAttemptId}`);
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error: any) {
       toast.error("Failed to create test attempt");
+    } finally {
+      toast.dismiss(toastId);
     }
   }, [testSeries.id, router]);
 
