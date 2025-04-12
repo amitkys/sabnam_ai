@@ -7,7 +7,7 @@ import { FetchedTestSeriesData } from "@/lib/type";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ testSeriesId: string; attemptId: string }> }
+  { params }: { params: Promise<{ testSeriesId: string; attemptId: string }> },
 ) {
   try {
     const { testSeriesId, attemptId } = await params;
@@ -17,8 +17,14 @@ export async function GET(
     // Validate required fields
     if (!testSeriesId || !attemptId) {
       return NextResponse.json(
-        { error: "testSeriesId, userId and attemptId are required" },
-        { status: 400 }
+        { message: "Required data not provided" },
+        { status: 400 },
+      );
+    }
+    if (!userId) {
+      return NextResponse.json(
+        { message: "User not authenticated" },
+        { status: 401 },
       );
     }
 
@@ -62,16 +68,18 @@ export async function GET(
     // Verify the testSeriesId matches
     if (testAttempt?.testSeriesId !== testSeriesId) {
       return NextResponse.json(
-        { error: "Test attempt does not belong to the specified test series" },
-        { status: 400 }
+        {
+          message: "Test attempt does not belong to the specified test series",
+        },
+        { status: 400 },
       );
     }
 
     // If userId is provided, verify it matches the test attempt
     if (userId && testAttempt && testAttempt.userId !== userId) {
       return NextResponse.json(
-        { error: "Unauthorized access to test attempt" },
-        { status: 403 }
+        { message: "Unauthorized access to test attempt" },
+        { status: 403 },
       );
     }
 
@@ -80,14 +88,14 @@ export async function GET(
       testAttempt,
     };
 
-    return NextResponse.json(response);
+    return NextResponse.json(response, { status: 200 });
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error("Error fetching test data:", error);
 
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   } finally {
     await prisma.$disconnect();

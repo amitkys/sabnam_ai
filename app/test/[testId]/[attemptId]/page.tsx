@@ -4,10 +4,20 @@ import useSWR from "swr";
 
 import { FetchedTestSeriesData } from "@/lib/type";
 import QuizInterface from "@/components/quiz/QuizInterface";
+import { Loader } from "@/components/ui/loader";
 
-// Fetcher function for SWR
-const fetcher = (url: string): Promise<FetchedTestSeriesData> =>
-  fetch(url).then((res) => res.json());
+const fetcher = async (url: string): Promise<FetchedTestSeriesData> => {
+  const res = await fetch(url);
+
+  if (!res.ok) {
+    const errorResponse = await res.json();
+    const error = new Error(errorResponse.message || "Unknown error");
+
+    throw error;
+  }
+
+  return res.json();
+};
 
 export default function Page() {
   const pathname = usePathname();
@@ -16,8 +26,6 @@ export default function Page() {
 
   const testSeriesId = parts[2];
   const testAttemptId = parts[3];
-  // const testSeriesId = "cm8ugjts30001cz02z5siz7xz";
-  // const testAttemptId = "cm98vmyqi0001jv04sdj9w9lj";
 
   if (!testSeriesId || !testAttemptId) {
     alert("URL is missing");
@@ -33,10 +41,31 @@ export default function Page() {
     fetcher,
   );
 
-  if (error) return <div>Error loading data</div>;
-  if (!testSeriesData) return <div>Loading...</div>;
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-red-500">
+          <p>{error.message}</p>
+        </div>
+      </div>
+    );
+  }
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center space-x-2">
+        <Loader size="small" variant="spin" />
+        <p className=" ">Preparing..</p>
+      </div>
+    );
+  }
 
-  console.log("coming data from backedn", testSeriesData);
+  if (!testSeriesData) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p>Failed to load test series data.</p>
+      </div>
+    );
+  }
 
   return (
     <div>
