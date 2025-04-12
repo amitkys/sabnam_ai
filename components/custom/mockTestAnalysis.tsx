@@ -27,7 +27,7 @@ interface TestSeriesDetails {
     score: number | null;
     answers: {
       questionId: string;
-      userAnswer: string;
+      userAnswer: string | undefined;
       isCorrect: boolean;
     }[];
   }[];
@@ -181,15 +181,18 @@ export default function MockTestAnalysis({
                   },
                 }}
                 tooltip={({ datum }) => (
-                  <div style={{ 
-                    padding: '6px 10px',
-                    background: 'hsl(var(--card))',
-                    border: '1px solid hsl(var(--border))',
-                    color: 'hsl(var(--foreground))',
-                    borderRadius: '4px',
-                    boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
-                  }}>
-                    <strong>{datum.label}:</strong> {datum.value} ({((datum.value / totalQuestions) * 100).toFixed(1)}%)
+                  <div
+                    style={{
+                      padding: "6px 10px",
+                      background: "hsl(var(--card))",
+                      border: "1px solid hsl(var(--border))",
+                      color: "hsl(var(--foreground))",
+                      borderRadius: "4px",
+                      boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+                    }}
+                  >
+                    <strong>{datum.label}:</strong> {datum.value} (
+                    {((datum.value / totalQuestions) * 100).toFixed(1)}%)
                   </div>
                 )}
               />
@@ -241,14 +244,13 @@ export default function MockTestAnalysis({
                           className="flex items-center space-x-2"
                         >
                           <span
-                            className={`w-4 h-4 rounded-full inline-block ${
-                              option.text === question.correctAnswer
+                            className={`w-4 h-4 rounded-full inline-block ${option.text === question.correctAnswer
                                 ? "bg-primary"
                                 : userAnswer &&
-                                    option.text === userAnswer.userAnswer
+                                  option.text === userAnswer.userAnswer
                                   ? "bg-destructive"
                                   : "bg-muted"
-                            }`}
+                              }`}
                           />
                           <span
                             className={

@@ -35,6 +35,8 @@ export const QuestionCard = ({
   totalQuestions,
   onAnswerSelect,
 }: QuestionCardProps) => {
+  console.log(currentNumber);
+
   return (
     <Card className="bg-transparent border p-6 dark:border-gray-700">
       <div className="flex mb-2">

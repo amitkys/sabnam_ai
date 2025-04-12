@@ -1,12 +1,37 @@
 import { ChevronDown, ChevronUp } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { getStatusColor } from "@/lib/utiles/quiz-utiles";
+
+// Define the status type to match the store
+type QuestionStatusType = "solved" | "later" | "skipped";
+
+// Create our own getStatusColor function since the original isn't available
+const getStatusColor = (status: QuestionStatusType | undefined) => {
+  switch (status) {
+    case "solved":
+      return "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300";
+    case "later":
+      return "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300";
+    case "skipped":
+      return "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300";
+    default:
+      return "bg-background text-foreground";
+  }
+};
 
 interface QuestionNavigationProps {
-  questions: any[];
+  questions: {
+    id: string;
+    text: string;
+    answer: string;
+    options: {
+      id: string;
+      text: string;
+    }[];
+  }[];
   currentQuestion: number;
-  questionStatus: Record<number, "solved" | "later" | "skipped">;
+  questionStatus: Record<string, QuestionStatusType>;
   showNumbers: boolean;
   toggleShowNumbers: () => void;
   onQuestionSelect: (index: number) => void;
@@ -35,12 +60,12 @@ export const QuestionNavigation = ({
             <ChevronDown className="h-4 w-4" />
           )}
         </button>
-        
+
         {/* Legend */}
         <div
           className={cn(
             "space-y-1 mb-10 p-3 rounded-lg bg-muted",
-            !showNumbers && "lg:block hidden"
+            !showNumbers && "lg:block hidden",
           )}
         >
           <div className="flex items-center space-x-2">
@@ -96,11 +121,12 @@ export const QuestionNavigation = ({
         <div
           className={cn(
             "grid grid-cols-5 lg:grid-cols-5 gap-4 lg:gap-2 overflow-y-auto max-h-[calc(100vh-300px)] pr-2 p-1",
-            !showNumbers && "lg:grid hidden"
+            !showNumbers && "lg:grid hidden",
           )}
         >
-          {questions.map((_, idx) => {
-            const status = questionStatus[idx];
+          {questions.map((question, idx) => {
+            // Use question.id instead of idx to get the status
+            const status = questionStatus[question.id];
             const isCurrent = idx === currentQuestion;
 
             return (
@@ -112,7 +138,7 @@ export const QuestionNavigation = ({
                   "hover:bg-accent hover:text-accent-foreground",
                   "focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
                   getStatusColor(status),
-                  isCurrent && !status && "ring-2 ring-white"
+                  isCurrent && !status && "ring-2 ring-white",
                 )}
                 variant="outline"
                 onClick={() => onQuestionSelect(idx)}

@@ -176,20 +176,36 @@ export interface Data {
 }
 
 export interface FetchedTestSeriesData {
-  testseries: {
+  testAttempt: {
     id: string;
-    title: string;
-    duration: number;
-  };
-  questions: {
-    id: string;
-    text: string;
-    answer: string;
-    options: {
+    userId: string;
+    testSeriesId: string;
+    startedAt: Date;
+    completedAt: Date | null;
+    score: number | null;
+    answers: {
       id: string;
-      text: string;
+      questionId: string;
+      optionId: string | null;
+      markAs: string | null;
+      isCorrect: boolean;
     }[];
-  }[];
+    testSeries: {
+      id: string;
+      title: string;
+      duration: number;
+      createdAt: Date;
+      questions: {
+        id: string;
+        text: string;
+        answer: string;
+        options: {
+          id: string;
+          text: string;
+        }[];
+      }[];
+    };
+  } | null;
 }
 
 // Types for test attempt submission
@@ -263,4 +279,28 @@ export interface UserType {
 
 export interface ISubject {
   subjectName: string | string[] | undefined;
+}
+
+export interface Answer {
+  questionId: string;
+  optionId: string;
+  selectedAnswer: string;
+  answer: string;
+}
+
+export interface TestAttemptSubmission {
+  testSeriesId: string;
+  userId: string;
+  startedAt: string;
+  completedAt: string;
+  answers: {
+    questionId: string;
+    optionId: string;
+    isCorrect: boolean;
+  }[];
+}
+
+export interface SaveQuestionResponseResult {
+  success: boolean;
+  error?: string;
 }

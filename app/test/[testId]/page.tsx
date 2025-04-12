@@ -1,5 +1,5 @@
+/*
 import { Suspense } from "react";
-
 import QuizInterface from "@/components/quiz/QuizInterface";
 import { GetTestSeries } from "@/lib/actions";
 import { FetchedTestSeriesData } from "@/lib/type";
@@ -33,4 +33,9 @@ function Loading() {
       <p>Fetching Test..</p>
     </div>
   );
+}
+*/
+
+export default function Page() {
+  return <div>Hello</div>;
 }

@@ -1,4 +1,6 @@
-import { getTestSeriesDetailsForUser } from "@/lib/actions";
+import Link from "next/link";
+
+import { getAnalysisForTestAttempt } from "@/lib/actions";
 import MockTestAnalysis from "@/components/custom/mockTestAnalysis";
 import { ContentLayout } from "@/components/admin-panel/content-layout";
 import {
@@ -7,9 +9,8 @@ import {
   BreadcrumbLink,
   BreadcrumbList,
   BreadcrumbSeparator,
-  BreadcrumbPage
+  BreadcrumbPage,
 } from "@/components/ui/breadcrumb";
-import Link from "next/link";
 
 // Define the type for the component's props
 type Params = Promise<{ testSeriesId: string }>;
@@ -17,7 +18,8 @@ type Params = Promise<{ testSeriesId: string }>;
 export default async function Page(props: { params: Params }) {
   const params = await props.params;
   const testSeriesId = params.testSeriesId;
-  const testSeriesDetails = await getTestSeriesDetailsForUser(testSeriesId);
+  const testSeriesDetails = await getAnalysisForTestAttempt(testSeriesId);
+
   return (
     <ContentLayout title="Test Analysis">
       <Breadcrumb>
