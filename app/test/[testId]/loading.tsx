@@ -21,9 +21,9 @@ export default function Loading() {
                 <Skeleton className="h-6 w-3/4 mb-4 bg-muted" />
                 <div className="space-y-3">
                   {Array.from({ length: 4 }).map((_, idx) => (
-                    <Skeleton 
-                      key={idx} 
-                      className="h-12 w-full rounded-lg bg-muted" 
+                    <Skeleton
+                      key={idx}
+                      className="h-12 w-full rounded-lg bg-muted"
                     />
                   ))}
                 </div>
@@ -39,19 +39,16 @@ export default function Loading() {
                 {/* Legend */}
                 <div className="space-y-1 mb-4 p-3 rounded-lg bg-muted/50">
                   {Array.from({ length: 3 }).map((_, idx) => (
-                    <Skeleton 
-                      key={idx} 
-                      className="h-4 w-3/4 bg-muted" 
-                    />
+                    <Skeleton key={idx} className="h-4 w-3/4 bg-muted" />
                   ))}
                 </div>
 
                 {/* Question Numbers Grid */}
                 <div className="grid grid-cols-5 lg:grid-cols-5 gap-4 lg:gap-2 overflow-y-auto max-h-[calc(100vh-300px)] pr-2 p-1">
                   {Array.from({ length: 10 }).map((_, idx) => (
-                    <Skeleton 
-                      key={idx} 
-                      className="h-9 w-9 rounded-full bg-muted" 
+                    <Skeleton
+                      key={idx}
+                      className="h-9 w-9 rounded-full bg-muted"
                     />
                   ))}
                 </div>
@@ -64,9 +61,9 @@ export default function Loading() {
             <div className="max-w-7xl mx-auto">
               <div className="flex flex-col sm:flex-row gap-2">
                 {Array.from({ length: 4 }).map((_, idx) => (
-                  <Skeleton 
-                    key={idx} 
-                    className="h-10 w-full sm:w-1/4 bg-muted" 
+                  <Skeleton
+                    key={idx}
+                    className="h-10 w-full sm:w-1/4 bg-muted"
                   />
                 ))}
               </div>

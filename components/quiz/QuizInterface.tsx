@@ -7,10 +7,10 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
+import { Loader } from "@/components/ui/loader";
 import { useQuizStore } from "@/lib/store/useQuizStore";
 import { useFullscreen } from "@/hooks/use-fullscreen";
 import { Card } from "@/components/ui/card";
-import { Spinner } from "@/components/custom/spinner";
 import { SaveQuestionResponse } from "@/lib/actions";
 import { StartScreen } from "@/components/quiz/startScreen";
 import { QuizHeader } from "@/components/quiz/QuizHeader";
@@ -182,9 +182,9 @@ export default function QuizInterface({
   // Loading state check
   if (status === "loading") {
     return (
-      <div className="min-h-screen flex items-center justify-center flex-col space-y-2">
-        <Spinner size="xl" variant="primary" />
-        <p>Fetching Test..</p>
+      <div className="min-h-screen flex items-center justify-center space-x-2">
+        <Loader size="small" variant="spin" />
+        <p className=" ">Preparing..</p>
       </div>
     );
   }
