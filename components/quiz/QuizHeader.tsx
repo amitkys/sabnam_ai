@@ -1,3 +1,5 @@
+import { Timer } from "./Timer";
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -10,7 +12,6 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { Timer } from "./Timer";
 
 interface QuizHeaderProps {
   duration: number;
@@ -19,11 +20,11 @@ interface QuizHeaderProps {
   isSubmitting: boolean;
 }
 
-export const QuizHeader = ({ 
-  duration, 
-  onExit, 
-  onSubmit, 
-  isSubmitting 
+export const QuizHeader = ({
+  duration,
+  onExit,
+  onSubmit,
+  isSubmitting,
 }: QuizHeaderProps) => {
   return (
     <div className="flex justify-between items-center">
@@ -37,18 +38,16 @@ export const QuizHeader = ({
           </AlertDialogTrigger>
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>
-                Are you sure you want to submit?
-              </AlertDialogTitle>
+              <AlertDialogTitle>Submit your test?</AlertDialogTitle>
               <AlertDialogDescription>
-                Once submitted, you won&apos;t be able to change your
-                answers.
+                If this is unfinished, you can continue later from your
+                dashboard.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogCancel>Continue test</AlertDialogCancel>
               <AlertDialogAction onClick={onSubmit}>
-                Submit
+                Submit test
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
@@ -60,18 +59,15 @@ export const QuizHeader = ({
           </AlertDialogTrigger>
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>
-                Are you sure you want to exit?
-              </AlertDialogTitle>
+              <AlertDialogTitle>Exit the test?</AlertDialogTitle>
               <AlertDialogDescription>
-                Your progress will be lost if you exit now.
+                Your progress has been saved. You can continue this test later
+                from your dashboard.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction onClick={onExit}>
-                Exit
-              </AlertDialogAction>
+              <AlertDialogCancel>Continue test</AlertDialogCancel>
+              <AlertDialogAction onClick={onExit}>Exit</AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>

@@ -56,9 +56,9 @@ export default function MockTestAnalysis({
   ];
 
   return (
-    <div className="container mx-auto p-4 space-y-6 bg-background text-foreground mt-2 rounded-lg">
-      <h1 className="text-3xl font-bold">
-        {testSeriesDetails.title} - Analysis
+    <div className="container mx-auto p-4 space-y-6 bg-background text-foreground mt-3 rounded-lg">
+      <h1 className="text-base lg:text-lg font-bold mt-1">
+        {testSeriesDetails.title.split(" ").slice(1).join(" ")} - Analysis
       </h1>
 
       <div className="grid gap-6 md:grid-cols-2">
