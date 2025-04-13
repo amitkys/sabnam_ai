@@ -123,7 +123,7 @@ interface QuizState {
     questionId: string,
     optionId: string,
     optionText: string,
-    correctAnswer: string
+    correctAnswer: string,
   ) => void;
   setSelectedAnswers: (answers: Record<string, Answer>) => void;
   // UI Toggles
@@ -167,10 +167,10 @@ export const useQuizStore = create<QuizState>((set) => ({
         if (answer.optionId) {
           // Find the corresponding question and option
           const question = data.testAttempt?.testSeries.questions.find(
-            (q) => q.id === questionId
+            (q) => q.id === questionId,
           );
           const option = question?.options.find(
-            (opt) => opt.id === answer.optionId
+            (opt) => opt.id === answer.optionId,
           );
 
           if (question && option) {
@@ -190,7 +190,7 @@ export const useQuizStore = create<QuizState>((set) => ({
 
     if (data.testAttempt?.answers.length) {
       const questionIds = data.testAttempt.testSeries.questions.map(
-        (q) => q.id
+        (q) => q.id,
       );
 
       // Find the last answer in the list (chronologically)
@@ -216,7 +216,8 @@ export const useQuizStore = create<QuizState>((set) => ({
       questionStatus: questionStatusMap,
       selectedAnswers: answersMap,
       currentQuestion: lastAnsweredIndex,
-      hasStarted: !!data.testAttempt?.startedAt,
+      // hasStarted: !!data.testAttempt?.startedAt,
+      hasStarted: false,
       startTime:
         data.testAttempt?.startedAt instanceof Date
           ? data.testAttempt.startedAt.toISOString()

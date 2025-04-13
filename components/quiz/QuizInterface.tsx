@@ -2,7 +2,7 @@
 
 import type { FetchedTestSeriesData } from "@/lib/type";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -18,6 +18,8 @@ import { QuestionCard } from "@/components/quiz/QuestionsCard";
 import { QuestionNavigation } from "@/components/quiz/QuestionNavigation";
 import { QuizActions } from "@/components/quiz/QuizActions";
 
+type ActionButtonType = "save" | "later" | "skip" | null;
+
 export default function QuizInterface({
   TestSeriesData,
   attemptId,
@@ -28,6 +30,8 @@ export default function QuizInterface({
   const router = useRouter();
   const { data: session, status } = useSession();
   const { enterFullscreen, exitFullscreen } = useFullscreen();
+  const [isSaving, setIsSaving] = useState(false);
+  const [activeButton, setActiveButton] = useState<ActionButtonType>(null);
 
   const {
     testData,
@@ -86,6 +90,16 @@ export default function QuizInterface({
     )
       return;
 
+    // Set which button type was clicked
+    let buttonType: ActionButtonType = null;
+
+    if (action === "solved") buttonType = "save";
+    else if (action === "later") buttonType = "later";
+    else if (action === "skipped") buttonType = "skip";
+
+    setActiveButton(buttonType);
+    setIsSaving(true);
+
     const currentQuestionId =
       testData.testAttempt.testSeries.questions[currentQuestion].id;
     const selectedAnswer = selectedAnswers[currentQuestionId];
@@ -93,6 +107,8 @@ export default function QuizInterface({
     // For "solved" action, verify that an answer was selected
     if (action === "solved" && !selectedAnswer) {
       toast.warning("Please select an option");
+      setIsSaving(false);
+      setActiveButton(null);
 
       return;
     }
@@ -118,14 +134,18 @@ export default function QuizInterface({
     } catch (error) {
       console.error("Error saving question response:", error);
       toast.error("Failed to save response");
-    }
+    } finally {
+      // Move to next question if available
+      if (
+        currentQuestion <
+        testData.testAttempt.testSeries.questions.length - 1
+      ) {
+        setCurrentQuestion(currentQuestion + 1);
+      }
 
-    // Move to next question if available
-    if (
-      currentQuestion <
-      testData.testAttempt.testSeries.questions.length - 1
-    ) {
-      setCurrentQuestion(currentQuestion + 1);
+      // Reset loading state
+      setIsSaving(false);
+      setActiveButton(null);
     }
   };
 
@@ -150,21 +170,7 @@ export default function QuizInterface({
 
     setIsSubmitting(true);
 
-    // const submissionData: TestAttemptSubmission = {
-    //   testSeriesId: testData.testAttempt.testSeries.id,
-    //   userId: session.user.id,
-    //   startedAt: startTime,
-    //   completedAt: new Date().toISOString(),
-    //   answers: Object.values(selectedAnswers).map((answer) => ({
-    //     questionId: answer.questionId,
-    //     optionId: answer.optionId,
-    //     isCorrect: answer.answer === answer.selectedAnswer,
-    //   })),
-    // };
-
     try {
-      // const testAttemptId = await CreateTestAttempt(submissionData);
-
       toast.success("Test submitted successfully");
 
       setIsSubmitting(false);
@@ -239,7 +245,9 @@ export default function QuizInterface({
             />
           </div>
           <QuizActions
+            activeButton={activeButton}
             isAnswerSelected={!!selectedAnswers[currentQuestionData?.id]}
+            isSaving={isSaving}
             onLater={() => handleQuestionAction("later")}
             onSave={() => handleQuestionAction("solved")}
             onSkip={() => handleQuestionAction("skipped")}
