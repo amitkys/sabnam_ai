@@ -5,7 +5,22 @@ import { format } from "date-fns";
 import Markdown from "react-markdown";
 import rehypeKatex from "rehype-katex";
 import remarkMath from "remark-math";
+import Link from "next/link";
+import { GoHome } from "react-icons/go";
 
+import {
+  FirstTimeTooltip,
+  FirstTimeTooltipProvider,
+} from "@/components/ui/customeToolTip";
+import { ContentLayout } from "@/components/admin-panel/content-layout";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbSeparator,
+  BreadcrumbPage,
+} from "@/components/ui/breadcrumb";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
@@ -33,8 +48,38 @@ interface TestSeriesDetails {
   }[];
   totalMarks: number;
 }
-
 export default function MockTestAnalysis({
+  testSeriesDetails,
+}: {
+  testSeriesDetails: TestSeriesDetails;
+}) {
+  return (
+    <FirstTimeTooltipProvider>
+      <ContentLayout title="Test Analysis">
+        <Breadcrumb className="ml-5 lg:ml-3">
+          <BreadcrumbList>
+            <FirstTimeTooltip content="Go to Home" tooltipId="analysis">
+              <BreadcrumbItem>
+                <BreadcrumbLink asChild>
+                  <Link href="/">
+                    <GoHome className="text-lg" />
+                  </Link>
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+            </FirstTimeTooltip>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>Test Analysis</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+        <Content testSeriesDetails={testSeriesDetails} />
+      </ContentLayout>
+    </FirstTimeTooltipProvider>
+  );
+}
+
+function Content({
   testSeriesDetails,
 }: {
   testSeriesDetails: TestSeriesDetails;
