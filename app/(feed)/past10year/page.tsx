@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import useSWR from "swr";
 import Link from "next/link";
 import { toast } from "sonner";
+import { GoHome } from "react-icons/go";
 
 import { Button } from "@/components/ui/button";
 import { TestSeriesCard } from "@/components/TestSeries/TestSeriesCard";
@@ -49,17 +50,19 @@ export default function Page() {
 
   return (
     <ContentLayout title="Previous Year">
-      <Breadcrumb className="ml-3">
+      <Breadcrumb className="ml-5 lg:ml-3">
         <BreadcrumbList>
           <BreadcrumbItem>
             <BreadcrumbLink asChild>
-              <Link href="/">Sabnam</Link>
+              <Link href="/">
+                <GoHome className="text-lg" />
+              </Link>
             </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
             <BreadcrumbLink asChild>
-              <Link href={url}>Past 10 Year</Link>
+              <Link href={url}>Previous year</Link>
             </BreadcrumbLink>
           </BreadcrumbItem>
         </BreadcrumbList>

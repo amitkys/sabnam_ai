@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { GoHome } from "react-icons/go";
 
 import { getAnalysisForTestAttempt } from "@/lib/actions";
 import MockTestAnalysis from "@/components/custom/mockTestAnalysis";
@@ -22,11 +23,13 @@ export default async function Page(props: { params: Params }) {
 
   return (
     <ContentLayout title="Test Analysis">
-      <Breadcrumb>
+      <Breadcrumb className="ml-5 lg:ml-3">
         <BreadcrumbList>
           <BreadcrumbItem>
             <BreadcrumbLink asChild>
-              <Link href="/">Sabnam</Link>
+              <Link href="/">
+                <GoHome className="text-lg" />
+              </Link>
             </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
