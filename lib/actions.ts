@@ -88,7 +88,7 @@ export async function CreateTestAttempt(data: TestAttemptSubmission) {
     // Calculate the score based on correct answers
     const score = data.answers.reduce(
       (acc, answer) => (answer.isCorrect ? acc + 1 : acc),
-      0
+      0,
     );
 
     const testAttempt = await prisma.testAttempt.create({
@@ -316,6 +316,30 @@ export async function SaveQuestionResponse({
       });
     }
 
+    // Update the score in TestAttempt
+    // First get all answers for this test attempt
+    const allAnswers = await prisma.answer.findMany({
+      where: {
+        testAttemptId: testAttemptId,
+      },
+    });
+
+    // Calculate the new score based on correct answers
+    const updatedScore = allAnswers.reduce(
+      (acc, answer) => (answer.isCorrect ? acc + 1 : acc),
+      0,
+    );
+
+    // Update the TestAttempt score
+    await prisma.testAttempt.update({
+      where: {
+        id: testAttemptId,
+      },
+      data: {
+        score: updatedScore,
+      },
+    });
+
     // Return success indicator
     return { success: true };
   } catch (error) {
@@ -324,3 +348,89 @@ export async function SaveQuestionResponse({
     return { success: false, error: "Failed to save response" };
   }
 }
+
+// export async function SaveQuestionResponse({
+//   testAttemptId,
+//   questionId,
+//   optionId,
+//   markAs,
+//   isCorrect,
+// }: SaveQuestionResponseParams) {
+//   try {
+//     // Check if an answer for this question already exists
+//     const existingAnswer = await prisma.answer.findFirst({
+//       where: {
+//         testAttemptId,
+//         questionId,
+//       },
+//     });
+
+//     // Handle the answer update/creation
+//     let answerPromise;
+
+//     if (existingAnswer) {
+//       // Update existing answer
+//       answerPromise = prisma.answer.update({
+//         where: {
+//           id: existingAnswer.id,
+//         },
+//         data: {
+//           markAs,
+//           optionId: optionId || null,
+//           isCorrect:
+//             isCorrect !== undefined ? isCorrect : existingAnswer.isCorrect,
+//         },
+//       });
+//     } else {
+//       // Create new answer
+//       answerPromise = prisma.answer.create({
+//         data: {
+//           testAttemptId,
+//           questionId,
+//           markAs,
+//           optionId: optionId || null,
+//           isCorrect: isCorrect !== undefined ? isCorrect : false,
+//         },
+//       });
+//     }
+
+//     // Get all answers for score calculation in parallel with the answer update/creation
+//     const allAnswersPromise = prisma.answer.findMany({
+//       where: {
+//         testAttemptId: testAttemptId,
+//       },
+//       select: {
+//         isCorrect: true,
+//       },
+//     });
+
+//     // Wait for both operations to complete
+//     const [_, allAnswers] = await Promise.all([
+//       answerPromise,
+//       allAnswersPromise,
+//     ]);
+
+//     // Calculate the new score based on correct answers
+//     const updatedScore = allAnswers.reduce(
+//       (acc, answer) => (answer.isCorrect ? acc + 1 : acc),
+//       0,
+//     );
+
+//     // Update the TestAttempt score
+//     await prisma.testAttempt.update({
+//       where: {
+//         id: testAttemptId,
+//       },
+//       data: {
+//         score: updatedScore,
+//       },
+//     });
+
+//     // Return success indicator
+//     return { success: true };
+//   } catch (error) {
+//     console.error("Error saving question response:", error);
+
+//     return { success: false, error: "Failed to save response" };
+//   }
+// }

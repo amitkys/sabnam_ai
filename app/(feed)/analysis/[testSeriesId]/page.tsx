@@ -9,5 +9,7 @@ export default async function Page(props: { params: Params }) {
   const testSeriesId = params.testSeriesId;
   const testSeriesDetails = await getAnalysisForTestAttempt(testSeriesId);
 
+  console.log(testSeriesDetails);
+
   return <MockTestAnalysis testSeriesDetails={testSeriesDetails} />;
 }

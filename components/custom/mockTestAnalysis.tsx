@@ -121,7 +121,7 @@ function Content({
             <div className="flex justify-between items-center">
               <span>Your Score:</span>
               <span>
-                {latestAttempt?.score || 0} / {testSeriesDetails.totalMarks}
+                {correctAnswers} / {testSeriesDetails.totalMarks}
               </span>
             </div>
             <div className="flex justify-between items-center">
