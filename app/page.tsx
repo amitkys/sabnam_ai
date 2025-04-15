@@ -22,7 +22,7 @@ export default function NeonGradientCardDemo() {
     }
   }, [status, router]);
 
-  // Prevent rendering any UI until authentication status is determined
+  // Prevent rendering any UI until authentication status is determined.
   if (
     status === "loading" ||
     status === "unauthenticated" ||
