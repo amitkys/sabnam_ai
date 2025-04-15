@@ -20,6 +20,7 @@ model TestSeries {
     id        String  @id @default(cuid()) @map("_id")
   title     String
   questions Question[] 
+  language    String        @default("en")
   testAttempts TestAttempt[]
   createdAt DateTime   @default(now())
   duration Int
