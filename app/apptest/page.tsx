@@ -16,5 +16,5 @@
 // }
 
 export default function Page() {
-  return <div>hello world going to fix build hi hello there</div>;
+  return <div>fix testing page</div>;
 }
