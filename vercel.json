@@ -1,0 +1,3 @@
+{
+  "buildCommand": "./vercel.sh && npm run build"
+}
