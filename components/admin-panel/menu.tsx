@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Ellipsis, LogOut } from "lucide-react";
 import { usePathname } from "next/navigation";
+import { signOut } from "next-auth/react";
 
 import { cn } from "@/lib/utils";
 import { getMenuList } from "@/lib/menu-list";
@@ -13,9 +14,8 @@ import {
   Tooltip,
   TooltipTrigger,
   TooltipContent,
-  TooltipProvider
+  TooltipProvider,
 } from "@/components/ui/tooltip";
-import { signOut } from "next-auth/react";
 
 interface MenuProps {
   isOpen: boolean | undefined;
@@ -30,7 +30,7 @@ export function Menu({ isOpen }: MenuProps) {
       <nav className="mt-8 h-full w-full">
         <ul className="flex flex-col min-h-[calc(100vh-48px-36px-16px-32px)] lg:min-h-[calc(100vh-32px-40px-32px)] items-start space-y-1 px-2">
           {menuList.map(({ groupLabel, menus }, index) => (
-            <li className={cn("w-full", groupLabel ? "pt-5" : "")} key={index}>
+            <li key={index} className={cn("w-full", groupLabel ? "pt-5" : "")}>
               {(isOpen && groupLabel) || isOpen === undefined ? (
                 <p className="text-sm font-medium text-muted-foreground px-4 pb-2 max-w-[248px] truncate">
                   {groupLabel}
@@ -49,16 +49,18 @@ export function Menu({ isOpen }: MenuProps) {
                   </Tooltip>
                 </TooltipProvider>
               ) : (
-                <p className="pb-2"></p>
+                <p className="pb-2" />
               )}
               {menus.map(
                 ({ href, label, icon: Icon, active, submenus }, index) =>
                   !submenus || submenus.length === 0 ? (
-                    <div className="w-full" key={index}>
+                    <div key={index} className="w-full">
                       <TooltipProvider disableHoverableContent>
                         <Tooltip delayDuration={100}>
                           <TooltipTrigger asChild>
                             <Button
+                              asChild
+                              className="w-full justify-start h-10 mb-1"
                               variant={
                                 (active === undefined &&
                                   pathname.startsWith(href)) ||
@@ -66,8 +68,6 @@ export function Menu({ isOpen }: MenuProps) {
                                   ? "secondary"
                                   : "ghost"
                               }
-                              className="w-full justify-start h-10 mb-1"
-                              asChild
                             >
                               <Link href={href}>
                                 <span
@@ -80,7 +80,7 @@ export function Menu({ isOpen }: MenuProps) {
                                     "max-w-[200px] truncate",
                                     isOpen === false
                                       ? "-translate-x-96 opacity-0"
-                                      : "translate-x-0 opacity-100"
+                                      : "translate-x-0 opacity-100",
                                   )}
                                 >
                                   {label}
@@ -97,20 +97,20 @@ export function Menu({ isOpen }: MenuProps) {
                       </TooltipProvider>
                     </div>
                   ) : (
-                    <div className="w-full" key={index}>
+                    <div key={index} className="w-full">
                       <CollapseMenuButton
-                        icon={Icon}
-                        label={label}
                         active={
                           active === undefined
                             ? pathname.startsWith(href)
                             : active
                         }
-                        submenus={submenus}
+                        icon={Icon}
                         isOpen={isOpen}
+                        label={label}
+                        submenus={submenus}
                       />
                     </div>
-                  )
+                  ),
               )}
             </li>
           ))}
@@ -119,9 +119,9 @@ export function Menu({ isOpen }: MenuProps) {
               <Tooltip delayDuration={100}>
                 <TooltipTrigger asChild>
                   <Button
-                   onClick={() => signOut({ callbackUrl: '/login' })} 
-                    variant="outline"
                     className="w-full justify-center h-10 mt-5"
+                    variant="outline"
+                    onClick={() => signOut({ callbackUrl: "/login" })}
                   >
                     <span className={cn(isOpen === false ? "" : "mr-2")}>
                       <LogOut size={18} />
@@ -129,7 +129,7 @@ export function Menu({ isOpen }: MenuProps) {
                     <p
                       className={cn(
                         "whitespace-nowrap",
-                        isOpen === false ? "opacity-0 hidden" : "opacity-100"
+                        isOpen === false ? "opacity-0 hidden" : "opacity-100",
                       )}
                     >
                       Sign out

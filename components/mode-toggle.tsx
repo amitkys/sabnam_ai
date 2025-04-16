@@ -17,7 +17,7 @@ export function ModeToggle() {
 
   return (
     <TooltipProvider disableHoverableContent>
-      <Tooltip delayDuration={100}>
+      <Tooltip delayDuration={10}>
         <TooltipTrigger asChild>
           <Button
             className="rounded-full w-8 h-8 bg-background mr-2"

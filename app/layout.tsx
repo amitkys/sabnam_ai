@@ -19,7 +19,7 @@ export default function RootLayout({
   return (
     <SessionWrapper>
       <html suppressHydrationWarning lang="en">
-        <body className={`${inter.className} antialiased`}>
+        <body className={`${inter.className} antialiased text-foreground/75`}>
           <ThemeProvider
             disableTransitionOnChange
             enableSystem
