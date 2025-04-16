@@ -3,11 +3,11 @@
 import { useEffect } from "react";
 
 import { useBoardStore } from "@/lib/store/boardStore";
-import { EducationBreadcrumb } from "@/components/board/board-breadcrumb";
+import { BoardBreadcrumb } from "@/components/board/board-breadcrumb";
 import { BoardList } from "@/components/board/board-list";
-import { StandardList } from "@/components/board/standard-list";
-import { SubjectList } from "@/components/board/subject-list";
-import { ChapterList } from "@/components/board/chapter-list";
+import { StandardList } from "@/components/board/board-standard-list";
+import { SubjectList } from "@/components/board/board-subject-list";
+import { ChapterList } from "@/components/board/board-chapter-list";
 import { ChapterContent } from "@/components/board/chapter-content";
 
 interface EducationContentProps {
@@ -34,7 +34,7 @@ export default function EducationContent({
   if (!boardType) {
     return (
       <div>
-        <EducationBreadcrumb />
+        <BoardBreadcrumb />
         <BoardList />
       </div>
     );
@@ -43,7 +43,7 @@ export default function EducationContent({
   if (boardType && !standard) {
     return (
       <div>
-        <EducationBreadcrumb />
+        <BoardBreadcrumb />
         <StandardList />
       </div>
     );
@@ -52,7 +52,7 @@ export default function EducationContent({
   if (boardType && standard && !subject) {
     return (
       <div>
-        <EducationBreadcrumb />
+        <BoardBreadcrumb />
         <SubjectList />
       </div>
     );
@@ -61,7 +61,7 @@ export default function EducationContent({
   if (boardType && standard && subject && !chapter) {
     return (
       <div>
-        <EducationBreadcrumb />
+        <BoardBreadcrumb />
         <ChapterList />
       </div>
     );
@@ -70,7 +70,7 @@ export default function EducationContent({
   // Show chapter content if all selections are made
   return (
     <div>
-      <EducationBreadcrumb />
+      <BoardBreadcrumb />
       <ChapterContent />
     </div>
   );

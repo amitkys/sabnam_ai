@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/tooltip";
 import { useBoardStore } from "@/lib/store/boardStore";
 
-export function EducationBreadcrumb() {
+export function BoardBreadcrumb() {
   const {
     boardType,
     standard,

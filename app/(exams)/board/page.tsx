@@ -15,8 +15,7 @@ export default function BoardPage() {
   const subject = searchParams.get("subject");
   const chapter = searchParams.get("chapter");
 
-  const { boardName, standardName, subjectName, chapterName } =
-    useBoardStore();
+  const { boardName, standardName, subjectName, chapterName } = useBoardStore();
 
   // Determine the title based on the current navigation state
   const getTitle = () => {
