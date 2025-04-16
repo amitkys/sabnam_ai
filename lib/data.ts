@@ -1,4 +1,4 @@
-export const educationalData = {
+export const boardExam = {
   boards: [
     {
       id: "bseb",

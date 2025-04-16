@@ -5,7 +5,7 @@ import type { Board, NavigationState } from "@/lib/type/board";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-import { educationalData } from "@/lib/data";
+import { boardExam } from "@/lib/data";
 
 interface EducationState extends NavigationState {
   data: {
@@ -32,7 +32,7 @@ export const useEducationStore = create<EducationState>()(
       chapter: null,
 
       // Content state
-      data: educationalData,
+      data: boardExam,
       boardName: null,
       standardName: null,
       subjectName: null,
