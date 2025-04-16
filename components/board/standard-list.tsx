@@ -12,10 +12,10 @@ import {
   CardDescription,
   CardContent,
 } from "@/components/ui/card";
-import { useEducationStore } from "@/lib/store/boardStore";
+import { useBoardStore } from "@/lib/store/boardStore";
 
 export function StandardList() {
-  const { boardType, boardName, data } = useEducationStore();
+  const { boardType, boardName, data } = useBoardStore();
 
   const standards =
     data.boards.find((b) => b.id === boardType)?.standards || [];

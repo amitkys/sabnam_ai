@@ -18,7 +18,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { useEducationStore } from "@/lib/store/boardStore";
+import { useBoardStore } from "@/lib/store/boardStore";
 
 export function EducationBreadcrumb() {
   const {
@@ -30,7 +30,7 @@ export function EducationBreadcrumb() {
     standardName,
     subjectName,
     chapterName,
-  } = useEducationStore();
+  } = useBoardStore();
 
   // Determine the current active breadcrumb level
   const getCurrentLevel = () => {

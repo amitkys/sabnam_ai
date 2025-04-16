@@ -1,3 +1,4 @@
+// @/lib/data.ts
 export const boardExam = {
   boards: [
     {

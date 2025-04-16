@@ -6,7 +6,7 @@ import { useSearchParams } from "next/navigation";
 
 import EducationContent from "@/components/education-content";
 import { ContentLayout } from "@/components/admin-panel/content-layout";
-import { useEducationStore } from "@/lib/store/boardStore";
+import { useBoardStore } from "@/lib/store/boardStore";
 
 export default function BoardPage() {
   const searchParams = useSearchParams();
@@ -16,7 +16,7 @@ export default function BoardPage() {
   const chapter = searchParams.get("chapter");
 
   const { boardName, standardName, subjectName, chapterName } =
-    useEducationStore();
+    useBoardStore();
 
   // Determine the title based on the current navigation state
   const getTitle = () => {
@@ -36,7 +36,7 @@ export default function BoardPage() {
       return boardName || "Board";
     }
 
-    return "Educational Boards";
+    return "BSEB Boards";
   };
 
   return (

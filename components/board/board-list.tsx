@@ -12,10 +12,10 @@ import {
   CardDescription,
   CardContent,
 } from "@/components/ui/card";
-import { useEducationStore } from "@/lib/store/boardStore";
+import { useBoardStore } from "@/lib/store/boardStore";
 
 export function BoardList() {
-  const { data } = useEducationStore();
+  const { data } = useBoardStore();
   const boards = data.boards;
 
   return (

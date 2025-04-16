@@ -12,12 +12,12 @@ import {
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useEducationStore } from "@/lib/store/boardStore";
+import { useBoardStore } from "@/lib/store/boardStore";
 
 export function ChapterContent() {
   const [activeTab, setActiveTab] = useState<string>("content");
   const { content, chapterName, subjectName, standardName, boardName } =
-    useEducationStore();
+    useBoardStore();
 
   return (
     <Card>

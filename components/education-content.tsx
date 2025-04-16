@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 
-import { useEducationStore } from "@/lib/store/boardStore";
+import { useBoardStore } from "@/lib/store/boardStore";
 import { EducationBreadcrumb } from "@/components/board/board-breadcrumb";
 import { BoardList } from "@/components/board/board-list";
 import { StandardList } from "@/components/board/standard-list";
@@ -23,7 +23,7 @@ export default function EducationContent({
   subject,
   chapter,
 }: EducationContentProps) {
-  const { setNavigation } = useEducationStore();
+  const { setNavigation } = useBoardStore();
 
   // Sync URL params with store state
   useEffect(() => {

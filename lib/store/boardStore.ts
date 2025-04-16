@@ -1,4 +1,4 @@
-// src/store/educationStore.ts
+// @/lib/store/boardStore.ts
 
 import type { Board, NavigationState } from "@/lib/type/board";
 
@@ -22,7 +22,7 @@ interface EducationState extends NavigationState {
   updateNames: () => void;
 }
 
-export const useEducationStore = create<EducationState>()(
+export const useBoardStore = create<EducationState>()(
   persist(
     (set, get) => ({
       // Navigation state

@@ -1,4 +1,4 @@
-// src/types/education.ts
+// @/lib/type/board.ts
 
 export interface Chapter {
   id: string;
