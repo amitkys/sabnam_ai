@@ -1,10 +1,12 @@
+// src/app/board/page.tsx
+
 "use client";
 
 import { useSearchParams } from "next/navigation";
 
 import EducationContent from "@/components/education-content";
-import { educationalData } from "@/lib/data";
 import { ContentLayout } from "@/components/admin-panel/content-layout";
+import { useEducationStore } from "@/lib/store/boardStore";
 
 export default function BoardPage() {
   const searchParams = useSearchParams();
@@ -13,36 +15,25 @@ export default function BoardPage() {
   const subject = searchParams.get("subject");
   const chapter = searchParams.get("chapter");
 
+  const { boardName, standardName, subjectName, chapterName } =
+    useEducationStore();
+
   // Determine the title based on the current navigation state
   const getTitle = () => {
     if (chapter && subject && standard && boardType) {
-      const board = educationalData.boards.find((b) => b.id === boardType);
-      const std = board?.standards.find((s) => s.id === standard);
-      const subj = std?.subjects.find((s) => s.id === subject);
-      const chap = subj?.chapters.find((c) => c.id === chapter);
-
-      return chap?.name || "Chapter";
+      return chapterName || "Chapter";
     }
 
     if (subject && standard && boardType) {
-      const board = educationalData.boards.find((b) => b.id === boardType);
-      const std = board?.standards.find((s) => s.id === standard);
-      const subj = std?.subjects.find((s) => s.id === subject);
-
-      return subj?.name || "Subject";
+      return subjectName || "Subject";
     }
 
     if (standard && boardType) {
-      const board = educationalData.boards.find((b) => b.id === boardType);
-      const std = board?.standards.find((s) => s.id === standard);
-
-      return std?.name || "Standard";
+      return standardName || "Standard";
     }
 
     if (boardType) {
-      const board = educationalData.boards.find((b) => b.id === boardType);
-
-      return board?.name || "Board";
+      return boardName || "Board";
     }
 
     return "Educational Boards";
@@ -54,7 +45,6 @@ export default function BoardPage() {
       <EducationContent
         boardType={boardType}
         chapter={chapter}
-        data={educationalData}
         standard={standard}
         subject={subject}
       />
