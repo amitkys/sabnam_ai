@@ -3,8 +3,7 @@
 //   FirstTimeTooltipProvider,
 // } from "@/components/ui/customeToolTip";
 
-import Pricing from "@/components/ui/landing/pricing";
-
+import TypeWritter from "@/components/ui/landing/type-writter";
 // export default function Page() {
 //   return (
 //     <FirstTimeTooltipProvider>
@@ -18,5 +17,5 @@ import Pricing from "@/components/ui/landing/pricing";
 // }
 
 export default function Page() {
-  return <Pricing />;
+  return <TypeWritter />;
 }
