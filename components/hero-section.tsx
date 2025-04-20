@@ -2,6 +2,7 @@ import React from "react";
 import Link from "next/link";
 import { ArrowRight, ChevronRight } from "lucide-react";
 import Image from "next/image";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { TextEffect } from "@/components/ui/text-effect";
@@ -123,7 +124,10 @@ export default function HeroSection() {
                     size="lg"
                     variant="ghost"
                   >
-                    <Link href="#link">
+                    <Link
+                      href="#link"
+                      onClick={() => toast.info("Feature is not available yet")}
+                    >
                       <span className="text-nowrap">Request a test</span>
                     </Link>
                   </Button>
