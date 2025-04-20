@@ -3,6 +3,8 @@
 //   FirstTimeTooltipProvider,
 // } from "@/components/ui/customeToolTip";
 
+import Pricing from "@/components/ui/landing/pricing";
+
 // export default function Page() {
 //   return (
 //     <FirstTimeTooltipProvider>
@@ -16,10 +18,5 @@
 // }
 
 export default function Page() {
-  return (
-    <p className="truncate lg:overflow-visible lg:whitespace-normal lg:text-clip">
-      This is a really long text that will get truncated with an ellipsis on
-      small screens but will show fully on large screens.
-    </p>
-  );
+  return <Pricing />;
 }
