@@ -15,6 +15,19 @@ export default {
         sans: ["Inter", "ui-sans-serif", "system-ui"],
         serif: ["Noto Serif Devanagari", "ui-serif", "Georgia"],
       },
+      width: {
+        "60": "15rem",
+        "140": "35rem",
+      },
+      height: {
+        "320": "80rem",
+      },
+      translate: {
+        "87.5": "21.875rem",
+      },
+      opacity: {
+        "65": "0.65",
+      },
       colors: {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
