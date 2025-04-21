@@ -24,7 +24,7 @@ export function BoardList() {
         <CardTitle className="text-xl lg:text-2xl">Boards</CardTitle>
         <CardDescription>Select board to explore content</CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="min-h-[calc(100vh-56px-64px-20px-24px-56px-48px)]">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {boards.map((board: Board) => (
             <Link key={board.id} href={`/board?type=${board.id}`}>

@@ -1,7 +1,8 @@
 // src/components/education/chapter-content.tsx
 
-import { useState } from "react";
 import { BookText } from "lucide-react";
+
+import { Separator } from "../ui/separator";
 
 import {
   Card,
@@ -10,14 +11,10 @@ import {
   CardDescription,
   CardContent,
 } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { useBoardStore } from "@/lib/store/boardStore";
 
 export function ChapterContent() {
-  const [activeTab, setActiveTab] = useState<string>("content");
-  const { content, chapterName, subjectName, standardName, boardName } =
-    useBoardStore();
+  const { chapterName, subjectName, standardName, boardName } = useBoardStore();
 
   return (
     <Card>
@@ -27,39 +24,13 @@ export function ChapterContent() {
           <CardTitle>{chapterName}</CardTitle>
         </div>
         <CardDescription>
-          {subjectName} | {standardName} | {boardName}
+          {subjectName} | {standardName} | {boardName?.toUpperCase()}
         </CardDescription>
+        <Separator />
       </CardHeader>
-      <CardContent>
-        <Tabs className="w-full" value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-3 mb-6">
-            <TabsTrigger value="content">Content</TabsTrigger>
-            <TabsTrigger value="objectives">Learning Objectives</TabsTrigger>
-            <TabsTrigger value="practice">Practice Questions</TabsTrigger>
-          </TabsList>
-          <TabsContent className="mt-0" value="content">
-            <ScrollArea className="h-[60vh] rounded-md border p-4">
-              <div className="prose dark:prose-invert max-w-none">
-                <h2>Chapter Content</h2>
-                <p>{content}</p>
-                <p>
-                  This section would contain detailed explanations of the key
-                  concepts related to {chapterName} in {subjectName}.
-                </p>
-                {/* Additional content sections */}
-              </div>
-            </ScrollArea>
-          </TabsContent>
 
-          {/* Objectives and Practice tabs would be structured similarly */}
-          <TabsContent className="mt-0" value="objectives">
-            {/* Learning objectives content */}
-          </TabsContent>
-
-          <TabsContent className="mt-0" value="practice">
-            {/* Practice questions content */}
-          </TabsContent>
-        </Tabs>
+      <CardContent className="min-h-[calc(100vh-56px-64px-20px-24px-56px-48px)]">
+        <div>Hello world</div>
       </CardContent>
     </Card>
   );

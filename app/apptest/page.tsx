@@ -3,7 +3,6 @@
 //   FirstTimeTooltipProvider,
 // } from "@/components/ui/customeToolTip";
 
-import TypeWritter from "@/components/ui/landing/type-writter";
 // export default function Page() {
 //   return (
 //     <FirstTimeTooltipProvider>
@@ -15,7 +14,34 @@ import TypeWritter from "@/components/ui/landing/type-writter";
 //     </FirstTimeTooltipProvider>
 //   );
 // }
+"use client";
+
+import useSWR, { SWRConfig } from "swr";
+
+const fetcher = async (url: string) => {
+  await new Promise((resolve) => setTimeout(resolve, 3000)); // 3s delay
+
+  return fetch(url).then((res) => res.json());
+};
 
 export default function Page() {
-  return <TypeWritter />;
+  const fallbackData = {
+    "/api/testing": { message: "I am fallback message" },
+  };
+
+  return (
+    <SWRConfig value={{ fetcher, fallback: fallbackData }}>
+      <Other />
+    </SWRConfig>
+  );
+}
+
+function Other() {
+  const { data, isLoading } = useSWR("/api/testing");
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  return <div>{data.message}</div>;
 }
