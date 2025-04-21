@@ -19,7 +19,7 @@
 import useSWR, { SWRConfig } from "swr";
 
 const fetcher = async (url: string) => {
-  await new Promise((resolve) => setTimeout(resolve, 3000)); // 3s delay
+  await new Promise((resolve) => setTimeout(resolve, 3000));
 
   return fetch(url).then((res) => res.json());
 };
