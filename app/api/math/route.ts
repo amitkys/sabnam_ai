@@ -5,6 +5,7 @@ import prisma from "@/lib/db";
 
 export async function GET(req: NextRequest) {
   try {
+    await new Promise((resolve) => setTimeout(resolve, 5000));
     const { searchParams } = new URL(req.url);
     const claas = searchParams.get("claas");
     const subject = searchParams.get("subject");

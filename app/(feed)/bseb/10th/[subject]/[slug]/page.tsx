@@ -14,8 +14,9 @@ import {
   BreadcrumbPage,
 } from "@/components/ui/breadcrumb";
 import { fetcher } from "@/lib/utils";
-import { Loader } from "@/components/ui/loader";
 import { TestSeriesCard } from "@/components/TestSeries/TestSeriesCard";
+import { TestSeriesCardSkeleton } from "@/components/TestSeries/TestCard-skelton";
+import { Card, CardDescription } from "@/components/ui/card";
 
 export interface TestSeriesResponse {
   data: {
@@ -107,11 +108,16 @@ function Content({ chapterName, subjectName }: ContentProps) {
 
   if (isLoading) {
     return (
-      <div className="min-h-[calc(100vh-56px-64px-20px-24px-56px-48px)] flex items-center justify-center">
-        <Loader size="small" variant="spin" />
-        <span className="ml-3 text-base">
-          Loading Test for <b>{chapterName}</b>
-        </span>
+      <div className="mt-4">
+        <Card className="min-h-[calc1(110vh-56px-64px-20px-24px-56px-48px)]">
+          <CardDescription className="p-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {Array.from({ length: 6 }).map((_, index) => (
+                <TestSeriesCardSkeleton key={index} />
+              ))}
+            </div>
+          </CardDescription>
+        </Card>
       </div>
     );
   }

@@ -14,34 +14,17 @@
 //     </FirstTimeTooltipProvider>
 //   );
 // }
-"use client";
 
-import useSWR, { SWRConfig } from "swr";
+import { Skeleton } from "@/components/ui/skeleton";
 
-const fetcher = async (url: string) => {
-  await new Promise((resolve) => setTimeout(resolve, 3000));
-
-  return fetch(url).then((res) => res.json());
-};
-
-export default function Page() {
-  const fallbackData = {
-    "/api/testing": { message: "I am fallback message" },
-  };
-
+export default function SkeletonDemo() {
   return (
-    <SWRConfig value={{ fetcher, fallback: fallbackData }}>
-      <Other />
-    </SWRConfig>
+    <div className="flex items-center space-x-4">
+      <Skeleton className="h-12 w-12 rounded-full" />
+      <div className="space-y-2">
+        <Skeleton className="h-4 w-[250px]" />
+        <Skeleton className="h-4 w-[200px]" />
+      </div>
+    </div>
   );
-}
-
-function Other() {
-  const { data, isLoading } = useSWR("/api/testing");
-
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
-
-  return <div>{data.message}</div>;
 }

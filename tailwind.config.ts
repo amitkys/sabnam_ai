@@ -92,6 +92,11 @@ export default {
             height: "0",
           },
         },
+        pulse: {
+          "50%": {
+            opacity: "0.5",
+          },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
