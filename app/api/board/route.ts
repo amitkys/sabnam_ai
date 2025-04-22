@@ -5,15 +5,15 @@ import prisma from "@/lib/db";
 
 export async function GET(req: NextRequest) {
   try {
-    await new Promise((resolve) => setTimeout(resolve, 5000));
     const { searchParams } = new URL(req.url);
-    const claas = searchParams.get("claas");
+    const board = searchParams.get("board");
+    const standard = searchParams.get("standard");
     const subject = searchParams.get("subject");
     const chapter = searchParams.get("chapter");
     const session = await GetServerSessionHere();
     const userId = session.user.id;
 
-    if (!claas || !subject || !chapter) {
+    if (!board || !standard || !subject || !chapter) {
       return Response.json(
         {
           message: "Required data not provided",
@@ -31,7 +31,7 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    const titlePattern = `${claas} ${subject} ${chapter}`;
+    const titlePattern = `${board} ${standard} ${subject} ${chapter}`;
 
     const testSeries = await prisma.testSeries.findMany({
       where: {
@@ -80,6 +80,8 @@ export async function GET(req: NextRequest) {
         totalQuestions: series._count.questions,
       };
     });
+
+    await new Promise((resolve) => setTimeout(resolve, 800));
 
     return Response.json(
       {

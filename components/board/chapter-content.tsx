@@ -1,11 +1,11 @@
-// src/components/education/chapter-content.tsx
-
-import { BookText } from "lucide-react";
+"use client";
+import { AlertTriangle, BookText } from "lucide-react";
 import useSWR from "swr";
 
 import { Separator } from "../ui/separator";
 import { TestSeriesCardSkeleton } from "../TestSeries/TestCard-skelton";
 
+import { TestSeriesCard } from "@/components/TestSeries/TestSeriesCard";
 import {
   Card,
   CardHeader,
@@ -18,15 +18,41 @@ import { fetcher } from "@/lib/utils";
 import { IMainTestSeriesResponse } from "@/lib/type";
 
 export function ChapterContent() {
-  const { chapterName, subjectName, standardName, boardName } = useBoardStore();
+  // Get both IDs and display names from the store
+  const {
+    boardType,
+    standard,
+    subject,
+    chapter, // IDs for API requests
+    chapterName,
+    subjectName,
+    standardName,
+    boardName, // Names for display
+  } = useBoardStore();
+
+  // Define URL using IDs instead of names
+  const url =
+    boardType && standard && subject && chapter
+      ? `/api/board?board=${encodeURIComponent(boardType)}&standard=${encodeURIComponent(standard)}&subject=${encodeURIComponent(subject)}&chapter=${encodeURIComponent(chapter)}`
+      : null;
+
   const {
     data: testSeriesData,
     error,
     isLoading,
-  } = useSWR<IMainTestSeriesResponse>(
-    `/api/math?board=${boardName}&standard=${standardName}&subject=${subjectName}&chapter=${chapterName}`,
-    fetcher,
-  );
+  } = useSWR<IMainTestSeriesResponse>(url, fetcher);
+
+  // If required data is missing, render nothing or a message
+  if (!boardType || !standard || !subject || !chapter) {
+    return (
+      <Card className="p-6">
+        <div className="flex items-center justify-center h-32">
+          <AlertTriangle className="h-6 w-6 text-amber-500 mr-2" />
+          <p className="text-lg font-medium">Invalid navigation parameters</p>
+        </div>
+      </Card>
+    );
+  }
 
   return (
     <Card>
@@ -40,14 +66,33 @@ export function ChapterContent() {
         </CardDescription>
         <Separator />
       </CardHeader>
-
       <CardContent className="min-h-[calc(100vh-56px-64px-20px-24px-56px-48px)]">
-        {/* Show 3 skeleton cards while loading */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {/* Show 3 skeleton cards while loading */}
-          {Array.from({ length: 6 }).map((_, index) => (
-            <TestSeriesCardSkeleton key={index} />
-          ))}
+          {isLoading && (
+            <>
+              {Array.from({ length: 6 }).map((_, index) => (
+                <TestSeriesCardSkeleton key={index} />
+              ))}
+            </>
+          )}
+          {testSeriesData?.data.length === 0 && (
+            <div className="col-span-full flex flex-col items-center justify-center p-8 text-center">
+              <p className="text-lg font-medium text-muted-foreground">
+                No test series available
+              </p>
+              <p className="text-sm text-muted-foreground">
+                Check back later for new tests
+              </p>
+            </div>
+          )}
+
+          {!isLoading && !error && testSeriesData && (
+            <>
+              {testSeriesData.data.map((testSeries) => (
+                <TestSeriesCard key={testSeries.id} testSeries={testSeries} />
+              ))}
+            </>
+          )}
         </div>
       </CardContent>
     </Card>
