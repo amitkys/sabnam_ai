@@ -7,7 +7,7 @@ import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { educationalData } from "@/lib/data";
+import { educationalData } from "@/lib/board/data";
 import {
   Collapsible,
   CollapsibleContent,

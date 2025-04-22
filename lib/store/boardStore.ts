@@ -5,7 +5,7 @@ import type { Board, NavigationState } from "@/lib/type/board";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-import { boardExam } from "@/lib/data";
+import { boardExam } from "@/lib/board/data";
 
 interface EducationState extends NavigationState {
   data: {
@@ -15,7 +15,6 @@ interface EducationState extends NavigationState {
   standardName: string | null;
   subjectName: string | null;
   chapterName: string | null;
-  content: string | null;
   // Actions
   setNavigation: (nav: Partial<NavigationState>) => void;
   resetNavigation: () => void;
@@ -37,7 +36,6 @@ export const useBoardStore = create<EducationState>()(
       standardName: null,
       subjectName: null,
       chapterName: null,
-      content: null,
 
       // Actions
       setNavigation: (nav) => {
@@ -55,7 +53,6 @@ export const useBoardStore = create<EducationState>()(
           standardName: null,
           subjectName: null,
           chapterName: null,
-          content: null,
         });
       },
 
@@ -66,7 +63,6 @@ export const useBoardStore = create<EducationState>()(
         let standardName = null;
         let subjectName = null;
         let chapterName = null;
-        let content = null;
 
         if (boardType) {
           const board = data.boards.find((b) => b.id === boardType);
@@ -91,7 +87,6 @@ export const useBoardStore = create<EducationState>()(
 
                       if (chap) {
                         chapterName = chap.name;
-                        content = chap.content;
                       }
                     }
                   }
@@ -106,7 +101,6 @@ export const useBoardStore = create<EducationState>()(
           standardName,
           subjectName,
           chapterName,
-          content,
         });
       },
     }),

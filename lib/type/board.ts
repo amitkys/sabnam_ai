@@ -3,7 +3,6 @@
 export interface Chapter {
   id: string;
   name: string;
-  content: string;
 }
 
 export interface Subject {
