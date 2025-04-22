@@ -16,19 +16,7 @@ import {
 import { fetcher } from "@/lib/utils";
 import { TestSeriesCard } from "@/components/TestSeries/TestSeriesCard";
 import { TestSeriesCardSkeleton } from "@/components/TestSeries/TestCard-skelton";
-import { Card, CardDescription } from "@/components/ui/card";
-
-export interface TestSeriesResponse {
-  data: {
-    id: string;
-    title: string;
-    duration: number;
-    hasAttempted: boolean;
-    lastScore: number | null;
-    isCompleted: boolean;
-    totalQuestions: number;
-  }[];
-}
+import { IMainTestSeriesResponse } from "@/lib/type";
 
 export default function Page() {
   const params = useParams();
@@ -91,7 +79,7 @@ function Content({ chapterName, subjectName }: ContentProps) {
     data: testSeriesData,
     error,
     isLoading,
-  } = useSWR<TestSeriesResponse>(
+  } = useSWR<IMainTestSeriesResponse>(
     `/api/math?claas=10th&subject=${subjectName}&chapter=${chapterName}`,
     fetcher,
   );
@@ -108,16 +96,13 @@ function Content({ chapterName, subjectName }: ContentProps) {
 
   if (isLoading) {
     return (
-      <div className="mt-4">
-        <Card className="min-h-[calc1(110vh-56px-64px-20px-24px-56px-48px)]">
-          <CardDescription className="p-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {Array.from({ length: 6 }).map((_, index) => (
-                <TestSeriesCardSkeleton key={index} />
-              ))}
-            </div>
-          </CardDescription>
-        </Card>
+      <div className="container mx-auto px-4 py-8 lg:py-24">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {/* Show 3 skeleton cards while loading */}
+          {Array.from({ length: 6 }).map((_, index) => (
+            <TestSeriesCardSkeleton key={index} />
+          ))}
+        </div>
       </div>
     );
   }
