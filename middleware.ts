@@ -1,4 +1,5 @@
 import type { NextRequest } from "next/server";
+
 import { getToken } from "next-auth/jwt";
 import { NextResponse } from "next/server";
 
@@ -7,22 +8,23 @@ const publicPaths = ["/login"];
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  
-  // Check if the path is public
-  const isPublicPath = publicPaths.some((path) => path === pathname);
-  
-  if (isPublicPath) {
-    return NextResponse.next();
-  }
-  
+
   // Check for authentication token
   const token = await getToken({ req: request });
-  
-  if (!token) {
-    // Redirect unauthenticated users to login
+
+  // Check if the path is public
+  const isPublicPath = publicPaths.some((path) => path === pathname);
+
+  // If user is logged in and trying to access login page, redirect to home
+  if (token && pathname === "/login") {
+    return NextResponse.redirect(new URL("/home", request.url));
+  }
+
+  // If user is not logged in and trying to access protected routes, redirect to login
+  if (!token && !isPublicPath) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
-  
+
   return NextResponse.next();
 }
 
