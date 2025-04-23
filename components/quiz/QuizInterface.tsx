@@ -6,8 +6,8 @@ import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import Image from "next/image";
 
-import { Loader } from "@/components/ui/loader";
 import { useQuizStore } from "@/lib/store/useQuizStore";
 import { useFullscreen } from "@/hooks/use-fullscreen";
 import { Card } from "@/components/ui/card";
@@ -188,9 +188,16 @@ export default function QuizInterface({
   // Loading state check
   if (status === "loading") {
     return (
-      <div className="min-h-screen flex items-center justify-center space-x-2">
-        <Loader size="small" variant="spin" />
-        <p className=" ">Preparing..</p>
+      <div className="min-h-screen flex items-center flex-col justify-center space-x-2">
+        <Image
+          alt="Loading illustration"
+          height={400}
+          src={"/dog.svg"}
+          width={400}
+        />
+        <p className="text-lg font-medium text-foreground/75">
+          Loading your test series, please wait...
+        </p>
       </div>
     );
   }

@@ -5,6 +5,7 @@ import type React from "react"; // Added import for React
 import { useState } from "react";
 import { Book, GraduationCap, School } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { GoHome } from "react-icons/go";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -54,11 +55,11 @@ type Selection = {
 export default function Page() {
   return (
     <ContentLayout title="Sabnam">
-      <Breadcrumb>
+      <Breadcrumb className="ml-5 lg:ml-3 mb-4">
         <BreadcrumbList>
           <BreadcrumbItem>
-            <BreadcrumbLink aria-current="page" href="/">
-              Sabnam
+            <BreadcrumbLink aria-current="page" href="/home">
+              <GoHome className="text-lg" />
             </BreadcrumbLink>
           </BreadcrumbItem>
         </BreadcrumbList>

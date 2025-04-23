@@ -35,7 +35,7 @@ export default function ExamPage() {
       return examName || "Exam";
     }
 
-    return "Competitive Exams";
+    return "Exams";
   };
 
   return (

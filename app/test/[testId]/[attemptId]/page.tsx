@@ -1,10 +1,10 @@
 "use client";
 import { usePathname } from "next/navigation";
 import useSWR from "swr";
+import Image from "next/image";
 
 import { FetchedTestSeriesData } from "@/lib/type";
 import QuizInterface from "@/components/quiz/QuizInterface";
-import { Loader } from "@/components/ui/loader";
 
 const fetcher = async (url: string): Promise<FetchedTestSeriesData> => {
   const res = await fetch(url);
@@ -52,9 +52,16 @@ export default function Page() {
   }
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center space-x-2">
-        <Loader size="small" variant="spin" />
-        <p className=" ">Preparing..</p>
+      <div className="min-h-screen flex items-center flex-col justify-center space-x-2">
+        <Image
+          alt="Loading illustration"
+          height={400}
+          src={"/dog.svg"}
+          width={400}
+        />
+        <p className="text-lg font-medium text-foreground/75">
+          Loading your test series, please wait...
+        </p>
       </div>
     );
   }

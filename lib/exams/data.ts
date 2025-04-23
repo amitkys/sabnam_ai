@@ -1,5 +1,6 @@
 // @/lib/exam/data.ts
-export const examData = {
+import type { ExamData } from "@/lib/type/exam";
+export const examData: ExamData = {
   exams: [
     {
       id: "scqp09",
@@ -68,6 +69,22 @@ export const examData = {
             {
               id: "inorganic",
               name: "Inorganic Chemistry",
+            },
+          ],
+        },
+      ],
+    },
+    {
+      id: "bihar-police",
+      name: "Bihar Police Constable",
+      subjects: [
+        {
+          id: "math",
+          name: "Mathematics",
+          chapters: [
+            {
+              id: "quadractic-equation",
+              name: "Quadratic Equation",
             },
           ],
         },

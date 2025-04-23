@@ -64,7 +64,7 @@ export function Menu({ isOpen }: MenuProps) {
                               variant={
                                 (active === undefined &&
                                   pathname.startsWith(href)) ||
-                                active
+                                  active
                                   ? "secondary"
                                   : "ghost"
                               }
@@ -121,7 +121,7 @@ export function Menu({ isOpen }: MenuProps) {
                   <Button
                     className="w-full justify-center h-10 mt-5"
                     variant="outline"
-                    onClick={() => signOut({ callbackUrl: "/login" })}
+                    onClick={() => signOut({ callbackUrl: "/" })}
                   >
                     <span className={cn(isOpen === false ? "" : "mr-2")}>
                       <LogOut size={18} />

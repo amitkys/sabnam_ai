@@ -1,0 +1,124 @@
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 150 150" style="enable-background:new 0 0 512 512" xml:space="preserve">
+  <style>
+    /* Shadcn Default Colors */
+    :root {
+      --background: #ffffff;
+      --foreground: #09090b;
+      --primary: #18181b;
+      --primary-foreground: #ffffff;
+      --secondary: #f4f4f5;
+      --muted: #a1a1aa;
+      --accent: #f4f4f5;
+    }
+    
+    @keyframes walk {
+      0% {
+        transform: translateX(0) rotate(0deg);
+      }
+      25% {
+        transform: translateX(15px) rotate(1deg);
+      }
+      50% {
+        transform: translateX(30px) rotate(0deg);
+      }
+      75% {
+        transform: translateX(15px) rotate(-1deg);
+      }
+      100% {
+        transform: translateX(0) rotate(0deg);
+      }
+    }
+    
+    @keyframes legSwing1 {
+      0% { transform: rotate(0deg); }
+      25% { transform: rotate(15deg); }
+      50% { transform: rotate(0deg); }
+      75% { transform: rotate(-10deg); }
+      100% { transform: rotate(0deg); }
+    }
+    
+    @keyframes legSwing2 {
+      0% { transform: rotate(0deg); }
+      25% { transform: rotate(-10deg); }
+      50% { transform: rotate(0deg); }
+      75% { transform: rotate(15deg); }
+      100% { transform: rotate(0deg); }
+    }
+    
+    @keyframes armSwing1 {
+      0% { transform: rotate(0deg); }
+      25% { transform: rotate(-15deg); }
+      50% { transform: rotate(0deg); }
+      75% { transform: rotate(15deg); }
+      100% { transform: rotate(0deg); }
+    }
+    
+    @keyframes armSwing2 {
+      0% { transform: rotate(0deg); }
+      25% { transform: rotate(15deg); }
+      50% { transform: rotate(0deg); }
+      75% { transform: rotate(-15deg); }
+      100% { transform: rotate(0deg); }
+    }
+    
+    .character {
+      animation: walk 2s infinite linear;
+      transform-origin: 75px 75px;
+    }
+    
+    .leg-left {
+      animation: legSwing1 2s infinite linear;
+      transform-origin: 70px 80px;
+    }
+    
+    .leg-right {
+      animation: legSwing2 2s infinite linear;
+      transform-origin: 82px 80px;
+    }
+    
+    .arm-left {
+      animation: armSwing1 2s infinite linear;
+      transform-origin: 75px 60px;
+    }
+    
+    .arm-right {
+      animation: armSwing2 2s infinite linear;
+      transform-origin: 85px 60px;
+    }
+  </style>
+  
+  <g class="character">
+    <!-- Head and hair -->
+    <circle cx="82.4" cy="19" r="13.1" fill="var(--muted)"/>
+    <path fill="var(--primary)" d="M95 13.3c-.1-1.9-1.3-3.6-2.9-4.7-6.6-4.2-17.8-4.1-21.5 5-3.8 9.4 2.1 17.4 7.2 17.1s5.8-4.7 5.8-4.7c-2.8 0-1.1-7 1.2-5.7 2.4 1.3 1.5 5.7 1.5 5.7 1-.6 2.3-4.8 2.7-6.4.4-.2 1.1-1.1 2.8-1.8 2.8-1 3.3-2.9 3.2-4.5z"/>
+    <path fill="#b4d46c" d="M75.3 7.4s1.6 3.1 0 5.1c0 0 2.6-1.7 1.2-5.4z"/>
+    <circle cx="71.2" cy="9.9" r="4.9" fill="var(--primary)"/>
+    <path fill="var(--muted)" d="m86.6 29.7-2.3 8-7.8-5.6v-4.2z"/>
+
+    <!-- Torso -->
+    <path fill="var(--primary)" d="M75.3 30.7s8.1 4.3 9.6 4.8c0 0 7.3 13.6 8 14.8s-.2 6-2.6 8.3c0 0-2.2 9.2-2 10.7s-15.7.1-17.1-1c-1.3-1.2-2.7-30.2 4.1-37.6z"/>
+    <path fill="var(--secondary)" d="M81.3 33.8s-2.2.2-7.7 3.9c-4.1 2.8-5.7 3.8-6-.2 0 0-4.3 4.5-3.1 7.5 1.3 3 1.1 4.7 1.8 5.3 1 .8 2.5 5.3 4.9 0 1.6-3.6 7.6-16.5 13.7-14.8 0 0-1.1-1.7-3.6-1.7z"/>
+    <path fill="var(--primary)" d="M67.5 37.5s3.1-3.5 7-5.4v7.6l-5.2 3.7-2.6-2.9z"/>
+    <path fill="var(--secondary)" d="M75.3 31.3s-8.6 3.1-9.4 9.2l2.1-.7s.9-3.9 6.6-7.2c2.3-1.4.6-.2.6-.2z"/>
+    <path fill="var(--secondary)" d="M87 40.8s-1-4.4-4.9-3.1c-3.6 1.1-5.8 13.1-6.6 17.9-.2 1.3-.1 2.6.4 3.8L80 70l5.4-2.3-2.1-10.4c.1-.1 4.1-12.8 3.7-16.5z"/>
+
+    <!-- Hands -->
+    <path class="arm-left" fill="var(--muted)" d="M86.4 66.6c-.1.3-.2.6-.1 1 .1 1.4.5 5.2 3.6 7.2 3 1.9 3.5-4.2 1-8.8-1.1-1.9-3.8-1.6-4.5.6z" />
+    <path class="arm-right" fill="var(--muted)" d="M81.8 73.1c-.3.3-.5.7-.7 1.1-.7 1.7-2.2 6.4.4 10.5 2.5 3.9 6.4-3.1 5.9-9.9-.3-2.9-3.7-3.9-5.6-1.7z" />
+    <path fill="var(--muted)" d="m79.3 67.8 3.1 8.7 5-1.6-2.8-10.4z"/>
+
+    <!-- Legs -->
+    <path class="leg-left" fill="var(--accent)" d="M73.2 68.8s-3 4.4-3 10c0 5.5 6.8 10.1 6.8 10.1l12.4 18.6 8.4 23.5s3.1 1.6 8.4-2.3c0 0-6.1-22.1-7.5-25.6s-4.3-17.4-9.3-25.3c0-3.7-1.9-11.7-1.9-11.7z"/>
+    <path class="leg-right" fill="var(--accent)" d="M71.2 68.2s-5.9 5.8-3.6 13.1l1.6 4.5s-1.9 10-2.1 19.5c0 0-8.7 12.7-12.1 22.8 0 0 2.8 2.2 7.5 1.5 0 0 13-18.5 13.7-22s5.2-18.2 5.2-18.2l-2-21.6z"/>
+
+    <!-- Feet -->
+    <path fill="var(--secondary)" d="M60.1 127.8s10.7 6.8 10.8 7.8c.1.9.7 3.4-7.5 1.6-5.3-1.1-7.7-1.8-9.4-2.4-.3-.1-.5-.5-.7-.9-.5-1.2-.3-2.6.4-3.7L55 128z"/>
+    <path fill="var(--secondary)" d="M103.7 128s12.4 2.5 12.9 3.3 1.8 2.9-6.4 4.3c-5.3.9-8.7 1.1-10.5 1.2-.8 0-1.5-.6-1.6-1.4l-.3-4.3z"/>
+
+    <!-- Additional body parts -->
+    <path fill="var(--primary)" d="m99.1 105.6-3.7-1.5c-2.4-4.1-5.1-4.1-5.1-4.1-5.1-1.2-9.3 4.1-9.3 4.1-5.4 1.5-22.1 1.7-29.8 1.7 1.8-3.4.9-5.3.9-5.3v-.1c-.2-1.7-.9-2.7-1.9-3.3-1-.7-1.7-1.2-2.8-1.2-1.3 0-3-.2-4.1.4-.1 0-.1.1-.1.1-1 .6-1.8 1.4-2.5 2.4-3.8 6.3 6 11.6 6 11.6-2.2 4.6-1.7 9.3-2.4 12s-6.8 8.2-6.8 8.2L33.1 145h5.6c.7-1.7-1.5-2.2-1.5-2.2s3.7-9.7 7.6-11c3.9-1.2 13.2-9.7 13.2-9.7s7.1 1.7 13.2 2.2 8.6-.8 8.6-.8l2.8 11.5 3.8 7 6-.3c0-2.8-4.5-2.8-4.5-2.8l-1.6-3.9v-12.8c1.4-2.9 3-8 3-8s1.3-2.7 6.4-3.2c5.1-.6 3.4-5.4 3.4-5.4z"/>
+    <path fill="var(--foreground)" d="M46.7 104.6s-3.5-1.9-1.5-3.8c1.9-2 3.8 1.6 1.5 3.8z"/>
+    <path fill="var(--foreground)" d="M47.3 102.6s-2 4.1-.6 7.8c0 0-2.6-4.8-.6-7.8z"/>
+    <path fill="var(--accent)" d="M78.6 104.6s3.8 0 10.6 9.6c0 0-1.8-7.2-8-10.3z"/>
+  </g>
+</svg>

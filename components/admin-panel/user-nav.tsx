@@ -1,13 +1,15 @@
 "use client";
 import Link from "next/link";
 import { LayoutGrid, LogOut } from "lucide-react";
+import { useSession, signOut } from "next-auth/react";
+
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-  TooltipProvider
+  TooltipProvider,
 } from "@/components/ui/tooltip";
 import {
   DropdownMenu,
@@ -16,23 +18,22 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuTrigger
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useSession, signOut } from "next-auth/react";
 
 export function UserNav() {
   const { data: session, status } = useSession();
-  
+
   // Extract user information from session
   const user = session?.user;
   const name = user?.name || "User";
   const email = user?.email || "No email";
   const image = user?.image || null;
-  
+
   // Create initials for avatar fallback
   const initials = name
     .split(" ")
-    .map(n => n[0])
+    .map((n) => n[0])
     .join("")
     .toUpperCase()
     .substring(0, 2);
@@ -44,12 +45,12 @@ export function UserNav() {
           <TooltipTrigger asChild>
             <DropdownMenuTrigger asChild>
               <Button
-                variant="outline"
                 className="relative h-8 w-8 rounded-full"
                 disabled={status === "loading"}
+                variant="outline"
               >
                 <Avatar className="h-8 w-8">
-                  <AvatarImage src={image || ""} alt={`${name}'s avatar`} />
+                  <AvatarImage alt={`${name}'s avatar`} src={image || ""} />
                   <AvatarFallback className="bg-primary/10">
                     {initials}
                   </AvatarFallback>
@@ -60,9 +61,9 @@ export function UserNav() {
           <TooltipContent side="bottom">Profile</TooltipContent>
         </Tooltip>
       </TooltipProvider>
-      
+
       {status === "authenticated" && (
-        <DropdownMenuContent className="w-56" align="end" forceMount>
+        <DropdownMenuContent forceMount align="end" className="w-56">
           <DropdownMenuLabel className="font-normal">
             <div className="flex flex-col space-y-1">
               <p className="text-sm font-medium leading-none">{name}</p>
@@ -73,8 +74,8 @@ export function UserNav() {
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
-            <DropdownMenuItem className="hover:cursor-pointer" asChild>
-              <Link href="/dashboard" className="flex items-center">
+            <DropdownMenuItem asChild className="hover:cursor-pointer">
+              <Link className="flex items-center" href="/dashboard">
                 <LayoutGrid className="w-4 h-4 mr-3 text-muted-foreground" />
                 Dashboard
               </Link>
@@ -87,9 +88,9 @@ export function UserNav() {
             </DropdownMenuItem> */}
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
-          <DropdownMenuItem 
-            className="hover:cursor-pointer" 
-            onClick={() => signOut({ callbackUrl: '/login' })}
+          <DropdownMenuItem
+            className="hover:cursor-pointer"
+            onClick={() => signOut({ callbackUrl: "/" })}
           >
             <LogOut className="w-4 h-4 mr-3 text-muted-foreground" />
             Sign out

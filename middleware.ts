@@ -4,7 +4,7 @@ import { getToken } from "next-auth/jwt";
 import { NextResponse } from "next/server";
 
 // Define paths that don't require authentication
-const publicPaths = ["/login"];
+const publicPaths = ["/login", "/"];
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
