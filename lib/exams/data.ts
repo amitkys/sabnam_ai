@@ -1,33 +1,73 @@
-//@lib/exams/data.ts
-import type { IExam } from "@/lib/type/exam";
-
-export const exam: IExam = {
-  examName: [
+// @/lib/exam/data.ts
+export const examData = {
+  exams: [
     {
-      id: "cuet/scqp09",
-      name: "CUET/SCQP09",
+      id: "scqp09",
+      name: "CUET/Computer Science",
       subjects: [
         {
           id: "math",
           name: "Mathematics",
           chapters: [
             {
-              id: "set-theory",
-              name: "Set theory",
+              id: "real-number",
+              name: "Real Numbers",
             },
             {
-              id: "quadratic-equations",
-              name: "Quadratic Equations",
+              id: "algebra",
+              name: "Algebra",
+            },
+            {
+              id: "calculus",
+              name: "Calculus",
             },
           ],
         },
         {
-          id: "os",
-          name: "Operating System",
+          id: "physics",
+          name: "Physics",
           chapters: [
             {
-              id: "process-management",
-              name: "Process Management",
+              id: "mechanics",
+              name: "Mechanics",
+            },
+            {
+              id: "thermodynamics",
+              name: "Thermodynamics",
+            },
+          ],
+        },
+      ],
+    },
+    {
+      id: "neet",
+      name: "NEET",
+      subjects: [
+        {
+          id: "biology",
+          name: "Biology",
+          chapters: [
+            {
+              id: "cell-biology",
+              name: "Cell Biology",
+            },
+            {
+              id: "genetics",
+              name: "Genetics",
+            },
+          ],
+        },
+        {
+          id: "chemistry",
+          name: "Chemistry",
+          chapters: [
+            {
+              id: "organic",
+              name: "Organic Chemistry",
+            },
+            {
+              id: "inorganic",
+              name: "Inorganic Chemistry",
             },
           ],
         },

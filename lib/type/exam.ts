@@ -1,18 +1,28 @@
 // @/lib/type/exam.ts
-import type { Subject } from "@/lib/type/board";
 
-export interface IExamName {
+export interface Chapter {
+  id: string;
+  name: string;
+}
+
+export interface Subject {
+  id: string;
+  name: string;
+  chapters: Chapter[];
+}
+
+export interface Exam {
   id: string;
   name: string;
   subjects: Subject[];
 }
 
-export interface IExam {
-  examName: IExamName[];
+export interface ExamData {
+  exams: Exam[];
 }
 
-export interface IExamNavigationState {
-  type: string | null;
+export interface ExamNavigationState {
+  examType: string | null;
   subject: string | null;
   chapter: string | null;
 }
