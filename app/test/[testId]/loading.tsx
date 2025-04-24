@@ -3,7 +3,7 @@
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card } from "@/components/ui/card";
 
-export default function Loading() {
+export default function TestSererisSkeleton() {
   return (
     <div className="min-h-screen bg-background text-foreground transition-colors">
       <div className="flex-grow max-w-7xl mx-auto w-full">
