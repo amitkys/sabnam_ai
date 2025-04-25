@@ -65,17 +65,15 @@ export function ExamList() {
             >
               <Search className="h-4 w-4" />
               <span className="ml-2 hidden sm:inline">Search exams...</span>
-              <kbd className="ml-auto hidden sm:inline-flex pointer-events-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-xs font-medium text-muted-foreground">
-                <span className="text-xs">ctrl +</span>K
+              <kbd className="ml-auto hidden sm:inline-flex pointer-events-none items-center gap-1 rounded border bg-muted px-1.5  text-xs  text-muted-foreground">
+                <span className="text-xs">Ctrl +</span>K
               </kbd>
             </Button>
           </div>
 
           {/* Heading */}
-          <div className="flex flex-col items-center text-center grow">
-            <CardTitle className="text-lg sm:text-xl lg:text-2xl">
-              Explore Exams
-            </CardTitle>
+          <div className="flex flex-col items-center text-center grow text-foreground/75">
+            <CardTitle className="text-lg text-bold">Explore Exams</CardTitle>
             <CardDescription className="text-sm sm:text-base hidden lg:block">
               Select an exam to explore content
             </CardDescription>
