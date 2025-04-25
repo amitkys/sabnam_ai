@@ -1,11 +1,10 @@
-// src/components/exam/exam-chapter-content.tsx
-
 "use client";
-import { AlertTriangle, BookOpen } from "lucide-react";
+import { AlertTriangle, ArrowLeft } from "lucide-react";
 import useSWR from "swr";
+import Link from "next/link";
 
-import { Separator } from "../ui/separator";
 import { TestSeriesCardSkeleton } from "../TestSeries/TestCard-skelton";
+import { SelectSeparator } from "../ui/select";
 
 import { TestSeriesCard } from "@/components/TestSeries/TestSeriesCard";
 import {
@@ -56,16 +55,33 @@ export function ChapterContent() {
 
   return (
     <Card>
-      <CardHeader className="text-foreground/75">
-        <div className="flex items-center gap-2">
-          <BookOpen className="h-5 w-5" />
-          <CardTitle>{chapterName}</CardTitle>
+      <CardHeader className="px-4 text-foreground/75">
+        {/* Title row with back button */}
+        <div className="flex items-center justify-between w-full mx-2">
+          {/* Left - Back Button aligned with CardTitle */}
+          <Link
+            className="text-muted-foreground hover:text-foreground flex items-center gap-1 group"
+            href={`/exams?type=${examType}&subject=${subject}`}
+          >
+            <ArrowLeft className="h-4 md:h-5 group-hover:-translate-x-1 transition-transform" />
+          </Link>
+
+          {/* Middle - Title only */}
+          <CardTitle className="uppercase text-center flex-1">
+            {chapterName}
+          </CardTitle>
+
+          {/* Right - Empty space for balance */}
+          <div className="w-6 md:w-8" />
         </div>
-        <CardDescription>
+
+        {/* Description centered below title */}
+        <CardDescription className="text-center mt-1">
           {subjectName} | {examName?.toUpperCase()}
         </CardDescription>
-        <Separator />
+        <SelectSeparator />
       </CardHeader>
+
       <CardContent className="min-h-[calc(100vh-56px-64px-20px-24px-56px-48px)]">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {isLoading && (
