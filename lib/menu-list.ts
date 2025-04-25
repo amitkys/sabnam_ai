@@ -1,12 +1,13 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   Tag,
-  Users,
   Settings,
   Bookmark,
   SquarePen,
   LayoutGrid,
-  LucideIcon
+  LucideIcon,
+  Mail,
+  MessageCircle,
 } from "lucide-react";
 
 type Submenu = {
@@ -37,70 +38,81 @@ export function getMenuList(pathname: string): Group[] {
           href: "/dashboard",
           label: "Dashboard",
           icon: LayoutGrid,
-          submenus: []
-        }
-      ]
+          submenus: [],
+        },
+      ],
     },
     {
-      groupLabel: "Test Series",
+      groupLabel: "Test Series for:",
       menus: [
         {
-          href: "",
-          label: "BSEB",
+          href: "/board",
+          label: "Board Exams",
           icon: SquarePen,
-          submenus: [
-            {
-              href: "/bseb/10th",
-              label: "10th"
-            },
-            {
-              href: "/bseb/12th",
-              label: "12th"
-            }
-          ]
+          // submenus: [
+          //   {
+          //     href: "/bseb/10th",
+          //     label: "10th",
+          //   },
+          //   {
+          //     href: "/bseb/12th",
+          //     label: "12th",
+          //   },
+          // ],
         },
         {
-          href: "/CBSE",
-          label: "CBSE",
+          href: "/exams",
+          label: "More Exams",
           icon: Bookmark,
-          submenus: [
-            {
-              href: "/CBSE/10th",
-              label: "10th"
-            },
-            {
-              href: "/CBSE/12th",
-              label: "12th"
-            }
-          ]
+          // submenus: [
+          //   {
+          //     href: "/CBSE/10th",
+          //     label: "10th",
+          //   },
+          //   {
+          //     href: "/CBSE/12th",
+          //     label: "12th",
+          //   },
+          // ],
         },
         {
-          href: "/Computer Science",
-          label: "Computer Science",
+          href: "/subjects",
+          label: "Individual Subjects",
           icon: Tag,
-          submenus: [
-            {
-              href: "/comingsoon",
-              label: "Coming Soon"
-            }
-          ]
-        }
-      ]
+          // submenus: [
+          //   {
+          //     href: "/comingsoon",
+          //     label: "Coming Soon",
+          //   },
+          // ],
+        },
+      ],
     },
     {
-      groupLabel: "Others",
+      groupLabel: "User Voice", // Or any of the above
+      menus: [
+        {
+          href: "/feedback",
+          label: "Feedback",
+          icon: MessageCircle, // Instead of Users
+        },
+        {
+          href: "/req",
+          label: "Request a Test",
+          icon: Mail, // Instead of Settings
+        },
+      ],
+    },
+
+    {
+      groupLabel: "More..",
       menus: [
         {
           href: "/create",
-          label: "Create Test",
-          icon: Users,
+          label: "Add Test",
+          icon: Settings,
         },
-        {
-          href: "/users",
-          label: "Users",
-          icon: Settings
-        }
-      ]
-    }
+      ],
+    },
   ];
 }

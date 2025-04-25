@@ -7,7 +7,7 @@ import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { educationalData } from "@/lib/board/data";
+import { boardExam } from "@/lib/board/data";
 import {
   Collapsible,
   CollapsibleContent,
@@ -40,7 +40,7 @@ export function EducationSubmenu({
   const currentChapter = searchParams.get("chapter");
 
   // Find the board and standard
-  const board = educationalData.boards.find((b) => b.id === boardId);
+  const board = boardExam.boards.find((b) => b.id === boardId);
   const standard = board?.standards.find((s) => s.id === standardId);
 
   if (!board || !standard) return null;
