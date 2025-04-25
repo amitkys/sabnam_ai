@@ -25,9 +25,9 @@ export function ChapterList() {
 
   return (
     <Card>
-      <CardHeader className="flex items-center justify-center">
+      <CardHeader className="flex items-center justify-center text-foreground/75">
         <div className="flex items-center justify-center gap-2">
-          <CardTitle>{subjectName}</CardTitle>
+          <CardTitle className="font-bold text-lg">{subjectName}</CardTitle>
         </div>
         <CardDescription>Select a chapter to continue</CardDescription>
       </CardHeader>

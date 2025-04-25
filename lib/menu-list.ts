@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import {
-  Tag,
-  Settings,
-  Bookmark,
-  SquarePen,
+  CirclePlus,
   LayoutGrid,
   LucideIcon,
+  Book,
+  BookPlus,
+  School,
   Mail,
   MessageCircle,
 } from "lucide-react";
@@ -48,7 +48,7 @@ export function getMenuList(pathname: string): Group[] {
         {
           href: "/board",
           label: "Board Exams",
-          icon: SquarePen,
+          icon: School,
           // submenus: [
           //   {
           //     href: "/bseb/10th",
@@ -63,7 +63,7 @@ export function getMenuList(pathname: string): Group[] {
         {
           href: "/exams",
           label: "More Exams",
-          icon: Bookmark,
+          icon: BookPlus,
           // submenus: [
           //   {
           //     href: "/CBSE/10th",
@@ -78,7 +78,7 @@ export function getMenuList(pathname: string): Group[] {
         {
           href: "/subjects",
           label: "Individual Subjects",
-          icon: Tag,
+          icon: Book,
           // submenus: [
           //   {
           //     href: "/comingsoon",
@@ -110,7 +110,7 @@ export function getMenuList(pathname: string): Group[] {
         {
           href: "/create",
           label: "Add Test",
-          icon: Settings,
+          icon: CirclePlus,
         },
       ],
     },

@@ -24,7 +24,7 @@ export function SubjectList() {
 
   return (
     <Card>
-      <CardHeader className="flex items-center justify-center">
+      <CardHeader className="flex items-center justify-center text-foreground/75">
         <div className="flex items-center justify-center gap-2">
           <CardTitle>{standardName}</CardTitle>
         </div>
@@ -52,6 +52,11 @@ export function SubjectList() {
           ))}
         </div>
       </CardContent>
+      <div className="text-right mr-4 mb-1 text-foreground/60 hover:text-foreground/80">
+        <Link className="text-sm underline" href={"/req"}>
+          Request more subject
+        </Link>
+      </div>
     </Card>
   );
 }

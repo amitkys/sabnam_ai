@@ -15,40 +15,165 @@ export const boardExam = {
               chapters: [
                 {
                   id: "real-number",
-                  name: "Real Numbers",
+                  name: "1. Real Numbers",
                 },
                 {
                   id: "polynomials",
-                  name: "Polynomials",
+                  name: "2. Polynomials",
+                },
+                {
+                  id: "linear-equations-in-two-variables",
+                  name: "3. Linear Equations in Two Variables",
                 },
                 {
                   id: "quadratic-equations",
-                  name: "Quadratic Equations",
+                  name: "4. Quadratic Equations",
                 },
                 {
-                  id: "arithmetic-progressions",
-                  name: "Arithmetic Progressions",
+                  id: "ap",
+                  name: "5. Arithmetic Progressions",
+                },
+                {
+                  id: "triangles",
+                  name: "6. Triangles",
+                },
+                {
+                  id: "coordinate-geometry",
+                  name: "7. Coordinate Geometry",
+                },
+                {
+                  id: "introduction-to-trigonometry",
+                  name: "8. Introduction to Trigonometry",
+                },
+                {
+                  id: "applications-of-trigonometry",
+                  name: "9. Applications of Trigonometry",
+                },
+                {
+                  id: "circles",
+                  name: "10. Circles",
+                },
+                {
+                  id: "constructions",
+                  name: "11. Constructions",
+                },
+                {
+                  id: "areas-related-to-Circles",
+                  name: "12. Areas Related to Circles",
+                },
+                {
+                  id: "surface-areas-and-volumes",
+                  name: "13. Surface Areas and Volumes",
+                },
+                {
+                  id: "statistics",
+                  name: "14. Statistics",
+                },
+                {
+                  id: "probability",
+                  name: "15. Probability",
+                },
+                {
+                  id: "all",
+                  name: "Complete Math",
                 },
               ],
             },
             {
-              id: "science",
-              name: "Science",
+              id: "physics",
+              name: "Physics",
               chapters: [
                 {
-                  id: "chemical-reactions",
-                  name: "Chemical Reactions and Equations",
+                  id: "reflection-of-light",
+                  name: "1. Reflection of Light",
                 },
                 {
-                  id: "acids-bases-salts",
-                  name: "Acids, Bases and Salts",
+                  id: "refraction-of-light",
+                  name: "2. Refraction of Light",
                 },
                 {
-                  id: "metals-non-metals",
-                  name: "Metals and Non-metals",
+                  id: "human-eye-and-colourful-world",
+                  name: "3. Human Eye and the Colourful World",
+                },
+                {
+                  id: "electricity",
+                  name: "4. Electricity",
+                },
+                {
+                  id: "magnetic-effects-of-electric-current",
+                  name: "5. Magnetic Effects of Electric Current",
+                },
+                {
+                  id: "all",
+                  name: "Complete Physics",
                 },
               ],
             },
+            {
+              id: "chemistry",
+              name: "Chemistry",
+              chapters: [
+                {
+                  id: "chemical-reactions-and-equations",
+                  name: "1. Chemical Reactions and Equations",
+                },
+                {
+                  id: "acids-bases-and-salts",
+                  name: "2. Acids, Bases and Salts",
+                },
+                {
+                  id: "metals-and-non-metals",
+                  name: "3. Metals and Non-metals",
+                },
+                {
+                  id: "carbon-and-its-compounds",
+                  name: "4. Carbon and its Compounds",
+                },
+                {
+                  id: "periodic-classification-of-elements",
+                  name: "5. Periodic Classification of Elements",
+                },
+                {
+                  id: "all",
+                  name: "Complete Chemistry",
+                },
+              ],
+            },
+            {
+              id: "biology",
+              name: "Biology",
+              chapters: [
+                {
+                  id: "life-processes",
+                  name: "1. Life Processes",
+                },
+                {
+                  id: "control-and-coordination",
+                  name: "2. Control and Coordination",
+                },
+                {
+                  id: "how-do-organisms-reproduce",
+                  name: "3. How do Organisms Reproduce?",
+                },
+                {
+                  id: "heredity-and-evolution",
+                  name: "4. Heredity and Evolution",
+                },
+                {
+                  id: "our-environment",
+                  name: "5. Our Environment",
+                },
+                {
+                  id: "management-of-natural-resources",
+                  name: "6. Management of Natural Resources",
+                },
+                {
+                  id: "all",
+                  name: "Complete Biology",
+                },
+              ],
+            },
+
             {
               id: "english",
               name: "English",
