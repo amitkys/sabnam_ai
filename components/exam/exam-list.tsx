@@ -21,7 +21,7 @@ export function ExamList() {
   return (
     <Card>
       <CardHeader className="flex items-center justify-center">
-        <CardTitle className="text-xl lg:text-2xl">Competitive Exams</CardTitle>
+        <CardTitle className="text-xl lg:text-2xl">Explore Exams</CardTitle>
         <CardDescription>Select an exam to explore content</CardDescription>
       </CardHeader>
       <CardContent className="min-h-[calc(100vh-56px-64px-20px-24px-56px-48px)]">

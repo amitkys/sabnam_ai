@@ -1,9 +1,9 @@
 "use client";
 
-import type React from "react"; // Added import for React
+import type React from "react";
 
 import { useState } from "react";
-import { Book, GraduationCap, School } from "lucide-react";
+import { Book, School, GraduationCap, BookOpen } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { GoHome } from "react-icons/go";
 
@@ -40,10 +40,18 @@ import {
   BreadcrumbList,
 } from "@/components/ui/breadcrumb";
 
-type CardData = {
+type BoardCardData = {
   title: string;
   icon: React.ReactNode;
   iconColor: string;
+};
+
+type CategoryCardData = {
+  title: string;
+  description: string;
+  icon: React.ReactNode;
+  iconColor: string;
+  route: string;
 };
 
 type Selection = {
@@ -70,7 +78,7 @@ export default function Page() {
 }
 
 function CardWithForm() {
-  const router = useRouter(); // Initialize the router
+  const router = useRouter();
   const [isClassDialogOpen, setIsClassDialogOpen] = useState(false);
   const [isSubjectDialogOpen, setIsSubjectDialogOpen] = useState(false);
   const [currentSelection, setCurrentSelection] = useState<Selection>({
@@ -81,10 +89,9 @@ function CardWithForm() {
 
   const handleExplore = (topic: string) => {
     if (topic === "Competitive Exams") {
-      // Redirect to a specific page for competitive exams
-      router.push("/competitive-exams"); // Replace with your desired route
+      router.push("/competitive-exams");
 
-      return; // Exit the function early
+      return;
     }
 
     setCurrentSelection({ topic, class: "", subject: "" });
@@ -102,12 +109,14 @@ function CardWithForm() {
   };
 
   const handleFinalSubmit = () => {
-    // console.log("Final selection:", currentSelection);
     router.push(
       `/past10year?topic=${currentSelection.topic}&clas=${currentSelection.class}&subject=${currentSelection.subject}`,
     );
-    // Here you can perform any action with the final selection data
     setIsSubjectDialogOpen(false);
+  };
+
+  const handleCategoryClick = (route: string) => {
+    router.push(route);
   };
 
   const subjects10th = [
@@ -128,7 +137,7 @@ function CardWithForm() {
     "English",
   ];
 
-  const cardsData: CardData[] = [
+  const boardCardsData: BoardCardData[] = [
     {
       title: "NCERT",
       icon: <Book className="h-16 w-16" />,
@@ -139,10 +148,29 @@ function CardWithForm() {
       icon: <School className="h-16 w-16" />,
       iconColor: "text-green-500",
     },
+  ];
+
+  const categoryCardsData: CategoryCardData[] = [
     {
-      title: "Competitive Exams",
+      title: "Board Tests",
+      description: "Board exam preparations",
+      icon: <School className="h-16 w-16" />,
+      iconColor: "text-blue-500",
+      route: "/board",
+    },
+    {
+      title: "Subject Tests",
+      description: "Practice tests for individual subjects",
+      icon: <BookOpen className="h-16 w-16" />,
+      iconColor: "text-green-500",
+      route: "/subjects",
+    },
+    {
+      title: "Exams",
+      description: "Competitive exams, NEET, CUET & more",
       icon: <GraduationCap className="h-16 w-16" />,
       iconColor: "text-purple-500",
+      route: "/exams",
     },
   ];
 
@@ -202,7 +230,7 @@ function CardWithForm() {
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction
-            disabled={!currentSelection.subject} // Disable if no subject selected
+            disabled={!currentSelection.subject}
             onClick={handleFinalSubmit}
           >
             Confirm
@@ -213,40 +241,81 @@ function CardWithForm() {
   );
 
   return (
-    <div className="flex flex-col items-center gap-8 p-4">
-      {/* Text Section */}
-      <div className="text-center">
-        <h1 className="text-2xl lg:text-3xl font-bold">
-          10+ Years of Question Bank
-        </h1>
-        <p className="text-muted-foreground mt-2">
-          Start Mock Test for Free. Get Instant Results. Get Detailed Analysis.
-        </p>
-      </div>
+    <div className="flex flex-col items-center gap-12 p-4">
+      {/* First section: Question Bank */}
+      <div className="w-full">
+        {/* Heading for first section */}
+        <div className="text-center mb-6">
+          <h1 className="text-2xl lg:text-3xl font-bold">
+            Explore Exam Categories
+          </h1>
+          <p className="text-muted-foreground mt-2">
+            Find specialized content for various types of exams
+          </p>
+        </div>
+        {/* New three category cards */}
 
-      {/* Cards Section */}
-      <div className="flex flex-wrap justify-center gap-4 w-full">
-        {cardsData.map((card, index) => (
-          <Card key={index} className="w-full sm:w-[350px] relative">
-            <Badge className="absolute top-2 right-2" variant="secondary">
-              Free
-            </Badge>
-            <CardHeader className="flex items-center justify-center">
-              <div className={card.iconColor}>{card.icon}</div>
-            </CardHeader>
-            <CardContent className="text-center">
-              <h2 className="text-2xl font-bold">{card.title}</h2>
-            </CardContent>
-            <CardFooter>
-              <Button
-                className="w-full"
-                onClick={() => handleExplore(card.title)}
-              >
-                Explore
-              </Button>
-            </CardFooter>
-          </Card>
-        ))}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full">
+          {categoryCardsData.map((card, index) => (
+            <Card key={index} className="w-full relative">
+              <Badge className="absolute top-2 right-2" variant="secondary">
+                Free
+              </Badge>
+              <CardHeader className="flex items-center justify-center">
+                <div className={card.iconColor}>{card.icon}</div>
+              </CardHeader>
+              <CardContent className="text-center">
+                <h2 className="text-xl font-bold">{card.title}</h2>
+                <p className="text-muted-foreground mt-2">{card.description}</p>
+              </CardContent>
+              <CardFooter>
+                <Button
+                  className="w-full"
+                  onClick={() => handleCategoryClick(card.route)}
+                >
+                  Explore
+                </Button>
+              </CardFooter>
+            </Card>
+          ))}
+        </div>
+      </div>
+      <div className="w-full">
+        {/* Heading for second section */}
+        <div className="text-center mb-6">
+          <h1 className="text-2xl lg:text-3xl font-bold">
+            10+ Years of Question Bank
+          </h1>
+          <p className="text-muted-foreground mt-2">
+            Start Mock Test for Free. Get Instant Results. Get Detailed
+            Analysis.
+          </p>
+        </div>
+
+        {/* Original two cards (NCERT and CBSE) */}
+        <div className="flex flex-col sm:flex-row w-full gap-4">
+          {boardCardsData.map((card, index) => (
+            <Card key={index} className="w-full sm:w-1/2 relative">
+              <Badge className="absolute top-2 right-2" variant="secondary">
+                Free
+              </Badge>
+              <CardHeader className="flex items-center justify-center">
+                <div className={card.iconColor}>{card.icon}</div>
+              </CardHeader>
+              <CardContent className="text-center">
+                <h2 className="text-2xl font-bold">{card.title}</h2>
+              </CardContent>
+              <CardFooter>
+                <Button
+                  className="w-full"
+                  onClick={() => handleExplore(card.title)}
+                >
+                  Explore
+                </Button>
+              </CardFooter>
+            </Card>
+          ))}
+        </div>
       </div>
 
       {renderClassDialog()}

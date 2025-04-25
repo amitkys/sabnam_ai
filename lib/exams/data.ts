@@ -90,5 +90,87 @@ export const examData: ExamData = {
         },
       ],
     },
+    {
+      id: "cs",
+      name: "Computer Science",
+      subjects: [
+        {
+          id: "os",
+          name: "Operating System",
+          chapters: [
+            {
+              id: "process-management",
+              name: "Process Management",
+            },
+            {
+              id: "memory-management",
+              name: "Memory Management",
+            },
+            {
+              id: "file-management",
+              name: "File Management",
+            },
+            {
+              id: "cpu-scheduling",
+              name: "CPU Scheduling",
+            },
+          ],
+        },
+        {
+          id: "ds",
+          name: "Data Structure",
+          chapters: [
+            {
+              id: "array",
+              name: "Array",
+            },
+            {
+              id: "link-list",
+              name: "Link List",
+            },
+            {
+              id: "stack",
+              name: "Stack",
+            },
+            {
+              id: "queue",
+              name: "Queue",
+            },
+          ],
+        },
+        {
+          id: "networking",
+          name: "Computer Networking",
+          chapters: [
+            {
+              id: "network-topology",
+              name: "Network Topology",
+            },
+            {
+              id: "packet-switching",
+              name: "Packet Switching",
+            },
+            {
+              id: "circuit-switching",
+              name: "Circuit Switching",
+            },
+          ],
+        },
+        {
+          id: "db",
+          name: "Data Base Management System",
+          chapters: [
+            {
+              id: "into",
+              name: "Introduction to Database Management System",
+            },
+            {
+              id: "normalization",
+              name: "Normalization",
+            },
+          ],
+        },
+      ],
+    },
   ],
 };
