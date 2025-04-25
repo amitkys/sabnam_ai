@@ -42,17 +42,11 @@ export function ExamBreadcrumb() {
           <TooltipProvider>
             <Tooltip delayDuration={10}>
               <TooltipTrigger asChild>
-                {currentLevel === "home" ? (
-                  <BreadcrumbPage className="flex items-center">
-                    <GoHome className="text-lg text-primary font-bold" />
-                  </BreadcrumbPage>
-                ) : (
-                  <BreadcrumbLink asChild>
-                    <Link href="/home">
-                      <GoHome className="text-lg" />
-                    </Link>
-                  </BreadcrumbLink>
-                )}
+                <BreadcrumbLink asChild>
+                  <Link href="/home">
+                    <GoHome className="text-lg" />
+                  </Link>
+                </BreadcrumbLink>
               </TooltipTrigger>
               <TooltipContent>
                 <p>Home</p>
@@ -76,7 +70,7 @@ export function ExamBreadcrumb() {
                   </BreadcrumbPage>
                 ) : (
                   <BreadcrumbLink asChild>
-                    <Link className="flex items-center" href="/exam">
+                    <Link className="flex items-center" href="/exams">
                       <FileText className="h-4 w-4" />
                       {currentLevel === "exam" && !examType && (
                         <span className="ml-1">Exams</span>
@@ -111,7 +105,7 @@ export function ExamBreadcrumb() {
                       <BreadcrumbLink asChild>
                         <Link
                           className="flex items-center"
-                          href={`/exam?type=${examType}`}
+                          href={`/exams?type=${examType}`}
                         >
                           <span className="uppercase">{examName}</span>
                         </Link>
@@ -147,7 +141,7 @@ export function ExamBreadcrumb() {
                       <BreadcrumbLink asChild>
                         <Link
                           className="flex items-center"
-                          href={`/exam?type=${examType}&subject=${subject}`}
+                          href={`/exams?type=${examType}&subject=${subject}`}
                         >
                           <BookText className="h-4 w-4 mr-1" />
                           <span>{subjectName}</span>

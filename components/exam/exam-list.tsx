@@ -66,7 +66,7 @@ export function ExamList() {
               <Search className="h-4 w-4" />
               <span className="ml-2 hidden sm:inline">Search exams...</span>
               <kbd className="ml-auto hidden sm:inline-flex pointer-events-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-xs font-medium text-muted-foreground">
-                <span className="text-xs">⌘</span>K
+                <span className="text-xs">ctrl +</span>K
               </kbd>
             </Button>
           </div>

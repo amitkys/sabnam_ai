@@ -152,6 +152,13 @@ function CardWithForm() {
 
   const categoryCardsData: CategoryCardData[] = [
     {
+      title: "Exams",
+      description: "Competitive exams, NEET, CUET & more",
+      icon: <GraduationCap className="h-16 w-16" />,
+      iconColor: "text-purple-500",
+      route: "/exams",
+    },
+    {
       title: "Board Tests",
       description: "Board exam preparations",
       icon: <School className="h-16 w-16" />,
@@ -164,13 +171,6 @@ function CardWithForm() {
       icon: <BookOpen className="h-16 w-16" />,
       iconColor: "text-green-500",
       route: "/subjects",
-    },
-    {
-      title: "Exams",
-      description: "Competitive exams, NEET, CUET & more",
-      icon: <GraduationCap className="h-16 w-16" />,
-      iconColor: "text-purple-500",
-      route: "/exams",
     },
   ];
 

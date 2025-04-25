@@ -2,12 +2,13 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 
 import {
   Card,
   CardHeader,
   CardTitle,
-  CardDescription,
   CardContent,
   CardFooter,
 } from "@/components/ui/card";
@@ -65,18 +66,29 @@ export default function RequestExamPage() {
   };
 
   return (
-    <div className="flex flex-col items-center min-h-[calc(100vh-56px-64px-20px-24px-56px-48px)] py-8">
-      <div className="container max-w-2xl">
+    <div className="flex flex-col items-center min-h-[calc(100vh-56px-64px-20px-24px-56px-48px)] pt-14">
+      <div className="container max-w-4xl">
         <Card>
-          <CardHeader>
-            <CardTitle className="text-2xl">Request an Exam Test</CardTitle>
-            <CardDescription>
-              Fill out this form to request a new exam to be added to our
-              platform
-            </CardDescription>
+          <CardHeader className="text-foreground/75 relative px-4 py-6 flex flex-col sm:flex-row items-center justify-center gap-2 text-center">
+            {/* Back Button - absolute positioned on all screen sizes */}
+            <div className="absolute left-4 top-1/2 -translate-y-1/2">
+              <Link
+                className="text-muted-foreground hover:text-foreground flex items-center gap-1 group"
+                href="/exams"
+              >
+                <ArrowLeft className="h-4 md:h-5 transform transition-transform duration-200 group-hover:-translate-x-1" />
+              </Link>
+            </div>
+
+            {/* Centered Title - truly centered regardless of back button */}
+            <div className="flex flex-col w-full">
+              <CardTitle className="text-base md:text-xl font-bold">
+                Request an Exam Test
+              </CardTitle>
+            </div>
           </CardHeader>
 
-          <form onSubmit={handleSubmit}>
+          <form className="text-foreground/75" onSubmit={handleSubmit}>
             <CardContent className="space-y-6">
               <div className="space-y-2">
                 <label className="text-sm font-medium" htmlFor="examName">
@@ -122,23 +134,8 @@ export default function RequestExamPage() {
                   className="min-h-32"
                   id="description"
                   name="description"
-                  placeholder="Describe the exam in detail, including subjects and chapters you'd like to see"
+                  placeholder="Describe what you want related to exams"
                   value={formData.description}
-                  onChange={handleChange}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium" htmlFor="email">
-                  Your Email <span className="text-red-500">*</span>
-                </label>
-                <Input
-                  required
-                  id="email"
-                  name="email"
-                  placeholder="We'll notify you when the exam is added"
-                  type="email"
-                  value={formData.email}
                   onChange={handleChange}
                 />
               </div>
