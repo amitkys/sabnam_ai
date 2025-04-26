@@ -1,3 +1,5 @@
+import { Skeleton } from "@/components/ui/skeleton";
+
 // import {
 //   FirstTimeTooltip,
 //   FirstTimeTooltipProvider,
@@ -14,8 +16,6 @@
 //     </FirstTimeTooltipProvider>
 //   );
 // }
-
-import { Skeleton } from "@/components/ui/skeleton";
 
 export default function SkeletonDemo() {
   return (

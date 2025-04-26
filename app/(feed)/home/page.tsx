@@ -32,6 +32,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ContentLayout } from "@/components/admin-panel/content-layout";
+import { Loader } from "@/components/ui/loader"; // Import the Loader component
 
 type BoardCardData = {
   title: string;
@@ -62,16 +63,25 @@ export default function Page() {
     class: "",
     subject: "",
   });
+  const [loadingCard, setLoadingCard] = useState<string | null>(null);
 
   const handleExplore = (topic: string) => {
+    setLoadingCard(topic);
+
     if (topic === "Competitive Exams") {
-      router.push("/competitive-exams");
+      setTimeout(() => {
+        router.push("/competitive-exams");
+        setLoadingCard(null);
+      }, 500);
 
       return;
     }
 
     setCurrentSelection({ topic, class: "", subject: "" });
-    setIsClassDialogOpen(true);
+    setTimeout(() => {
+      setIsClassDialogOpen(true);
+      setLoadingCard(null);
+    }, 500);
   };
 
   const handleClassSelect = (value: string) => {
@@ -85,14 +95,22 @@ export default function Page() {
   };
 
   const handleFinalSubmit = () => {
-    router.push(
-      `/past10year?topic=${currentSelection.topic}&clas=${currentSelection.class}&subject=${currentSelection.subject}`,
-    );
-    setIsSubjectDialogOpen(false);
+    setLoadingCard("submit");
+    setTimeout(() => {
+      router.push(
+        `/past10year?topic=${currentSelection.topic}&clas=${currentSelection.class}&subject=${currentSelection.subject}`,
+      );
+      setIsSubjectDialogOpen(false);
+      setLoadingCard(null);
+    }, 500);
   };
 
-  const handleCategoryClick = (route: string) => {
-    router.push(route);
+  const handleCategoryClick = (route: string, title: string) => {
+    setLoadingCard(title);
+    setTimeout(() => {
+      router.push(route);
+      setLoadingCard(null);
+    }, 500);
   };
 
   const subjects10th = [
@@ -206,9 +224,12 @@ export default function Page() {
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction
-            disabled={!currentSelection.subject}
+            disabled={!currentSelection.subject || loadingCard === "submit"}
             onClick={handleFinalSubmit}
           >
+            {loadingCard === "submit" && (
+              <Loader className="mr-1" size="small" variant="spin" />
+            )}
             Confirm
           </AlertDialogAction>
         </AlertDialogFooter>
@@ -250,8 +271,12 @@ export default function Page() {
                 <CardFooter>
                   <Button
                     className="w-full"
-                    onClick={() => handleCategoryClick(card.route)}
+                    disabled={loadingCard === card.title}
+                    onClick={() => handleCategoryClick(card.route, card.title)}
                   >
+                    {loadingCard === card.title && (
+                      <Loader className="mr-1" size="small" variant="spin" />
+                    )}
                     Explore
                   </Button>
                 </CardFooter>
@@ -287,8 +312,12 @@ export default function Page() {
                 <CardFooter>
                   <Button
                     className="w-full"
+                    disabled={loadingCard === card.title}
                     onClick={() => handleExplore(card.title)}
                   >
+                    {loadingCard === card.title && (
+                      <Loader className="mr-1" size="small" variant="spin" />
+                    )}
                     Explore
                   </Button>
                 </CardFooter>
