@@ -5,7 +5,6 @@ import type React from "react";
 import { useState } from "react";
 import { Book, School, GraduationCap, BookOpen } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { GoHome } from "react-icons/go";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -33,12 +32,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ContentLayout } from "@/components/admin-panel/content-layout";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-} from "@/components/ui/breadcrumb";
 
 type BoardCardData = {
   title: string;
@@ -61,23 +54,6 @@ type Selection = {
 };
 
 export default function Page() {
-  return (
-    <ContentLayout title="Sabnam">
-      <Breadcrumb className="ml-5 lg:ml-3 mb-4">
-        <BreadcrumbList>
-          <BreadcrumbItem>
-            <BreadcrumbLink aria-current="page" href="/home">
-              <GoHome className="text-lg" />
-            </BreadcrumbLink>
-          </BreadcrumbItem>
-        </BreadcrumbList>
-      </Breadcrumb>
-      <CardWithForm />
-    </ContentLayout>
-  );
-}
-
-function CardWithForm() {
   const router = useRouter();
   const [isClassDialogOpen, setIsClassDialogOpen] = useState(false);
   const [isSubjectDialogOpen, setIsSubjectDialogOpen] = useState(false);
@@ -241,85 +217,89 @@ function CardWithForm() {
   );
 
   return (
-    <div className="flex flex-col items-center gap-12 p-4">
-      {/* First section: Question Bank */}
-      <div className="w-full">
-        {/* Heading for first section */}
-        <div className="text-center mb-6">
-          <h1 className="text-2xl lg:text-3xl font-bold">
-            Explore Exam Categories
-          </h1>
-          <p className="text-muted-foreground mt-2">
-            Find specialized content for various types of exams
-          </p>
-        </div>
-        {/* New three category cards */}
+    <ContentLayout title="Home">
+      <div className="flex flex-col items-center gap-12 p-2">
+        {/* First section: Question Bank */}
+        <div className="w-full">
+          {/* Heading for first section */}
+          <div className="text-center mb-6">
+            <h1 className="text-2xl lg:text-3xl font-bold">
+              Explore Exam Categories
+            </h1>
+            <p className="text-muted-foreground mt-2">
+              Find specialized content for various types of exams
+            </p>
+          </div>
+          {/* New three category cards */}
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full">
-          {categoryCardsData.map((card, index) => (
-            <Card key={index} className="w-full relative">
-              <Badge className="absolute top-2 right-2" variant="secondary">
-                Free
-              </Badge>
-              <CardHeader className="flex items-center justify-center">
-                <div className={card.iconColor}>{card.icon}</div>
-              </CardHeader>
-              <CardContent className="text-center">
-                <h2 className="text-xl font-bold">{card.title}</h2>
-                <p className="text-muted-foreground mt-2">{card.description}</p>
-              </CardContent>
-              <CardFooter>
-                <Button
-                  className="w-full"
-                  onClick={() => handleCategoryClick(card.route)}
-                >
-                  Explore
-                </Button>
-              </CardFooter>
-            </Card>
-          ))}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full">
+            {categoryCardsData.map((card, index) => (
+              <Card key={index} className="w-full relative">
+                <Badge className="absolute top-2 right-2" variant="secondary">
+                  Free
+                </Badge>
+                <CardHeader className="flex items-center justify-center">
+                  <div className={card.iconColor}>{card.icon}</div>
+                </CardHeader>
+                <CardContent className="text-center">
+                  <h2 className="text-xl font-bold">{card.title}</h2>
+                  <p className="text-muted-foreground mt-2">
+                    {card.description}
+                  </p>
+                </CardContent>
+                <CardFooter>
+                  <Button
+                    className="w-full"
+                    onClick={() => handleCategoryClick(card.route)}
+                  >
+                    Explore
+                  </Button>
+                </CardFooter>
+              </Card>
+            ))}
+          </div>
         </div>
+        <div className="w-full">
+          {/* Heading for second section */}
+          <div className="text-center mb-6">
+            <h1 className="text-2xl lg:text-3xl font-bold">
+              10+ Years of Question Bank
+            </h1>
+            <p className="text-muted-foreground mt-2">
+              Start Mock Test for Free. Get Instant Results. Get Detailed
+              Analysis.
+            </p>
+          </div>
+
+          {/* Original two cards (NCERT and CBSE) */}
+          <div className="flex flex-col sm:flex-row w-full gap-4">
+            {boardCardsData.map((card, index) => (
+              <Card key={index} className="w-full sm:w-1/2 relative">
+                <Badge className="absolute top-2 right-2" variant="secondary">
+                  Free
+                </Badge>
+                <CardHeader className="flex items-center justify-center">
+                  <div className={card.iconColor}>{card.icon}</div>
+                </CardHeader>
+                <CardContent className="text-center">
+                  <h2 className="text-2xl font-bold">{card.title}</h2>
+                </CardContent>
+                <CardFooter>
+                  <Button
+                    className="w-full"
+                    onClick={() => handleExplore(card.title)}
+                  >
+                    Explore
+                  </Button>
+                </CardFooter>
+              </Card>
+            ))}
+          </div>
+        </div>
+
+        {renderClassDialog()}
+        {renderSubjectDialog()}
       </div>
-      <div className="w-full">
-        {/* Heading for second section */}
-        <div className="text-center mb-6">
-          <h1 className="text-2xl lg:text-3xl font-bold">
-            10+ Years of Question Bank
-          </h1>
-          <p className="text-muted-foreground mt-2">
-            Start Mock Test for Free. Get Instant Results. Get Detailed
-            Analysis.
-          </p>
-        </div>
-
-        {/* Original two cards (NCERT and CBSE) */}
-        <div className="flex flex-col sm:flex-row w-full gap-4">
-          {boardCardsData.map((card, index) => (
-            <Card key={index} className="w-full sm:w-1/2 relative">
-              <Badge className="absolute top-2 right-2" variant="secondary">
-                Free
-              </Badge>
-              <CardHeader className="flex items-center justify-center">
-                <div className={card.iconColor}>{card.icon}</div>
-              </CardHeader>
-              <CardContent className="text-center">
-                <h2 className="text-2xl font-bold">{card.title}</h2>
-              </CardContent>
-              <CardFooter>
-                <Button
-                  className="w-full"
-                  onClick={() => handleExplore(card.title)}
-                >
-                  Explore
-                </Button>
-              </CardFooter>
-            </Card>
-          ))}
-        </div>
-      </div>
-
-      {renderClassDialog()}
-      {renderSubjectDialog()}
-    </div>
+    </ContentLayout>
   );
 }
