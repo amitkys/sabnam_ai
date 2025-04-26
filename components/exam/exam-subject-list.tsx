@@ -59,7 +59,9 @@ export function SubjectList() {
                 <CardHeader className="p-4">
                   <div className="flex items-center gap-2 text-foreground/75">
                     <BookText className="h-5 w-5" />
-                    <CardTitle className="text-lg">{subj.name}</CardTitle>
+                    <CardTitle className="text-lg truncate max-w-xs">
+                      {subj.name}
+                    </CardTitle>
                   </div>
                   <CardDescription>
                     {subj.chapters.length} chapters available

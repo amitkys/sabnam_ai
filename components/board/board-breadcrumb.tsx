@@ -51,17 +51,11 @@ export function BoardBreadcrumb() {
           <TooltipProvider>
             <Tooltip delayDuration={10}>
               <TooltipTrigger asChild>
-                {currentLevel === "home" ? (
-                  <BreadcrumbPage className="flex items-center">
-                    <GoHome className="text-lg text-primary font-bold" />
-                  </BreadcrumbPage>
-                ) : (
-                  <BreadcrumbLink asChild>
-                    <Link href="/home">
-                      <GoHome className="text-lg" />
-                    </Link>
-                  </BreadcrumbLink>
-                )}
+                <BreadcrumbLink asChild>
+                  <Link href="/home">
+                    <GoHome className="text-lg" />
+                  </Link>
+                </BreadcrumbLink>
               </TooltipTrigger>
               <TooltipContent>
                 <p>Home</p>

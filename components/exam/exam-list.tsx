@@ -3,8 +3,10 @@ import type { Exam } from "@/lib/type/exam";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { FileText, Search, Plus } from "lucide-react";
+import { FileText, Search, Plus, ArrowLeft } from "lucide-react";
 import { DialogTitle } from "@radix-ui/react-dialog";
+
+import { SelectSeparator } from "../ui/select";
 
 import {
   Card,
@@ -55,38 +57,56 @@ export function ExamList() {
   return (
     <>
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between flex-wrap gap-2">
-          {/* Search Button */}
-          <div className="w-auto">
-            <Button
-              className="justify-start text-muted-foreground"
-              variant="outline"
-              onClick={() => setOpen(true)}
+        <CardHeader className="px-4 text-foreground/75">
+          {/* Title row with back button */}
+          <div className="flex items-center justify-between w-full mx-2">
+            {/* Left - Back Button aligned with CardTitle */}
+            <Link
+              className="text-muted-foreground hover:text-foreground flex items-center gap-1 group"
+              href="/home"
             >
-              <Search className="h-4 w-4" />
-              <span className="ml-2 hidden sm:inline">Search exams...</span>
-              <kbd className="ml-auto hidden sm:inline-flex pointer-events-none items-center gap-1 rounded border bg-muted px-1.5  text-xs  text-muted-foreground">
-                <span className="text-xs">Ctrl +</span>K
-              </kbd>
-            </Button>
+              <ArrowLeft className="h-4 md:h-5 group-hover:-translate-x-1 transition-transform" />
+            </Link>
+            {/* Middle - Title only */}
+            <CardTitle className="uppercase text-center flex-1">
+              Explore Exams
+            </CardTitle>
+            {/* Right - Empty space for balance */}
+            <div className="w-6 md:w-8" />
           </div>
 
-          {/* Heading */}
-          <div className="flex flex-col items-center text-center grow text-foreground/75">
-            <CardTitle className="text-lg text-bold">Explore Exams</CardTitle>
-            <CardDescription className="text-sm sm:text-base hidden lg:block">
-              Select an exam to explore content
-            </CardDescription>
-          </div>
+          {/* Description centered below title */}
+          <CardDescription className="text-center mt-1">
+            Select an exam to explore content
+          </CardDescription>
+          <SelectSeparator className="my-2" />
 
-          {/* Request Exam Button */}
-          <div className="w-auto">
-            <Button onClick={handleRequestExam}>
-              <Plus className="h-4 w-4" />
-              <span className="ml-2 hidden sm:inline">
-                Request for Exam Test
-              </span>
-            </Button>
+          {/* Search and Request Row */}
+          <div className="flex flex-row items-center justify-between flex-wrap gap-2 mt-2">
+            {/* Search Button */}
+            <div className="w-auto">
+              <Button
+                className="justify-start text-muted-foreground"
+                variant="outline"
+                onClick={() => setOpen(true)}
+              >
+                <Search className="h-4 w-4" />
+                <span className="ml-2 hidden sm:inline">Search exams...</span>
+                <kbd className="ml-auto hidden sm:inline-flex pointer-events-none items-center gap-1 rounded border bg-muted px-1.5 text-xs text-muted-foreground">
+                  <span className="text-xs">Ctrl +</span>K
+                </kbd>
+              </Button>
+            </div>
+
+            {/* Request Exam Button */}
+            <div className="w-auto">
+              <Button onClick={handleRequestExam}>
+                <Plus className="h-4 w-4" />
+                <span className="ml-2 hidden sm:inline">
+                  Request for Exam Test
+                </span>
+              </Button>
+            </div>
           </div>
         </CardHeader>
 
@@ -98,7 +118,10 @@ export function ExamList() {
                   <CardHeader className="p-4">
                     <div className="flex items-center gap-2 text-foreground/75">
                       <FileText className="h-5 w-5" />
-                      <CardTitle className="text-lg uppercase">
+                      <CardTitle
+                        className="text-lg uppercase truncate max-w-xs"
+                        title={`${exam.name}`}
+                      >
                         {exam.name}
                       </CardTitle>
                     </div>

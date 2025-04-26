@@ -13,7 +13,6 @@ import { ExamList } from "@/components/exam/exam-list";
 import { SubjectList } from "@/components/exam/exam-subject-list";
 import { ChapterList } from "@/components/exam/exam-chapter-list";
 import { ChapterContent } from "@/components/exam/exam-chapter-content";
-import { ExamNavigation } from "@/components/exam/exam-navigation";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { getExamDisplayName } from "@/utils/parseExamId";
 
@@ -159,7 +158,7 @@ export default function ExamContent({
     <div>
       <ExamBreadcrumb />
       <ChapterContent />
-      <ExamNavigation />
+      {/* <ExamNavigation /> */}
     </div>
   );
 }
