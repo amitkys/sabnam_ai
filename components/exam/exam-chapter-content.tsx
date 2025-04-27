@@ -32,7 +32,7 @@ export function ChapterContent() {
   // Define URL using IDs instead of names
   const url =
     examType && subject && chapter
-      ? `/api/exam?exam=${encodeURIComponent(examType)}&subject=${encodeURIComponent(subject)}&chapter=${encodeURIComponent(chapter)}`
+      ? `/api/exams?type=${encodeURIComponent(examType)}&subject=${encodeURIComponent(subject)}&chapter=${encodeURIComponent(chapter)}`
       : null;
 
   const {
@@ -50,6 +50,17 @@ export function ChapterContent() {
           <p className="text-lg font-medium">Invalid navigation parameters</p>
         </div>
       </Card>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-[calc(100vh-56px-64px-20px-24px-56px-48px)] flex flex-col space-y-3 items-center justify-center">
+        <div className="text-red-500">{error.message}</div>
+        <Link className="hover:underline" href={"/exams"}>
+          Try again
+        </Link>
+      </div>
     );
   }
 

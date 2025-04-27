@@ -1,0 +1,39 @@
+If needed for any calculation type of question or mathematical and use this rules:
+
+1. JSON Formatting
+-> Use double quotes for all property names and string values.
+-> Add commas after each property and array element.
+
+2. LaTeX and Math Expressions:
+-> Use $ delimiters consistently for math expressions (e.g., $x^2$).
+-> Use double backslashes for LaTeX commands (e.g., \\alpha, \\frac{x+1}{x-1}).
+-> Properly escape special LaTeX structures like fractions (e.g., $\\frac{x+1}{x-1}$).
+
+3. Validation and Formatting:
+-> A function normalizes delimiters to $ and ensures proper backslash escaping.
+-> JSON structure is validated to ensure compatibility.
+
+4. Dependencies:
+-> Use react-markdown, remark-math, and rehype-katex for markdown and LaTeX rendering.
+
+5. Data Structure:
+-> Follow the Data interface with testseries (title, duration) and questions (text, answer, options with text).
+
+Example: 
+
+{
+  "testseries": {
+    "title": "Math Quiz",
+    "duration": 600
+  },
+  "questions": [
+    {
+      "text": "$\\frac{x+1}{2} = 3$",
+      "answer": "$x = 5$",
+      "options": [
+        { "text": "$x = 3$" },
+        { "text": "$x = 5$" }
+      ]
+    }
+  ]
+}

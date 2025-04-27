@@ -55,6 +55,17 @@ export function ChapterContent() {
     );
   }
 
+  if (error) {
+    return (
+      <div className="min-h-[calc(100vh-56px-64px-20px-24px-56px-48px)] flex flex-col space-y-3 items-center justify-center">
+        <div className="text-red-500">{error.message}</div>
+        <Link className="hover:underline" href={"/board"}>
+          Try again
+        </Link>
+      </div>
+    );
+  }
+
   return (
     <Card>
       <CardHeader className="px-4 text-foreground/75">
