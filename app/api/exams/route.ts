@@ -12,6 +12,8 @@ export async function GET(req: NextRequest) {
     const session = await GetServerSessionHere();
     const userId = session.user.id;
 
+    console.log(examType, subject, chapter);
+
     if (!examType || !subject || !chapter) {
       return Response.json(
         {
