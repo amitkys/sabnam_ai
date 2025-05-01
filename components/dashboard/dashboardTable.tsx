@@ -188,7 +188,9 @@ export default function DashBoardTable() {
 
   return (
     <div className="w-full">
-      <h2 className="text-xl font-semibold mb-3">Recent Test Results</h2>
+      <h2 className="text-base md:text-lg ml-4  font-semibold mb-3">
+        Recent Test Results
+      </h2>
       <div className="bg-card rounded-lg p-2">
         <div className="flex justify-end mr-3 mb-0.5">
           <Select onValueChange={handleFilterChange}>
@@ -247,7 +249,7 @@ export default function DashBoardTable() {
                         <CircleCheck className="h-5 w-5 text-green-600" />
                       </div>
                     ) : (
-                      <div title="Uncompleted">
+                      <div title="Incompleted">
                         <ClockAlert className="h-5 w-5 text-red-600" />
                       </div>
                     )}
