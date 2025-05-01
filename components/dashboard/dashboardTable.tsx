@@ -188,7 +188,7 @@ export default function DashBoardTable() {
 
   return (
     <div className="w-full">
-      <h2 className="text-base md:text-lg ml-4  font-semibold mb-3">
+      <h2 className="text-base md:text-xl ml-4  font-semibold mb-3">
         Recent Test Results
       </h2>
       <div className="bg-card rounded-lg p-2">
