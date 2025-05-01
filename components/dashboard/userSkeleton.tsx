@@ -7,7 +7,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 export default function DashboardUserSkeleton() {
   return (
     <div className="text-foreground/75">
-      <h2 className="text-xl font-semibold mb-3 text-foreground/75">
+      <h2 className="text-base md:text-xl ml-4 font-semibold mb-3 text-foreground/75">
         User Profile
       </h2>
       <Card className="cursor-pointer hover:shadow transition-shadow text-foreground/75 py-1.5">
