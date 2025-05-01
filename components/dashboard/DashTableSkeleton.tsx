@@ -33,7 +33,9 @@ export default function DashBoardTableSkeleton() {
 
   return (
     <div className="w-full">
-      <h2 className="text-xl font-semibold mb-3">Recent Test Results</h2>
+      <h2 className="text-base md:text-xl ml-4 font-semibold mb-3 text-foreground/75">
+        Recent Test Results
+      </h2>
       <div className="bg-card rounded-lg p-2">
         <div className="flex justify-end mr-3 mb-0.5">
           {/* Filter dropdown - disabled in skeleton */}
