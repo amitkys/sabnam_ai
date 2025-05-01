@@ -20,16 +20,51 @@ import {
 import {
   Pagination,
   PaginationContent,
-  PaginationEllipsis,
   PaginationItem,
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
 
-export default function DashBoardTableSkeleton() {
-  // Create array for skeleton placeholder rows
-  const skeletonRows = Array(3).fill(null);
+interface PaginationSkeleton {
+  currentPage: number;
+  dataLength: number | undefined;
+  maximumPage: number;
+}
+
+export default function DashBoardTableSkeleton({
+  currentPage,
+  dataLength,
+  maximumPage,
+}: PaginationSkeleton) {
+  // Create array for skeleton placeholder rows - default to 3 rows
+  const skeletonRows = Array(dataLength || 3).fill(null);
+
+  // For the skeleton state, we want to show a simpler pagination
+  // that won't conflict with the final loaded state
+  const renderSkeletonPageNumbers = () => {
+    // Show limited pagination in skeleton to avoid jarring transitions
+    // when real data loads (which might have very different page counts)
+    return (
+      <>
+        {/* First page */}
+        <PaginationItem>
+          <PaginationLink className="opacity-70" isActive={currentPage === 1}>
+            1
+          </PaginationLink>
+        </PaginationItem>
+
+        {/* Show dots to indicate loading state */}
+        <PaginationItem>
+          <div className="flex items-center px-2">
+            <div className="h-1 w-1 rounded-full bg-foreground/70 mx-0.5 animate-pulse" />
+            <div className="h-1 w-1 rounded-full bg-foreground/70 mx-0.5 animate-pulse delay-75" />
+            <div className="h-1 w-1 rounded-full bg-foreground/70 mx-0.5 animate-pulse delay-150" />
+          </div>
+        </PaginationItem>
+      </>
+    );
+  };
 
   return (
     <div className="w-full">
@@ -90,24 +125,17 @@ export default function DashBoardTableSkeleton() {
         </div>
         <Pagination>
           <PaginationContent className="flex-wrap justify-center">
-            <PaginationItem>
+            <PaginationItem className="hidden md:block">
               <PaginationPrevious
                 aria-disabled={true}
                 className="pointer-events-none opacity-50"
               />
             </PaginationItem>
 
-            {/* Simplified pagination for skeleton */}
-            <PaginationItem>
-              <PaginationLink className="opacity-70" isActive={true}>
-                6
-              </PaginationLink>
-            </PaginationItem>
-            <PaginationItem>
-              <PaginationEllipsis className="opacity-70" />
-            </PaginationItem>
+            {/* Simplified pagination for skeleton state */}
+            {renderSkeletonPageNumbers()}
 
-            <PaginationItem>
+            <PaginationItem className="hidden md:block">
               <PaginationNext
                 aria-disabled={true}
                 className="pointer-events-none opacity-50"

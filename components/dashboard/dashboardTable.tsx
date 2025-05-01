@@ -67,7 +67,7 @@ export default function DashBoardTable() {
   );
 
   // These values should come from your API response
-  const totalCount = data?.totalCount || 100; // Total number of items
+  const totalCount = data?.totalCount || 100;
   const totalPages = Math.ceil(totalCount / pageSize);
 
   // Handle page change - updates URL
@@ -97,7 +97,13 @@ export default function DashBoardTable() {
   };
 
   if (isLoading) {
-    return <DashBoardTableSkeleton />;
+    return (
+      <DashBoardTableSkeleton
+        currentPage={currentPage}
+        dataLength={data?.testAttempts.length}
+        maximumPage={totalPages}
+      />
+    );
   }
 
   // Render page numbers with ellipsis
@@ -300,7 +306,8 @@ export default function DashBoardTable() {
         </div>
         <Pagination>
           <PaginationContent className="flex-wrap justify-center">
-            <PaginationItem>
+            {/* hidden on small screen */}
+            <PaginationItem className="hidden md:block">
               <PaginationPrevious
                 aria-disabled={currentPage === 1 || isLoading}
                 className={
@@ -320,7 +327,7 @@ export default function DashBoardTable() {
 
             {renderPageNumbers()}
 
-            <PaginationItem>
+            <PaginationItem className="hidden md:block">
               <PaginationNext
                 aria-disabled={currentPage === totalPages || isLoading}
                 className={
