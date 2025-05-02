@@ -129,7 +129,7 @@ export default function ExamContent({
   if (!examType) {
     return (
       <div>
-        <ExamBreadcrumb />
+        {/* <ExamBreadcrumb /> */}
         <ExamList />
       </div>
     );
@@ -138,7 +138,7 @@ export default function ExamContent({
   if (examType && !subject) {
     return (
       <div>
-        <ExamBreadcrumb />
+        {/* <ExamBreadcrumb /> */}
         <SubjectList />
       </div>
     );
@@ -147,7 +147,7 @@ export default function ExamContent({
   if (examType && subject && !chapter) {
     return (
       <div>
-        <ExamBreadcrumb />
+        {/* <ExamBreadcrumb /> */}
         <ChapterList />
       </div>
     );
@@ -156,7 +156,7 @@ export default function ExamContent({
   // Show chapter content if all selections are made
   return (
     <div>
-      <ExamBreadcrumb />
+      {/* <ExamBreadcrumb /> */}
       <ChapterContent />
       {/* <ExamNavigation /> */}
     </div>

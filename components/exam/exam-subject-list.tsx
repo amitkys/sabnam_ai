@@ -53,18 +53,35 @@ export function SubjectList() {
           {subjects.map((subj: Subject) => (
             <Link
               key={subj.id}
-              href={`/exams?type=${examType}&subject=${subj.id}`}
+              href={`/exams?type=${examType}&subject=${subj.id}${subj.name === "Complete Test Series" ? "&chapter=series" : ""}`}
             >
-              <Card className="cursor-pointer hover:bg-secondary transition-colors h-full">
+              <Card
+                className={`cursor-pointer hover:bg-secondary transition-colors h-full ${subj.name === "Complete Test Series"
+                    ? "bg-primary/5 hover:bg-primary/10"
+                    : ""
+                  }`}
+              >
                 <CardHeader className="p-4">
                   <div className="flex items-center gap-2 text-foreground/75">
-                    <BookText className="h-5 w-5" />
-                    <CardTitle className="text-lg truncate max-w-xs">
+                    <BookText
+                      className={`h-5 w-5 text-foreground/75 ${subj.name === "Complete Test Series" ? "text-green-600" : ""}`}
+                    />
+                    <CardTitle
+                      className={`text-lg truncate max-w-xs ${subj.name === "Complete Test Series" ? "text-green-600" : ""}`}
+                    >
                       {subj.name}
                     </CardTitle>
                   </div>
-                  <CardDescription>
-                    {subj.chapters.length} chapters available
+                  <CardDescription
+                    className={
+                      subj.name === "Complete Test Series"
+                        ? "text-green-600"
+                        : ""
+                    }
+                  >
+                    {subj.name === "Complete Test Series"
+                      ? "Explore all tests"
+                      : `${subj.chapters.length} chapters available`}
                   </CardDescription>
                 </CardHeader>
               </Card>

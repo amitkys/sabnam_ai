@@ -72,7 +72,11 @@ export function ChapterContent() {
           {/* Left - Back Button aligned with CardTitle */}
           <Link
             className="text-muted-foreground hover:text-foreground flex items-center gap-1 group"
-            href={`/exams?type=${examType}&subject=${subject}`}
+            href={
+              subject === "test"
+                ? `/exams?type=${examType}`
+                : `/exams?type=${examType}&subject=${subject}`
+            }
           >
             <ArrowLeft className="h-4 md:h-5 group-hover:-translate-x-1 transition-transform" />
           </Link>
@@ -88,7 +92,7 @@ export function ChapterContent() {
 
         {/* Description centered below title */}
         <CardDescription className="text-center mt-1">
-          {subjectName} | {examName?.toUpperCase()}
+          {examName?.toUpperCase()}
         </CardDescription>
         <SelectSeparator />
       </CardHeader>

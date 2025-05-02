@@ -8,7 +8,6 @@ import { ArrowLeft } from "lucide-react";
 import { Button } from "./ui/button";
 
 import { useBoardStore } from "@/lib/store/boardStore";
-import { BoardBreadcrumb } from "@/components/board/board-breadcrumb";
 import { BoardList } from "@/components/board/board-list";
 import { StandardList } from "@/components/board/board-standard-list";
 import { SubjectList } from "@/components/board/board-subject-list";
@@ -149,7 +148,7 @@ export default function EducationContent({
   if (!boardType) {
     return (
       <div>
-        <BoardBreadcrumb />
+        {/* <BoardBreadcrumb /> */}
         <BoardList />
       </div>
     );
@@ -158,7 +157,7 @@ export default function EducationContent({
   if (boardType && !standard) {
     return (
       <div>
-        <BoardBreadcrumb />
+        {/* <BoardBreadcrumb /> */}
         <StandardList />
       </div>
     );
@@ -167,7 +166,7 @@ export default function EducationContent({
   if (boardType && standard && !subject) {
     return (
       <div>
-        <BoardBreadcrumb />
+        {/* <BoardBreadcrumb /> */}
         <SubjectList />
       </div>
     );
@@ -176,7 +175,7 @@ export default function EducationContent({
   if (boardType && standard && subject && !chapter) {
     return (
       <div>
-        <BoardBreadcrumb />
+        {/* <BoardBreadcrumb /> */}
         <ChapterList />
       </div>
     );
@@ -185,7 +184,7 @@ export default function EducationContent({
   // Show chapter content if all selections are made
   return (
     <div>
-      <BoardBreadcrumb />
+      {/* <BoardBreadcrumb /> */}
       <ChapterContent />
     </div>
   );

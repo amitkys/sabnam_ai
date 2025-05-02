@@ -88,6 +88,26 @@ export const examData: ExamData = {
             },
           ],
         },
+        {
+          id: "science",
+          name: "Science",
+          chapters: [
+            {
+              id: "electricity",
+              name: "Electricity",
+            },
+          ],
+        },
+        {
+          id: "test",
+          name: "Complete Test Series",
+          chapters: [
+            {
+              id: "series",
+              name: "Test Series",
+            },
+          ],
+        },
       ],
     },
     {
