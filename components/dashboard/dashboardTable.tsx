@@ -5,6 +5,7 @@ import {
   CircleCheck,
   CirclePlus,
   ClockAlert,
+  Clock,
   EllipsisVertical,
   RotateCcw,
   Trash2,
@@ -102,6 +103,7 @@ export default function DashBoardTable() {
         currentPage={currentPage}
         dataLength={data?.testAttempts.length}
         maximumPage={totalPages}
+        currentFilter={filterby}
       />
     );
   }
@@ -199,12 +201,18 @@ export default function DashBoardTable() {
       </h2>
       <div className="bg-card rounded-lg p-2">
         <div className="flex justify-end mr-3 mb-0.5">
-          <Select onValueChange={handleFilterChange}>
+          <Select value={filterby} onValueChange={handleFilterChange}>
             <SelectTrigger className="w-[180px] max-w-full">
-              <SelectValue placeholder="Filter by.." />
+              <SelectValue defaultValue="recent" placeholder="Filter by.." />
             </SelectTrigger>
             <SelectContent className="focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:outline-none">
               <SelectGroup>
+                <SelectItem value="recent">
+                  <div className="flex items-center gap-2">
+                    <Clock className="h-4 w-4" />
+                    Most recent
+                  </div>
+                </SelectItem>
                 <SelectItem value="highestScore">
                   <div className="flex items-center gap-2">
                     <ArrowUp className="h-4 w-4" />

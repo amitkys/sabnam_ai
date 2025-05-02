@@ -1,4 +1,4 @@
-import { EllipsisVertical } from "lucide-react";
+import { ArrowDown, ArrowUp, Clock, EllipsisVertical } from "lucide-react";
 
 import {
   Select,
@@ -30,12 +30,14 @@ interface PaginationSkeleton {
   currentPage: number;
   dataLength: number | undefined;
   maximumPage: number;
+  currentFilter: string;
 }
 
 export default function DashBoardTableSkeleton({
   currentPage,
   dataLength,
   maximumPage,
+  currentFilter,
 }: PaginationSkeleton) {
   // Create array for skeleton placeholder rows - default to 3 rows
   const skeletonRows = Array(dataLength || 3).fill(null);
@@ -74,9 +76,22 @@ export default function DashBoardTableSkeleton({
       <div className="bg-card rounded-lg p-2">
         <div className="flex justify-end mr-3 mb-0.5">
           {/* Filter dropdown - disabled in skeleton */}
-          <Select disabled>
+          <Select disabled value={currentFilter}>
             <SelectTrigger className="w-[180px] max-w-full opacity-70">
-              <SelectValue placeholder="Filter by.." />
+              <SelectValue>
+                <div className="flex items-center gap-2">
+                  {currentFilter === "recent" && <Clock className="h-4 w-4" />}
+                  {currentFilter === "highestScore" && (
+                    <ArrowUp className="h-4 w-4" />
+                  )}
+                  {currentFilter === "lowestScore" && (
+                    <ArrowDown className="h-4 w-4" />
+                  )}
+                  {currentFilter === "recent" && "Most recent"}
+                  {currentFilter === "highestScore" && "Highest score"}
+                  {currentFilter === "lowestScore" && "Lowest score"}
+                </div>
+              </SelectValue>
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>
