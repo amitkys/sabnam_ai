@@ -1,3 +1,5 @@
+import { ModeToggle } from "../mode-toggle";
+
 import { Timer } from "./Timer";
 
 import {
@@ -30,6 +32,7 @@ export const QuizHeader = ({
     <div className="flex justify-between items-center">
       <Timer initialTime={duration} />
       <div className="flex space-x-2">
+        <ModeToggle />
         <AlertDialog>
           <AlertDialogTrigger asChild>
             <Button disabled={isSubmitting} variant="default">
