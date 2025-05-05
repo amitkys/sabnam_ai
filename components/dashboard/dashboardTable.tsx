@@ -61,15 +61,15 @@ export default function DashBoardTable() {
 
   // Get page from URL or default to 1
   const currentPage = Number(searchParams.get("page")) || 1;
+  // api call for dashboard table data
   const { data, error, isLoading } = getDashboardTableData(
     filterby,
     currentPage,
     pageSize,
   );
 
-  // These values should come from your API response
-  const totalCount = data?.totalCount || 100;
-  const totalPages = Math.ceil(totalCount / pageSize);
+  const totalCount = data?.totalCount || 0; // total count of test attempts
+  const totalPages = Math.ceil(totalCount / pageSize); // total pages I have
 
   // Handle page change - updates URL
   const handlePageChange = (newPage: number) => {
@@ -100,10 +100,10 @@ export default function DashBoardTable() {
   if (isLoading) {
     return (
       <DashBoardTableSkeleton
+        currentFilter={filterby}
         currentPage={currentPage}
         dataLength={data?.testAttempts.length}
         maximumPage={totalPages}
-        currentFilter={filterby}
       />
     );
   }
@@ -191,7 +191,7 @@ export default function DashBoardTable() {
   };
 
   // Sample test data - replace with actual data from your API
-  if (error) return <div>found error</div>;
+  if (error) return <div>found error {error.message}</div>;
   const testData = data?.testAttempts;
 
   return (

@@ -25,10 +25,12 @@ export async function GET(req: NextRequest) {
   const pageNo = parseInt(searchParams.get("page") || "1");
   const pageSize = parseInt(searchParams.get("pageSize") || "10");
 
+  console.log("message from backend", { filterBy, pageNo, pageSize });
+
   // Validate pagination parameters
   if (pageNo < 1 || pageSize < 1) {
     return NextResponse.json(
-      { error: "Invalid pagination parameters" },
+      { message: "Invalid pagination parameters" },
       { status: 400 },
     );
   }
@@ -36,7 +38,7 @@ export async function GET(req: NextRequest) {
   const session = await GetServerSessionHere();
 
   if (!session?.user?.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
   const userId = session.user.id;
 
@@ -108,10 +110,8 @@ export async function GET(req: NextRequest) {
       { status: 200 },
     );
   } catch (error) {
-    console.error("Error fetching test attempts:", error);
-
     return NextResponse.json(
-      { error: "Internal server error" },
+      { message: "Internal server error ", error },
       { status: 500 },
     );
   }

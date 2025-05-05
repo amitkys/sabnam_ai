@@ -1,11 +1,16 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 
-export async function GET(request: NextRequest) {
+import Prisma from "@/lib/db";
+
+export async function GET() {
   // Simulate backend failure
-  await new Promise((resolve) => setTimeout(resolve, 2000));
+  // await new Promise((resolve) => setTimeout(resolve, 2000));
 
-  return NextResponse.json(
-    { message: "something went wrong" },
-    { status: 400 },
-  );
+  const user = await Prisma.user.findFirst();
+
+  if (!user) {
+    return NextResponse.json({ message: "User not found" }, { status: 404 });
+  }
+
+  return NextResponse.json({ users: user });
 }
