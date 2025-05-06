@@ -14,6 +14,7 @@ export interface Subject {
 export interface Exam {
   id: string;
   name: string;
+  isFavourite: boolean;
   subjects: Subject[];
 }
 

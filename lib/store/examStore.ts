@@ -17,6 +17,7 @@ interface ExamState extends ExamNavigationState {
   setNavigation: (nav: Partial<ExamNavigationState>) => void;
   resetNavigation: () => void;
   updateNames: () => void;
+  toggleFavorite: (examId: string) => void;
 }
 
 export const useExamStore = create<ExamState>()(
@@ -79,6 +80,18 @@ export const useExamStore = create<ExamState>()(
           subjectName,
           chapterName,
         });
+      },
+      toggleFavorite: (examId: string) => {
+        set((state) => ({
+          data: {
+            ...state.data,
+            exams: state.data.exams.map((exam) =>
+              exam.id === examId
+                ? { ...exam, isFavourite: !exam.isFavourite }
+                : exam,
+            ),
+          },
+        }));
       },
     }),
     {

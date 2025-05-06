@@ -36,7 +36,7 @@ interface PaginationSkeleton {
 export default function DashBoardTableSkeleton({
   currentPage,
   dataLength,
-  maximumPage,
+  // maximumPage,
   currentFilter,
 }: PaginationSkeleton) {
   // Create array for skeleton placeholder rows - default to 3 rows

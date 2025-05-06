@@ -27,8 +27,9 @@ import {
 } from "@/components/ui/command";
 
 export function ExamList() {
-  const { data } = useExamStore();
+  const { data, toggleFavorite } = useExamStore();
   const exams = data.exams;
+
   const router = useRouter();
   const [open, setOpen] = useState(false);
 
@@ -52,6 +53,11 @@ export function ExamList() {
   const handleSelectExam = (examId: string) => {
     setOpen(false);
     router.push(`/exams?type=${examId}`);
+  };
+
+  const handleToggleFavorite = (e: React.MouseEvent, examId: string) => {
+    e.preventDefault(); // Prevent the link navigation
+    toggleFavorite(examId);
   };
 
   return (
@@ -112,26 +118,50 @@ export function ExamList() {
 
         <CardContent className="min-h-[calc(100vh-56px-64px-20px-24px-56px-48px)]">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {exams.map((exam: Exam) => (
-              <Link key={exam.id} href={`/exams?type=${exam.id}`}>
-                <Card className="cursor-pointer hover:bg-secondary transition-colors h-full">
-                  <CardHeader className="p-4">
-                    <div className="flex items-center gap-2 text-foreground/75">
-                      <FileText className="h-5 w-5" />
-                      <CardTitle
-                        className="text-lg uppercase truncate max-w-xs"
-                        title={`${exam.name}`}
-                      >
-                        {exam.name}
-                      </CardTitle>
-                    </div>
-                    <CardDescription>
-                      {exam.subjects.length} subjects available
-                    </CardDescription>
-                  </CardHeader>
-                </Card>
-              </Link>
-            ))}
+            {exams
+              .sort((a, b) => (b.isFavourite ? 1 : 0) - (a.isFavourite ? 1 : 0))
+              .map((exam: Exam) => (
+                <Link key={exam.id} href={`/exams?type=${exam.id}`}>
+                  <Card className="cursor-pointer hover:bg-secondary transition-colors h-full">
+                    <CardHeader className="p-4">
+                      <div className="flex items-center justify-between text-foreground/75">
+                        <div className="flex items-center gap-2">
+                          <FileText className="h-5 w-5" />
+                          <CardTitle
+                            className="text-lg uppercase truncate max-w-xs"
+                            title={`${exam.name}`}
+                          >
+                            {exam.name}
+                          </CardTitle>
+                        </div>
+                        {/* <TooltipProvider>
+                          <Tooltip delayDuration={0}>
+                            <TooltipTrigger asChild>
+                              <Star
+                                className="h-5 w-5 cursor-pointer"
+                                fill={
+                                  exam.isFavourite ? "currentColor" : "none"
+                                }
+                                onClick={(e) =>
+                                  handleToggleFavorite(e, exam.id)
+                                }
+                              />
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              {exam.isFavourite
+                                ? "Remove from favorites"
+                                : "Add to favorites"}
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider> */}
+                      </div>
+                      <CardDescription>
+                        {exam.subjects.length} subjects available
+                      </CardDescription>
+                    </CardHeader>
+                  </Card>
+                </Link>
+              ))}
           </div>
         </CardContent>
       </Card>

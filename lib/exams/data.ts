@@ -5,6 +5,7 @@ export const examData: ExamData = {
     {
       id: "scqp09",
       name: "CUET/Computer Science",
+      isFavourite: false,
       subjects: [
         {
           id: "math",
@@ -43,6 +44,7 @@ export const examData: ExamData = {
     {
       id: "neet",
       name: "NEET",
+      isFavourite: false,
       subjects: [
         {
           id: "biology",
@@ -77,6 +79,7 @@ export const examData: ExamData = {
     {
       id: "bihar-police",
       name: "Bihar Police Constable",
+      isFavourite: true,
       subjects: [
         {
           id: "math",
@@ -113,6 +116,7 @@ export const examData: ExamData = {
     {
       id: "cs",
       name: "Computer Science",
+      isFavourite: false,
       subjects: [
         {
           id: "os",

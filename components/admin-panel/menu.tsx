@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { Ellipsis, LogOut } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
@@ -69,7 +68,7 @@ export function Menu({ isOpen }: MenuProps) {
                                   : "ghost"
                               }
                             >
-                              <Link href={href}>
+                              <a href={href}>
                                 <span
                                   className={cn(isOpen === false ? "" : "mr-2")}
                                 >
@@ -85,7 +84,7 @@ export function Menu({ isOpen }: MenuProps) {
                                 >
                                   {label}
                                 </p>
-                              </Link>
+                              </a>
                             </Button>
                           </TooltipTrigger>
                           {isOpen === false && (
