@@ -55,7 +55,7 @@ export const TestSeriesCard = ({
           Free
         </Badge>
         <CardTitle className="text-lg">
-          {testSeries.title.split(" ").slice(1).join(" ")}
+          {testSeries.title.split(" ").slice(2).join(" ")}
         </CardTitle>
       </CardHeader>
       <CardContent>
