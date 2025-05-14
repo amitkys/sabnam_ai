@@ -7,6 +7,10 @@ import rehypeKatex from "rehype-katex";
 import remarkMath from "remark-math";
 import Link from "next/link";
 import { GoHome } from "react-icons/go";
+import { Zap } from "lucide-react";
+import { toast } from "sonner";
+
+import { Separator } from "../ui/separator";
 
 import {
   FirstTimeTooltip,
@@ -259,22 +263,36 @@ function Content({
                 );
 
                 return (
-                  <div key={question.id} className="space-y-2">
+                  <div key={question.id} className="space-y-3">
                     <div className="flex justify-between items-start">
-                      <h3 className="font-medium">Question {index + 1}</h3>
-                      {userAnswer ? (
-                        <Badge
-                          variant={
-                            userAnswer.isCorrect ? "default" : "destructive"
-                          }
-                        >
-                          {userAnswer.isCorrect ? "Correct" : "Incorrect"}
-                        </Badge>
-                      ) : (
-                        <Badge variant="secondary">Unanswered</Badge>
-                      )}
+                      <h3 className="text-sm lg:text-base font-medium">
+                        Q. {index + 1}
+                      </h3>
+                      <div className="flex items-center gap-2">
+                        <button>
+                          <Badge
+                            onClick={() =>
+                              toast.info("AI integrated features coming soon")
+                            }
+                          >
+                            <Zap className="w-3 h-3 mr-1" />
+                            Explain
+                          </Badge>
+                        </button>
+                        {userAnswer ? (
+                          <Badge
+                            variant={
+                              userAnswer.isCorrect ? "default" : "destructive"
+                            }
+                          >
+                            {userAnswer.isCorrect ? "Correct" : "Incorrect"}
+                          </Badge>
+                        ) : (
+                          <Badge variant="secondary">Unanswered</Badge>
+                        )}
+                      </div>
                     </div>
-                    <div className="prose dark:prose-invert prose-strong:text-foreground dark:prose-strong:text-foreground text-foreground max-w-none">
+                    <div className="text-sm lg:text-base font-base font-semibold text-foreground/75">
                       <Markdown
                         rehypePlugins={[rehypeKatex]}
                         remarkPlugins={[remarkMath]}
@@ -282,29 +300,27 @@ function Content({
                         {question.text}
                       </Markdown>
                     </div>
-                    <ul className="space-y-1">
+                    <ul className="space-y-1 mb-10">
                       {question.options.map((option) => (
-                        <li
-                          key={option.id}
-                          className="flex items-center space-x-2"
-                        >
-                          <span
-                            className={`w-4 h-4 rounded-full inline-block ${option.text === question.correctAnswer
-                                ? "bg-primary"
-                                : userAnswer &&
-                                  option.text === userAnswer.userAnswer
-                                  ? "bg-destructive"
-                                  : "bg-muted"
-                              }`}
-                          />
-                          <span
-                            className={
-                              option.text === question.correctAnswer
+                        <li key={option.id} className="flex items-start gap-2">
+                          <div className="flex-shrink-0 mt-1">
+                            <div
+                              className={`w-4 h-4 rounded-full flex-shrink-0 ${option.text === question.correctAnswer
+                                  ? "bg-primary"
+                                  : userAnswer &&
+                                    option.text === userAnswer.userAnswer
+                                    ? "bg-destructive"
+                                    : "bg-muted"
+                                }`}
+                            />
+                          </div>
+                          <div
+                            className={`flex-grow ${option.text === question.correctAnswer
                                 ? "font-medium"
                                 : ""
-                            }
+                              }`}
                           >
-                            <div className="prose dark:prose-invert prose-strong:text-foreground dark:prose-strong:text-foreground text-foreground max-w-none">
+                            <div className="text-sm lg:text-base text-foreground/75">
                               <Markdown
                                 rehypePlugins={[rehypeKatex]}
                                 remarkPlugins={[remarkMath]}
@@ -312,10 +328,11 @@ function Content({
                                 {option.text}
                               </Markdown>
                             </div>
-                          </span>
+                          </div>
                         </li>
                       ))}
                     </ul>
+                    <Separator className="mt-10" />
                   </div>
                 );
               })}

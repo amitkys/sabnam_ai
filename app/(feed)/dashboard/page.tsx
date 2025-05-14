@@ -20,12 +20,12 @@ import DashBoardTable from "@/components/dashboard/dashboardTable";
 import DashboardUser from "@/components/dashboard/dashboardUser";
 
 const chartData = [
-  { month: "January", desktop: 186, mobile: 80 },
-  { month: "February", desktop: 305, mobile: 200 },
-  { month: "March", desktop: 237, mobile: 120 },
-  { month: "April", desktop: 73, mobile: 190 },
-  { month: "May", desktop: 209, mobile: 130 },
-  { month: "June", desktop: 214, mobile: 140 },
+  { month: "January", Completed: 17, Incompleted: 8 },
+  { month: "February", Completed: 10, Incompleted: 0 },
+  { month: "March", Completed: 23, Incompleted: 12 },
+  { month: "April", Completed: 7, Incompleted: 19 },
+  { month: "May", Completed: 20, Incompleted: 13 },
+  { month: "June", Completed: 21, Incompleted: 14 },
 ];
 
 const chartConfig = {
@@ -106,7 +106,7 @@ export default function Page() {
                   </linearGradient>
                 </defs>
                 <Area
-                  dataKey="mobile"
+                  dataKey="Completed"
                   fill="url(#fillMobile)"
                   fillOpacity={0.4}
                   stackId="a"
@@ -114,7 +114,7 @@ export default function Page() {
                   type="natural"
                 />
                 <Area
-                  dataKey="desktop"
+                  dataKey="Incompleted"
                   fill="url(#fillDesktop)"
                   fillOpacity={0.4}
                   stackId="a"
