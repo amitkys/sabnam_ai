@@ -1,16 +1,17 @@
 import { NextResponse } from "next/server";
 
-import Prisma from "@/lib/db";
+export interface IUser {
+  name: string;
+  age: number;
+  phone: string;
+}
 
 export async function GET() {
-  // Simulate backend failure
-  // await new Promise((resolve) => setTimeout(resolve, 2000));
+  const user: IUser = {
+    name: "kys",
+    age: 18,
+    phone: "9122",
+  };
 
-  const user = await Prisma.user.findFirst();
-
-  if (!user) {
-    return NextResponse.json({ message: "User not found" }, { status: 404 });
-  }
-
-  return NextResponse.json({ users: user });
+  return NextResponse.json({ user }, { status: 200 });
 }

@@ -16,6 +16,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { getTestAttemptId } from "@/lib/actions";
+import { formatDuration } from "@/utils/utils";
 
 export const TestSeriesCard = ({
   testSeries,
@@ -59,7 +60,7 @@ export const TestSeriesCard = ({
       </CardHeader>
       <CardContent>
         <p className="text-sm text-muted-foreground">
-          Duration: {testSeries.duration} minutes
+          Duration: {formatDuration(testSeries.duration)}
         </p>
         <p className="text-sm text-muted-foreground">
           Questions: {testSeries.totalQuestions}

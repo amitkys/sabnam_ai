@@ -147,7 +147,7 @@ export default function Page() {
   const categoryCardsData: CategoryCardData[] = [
     {
       title: "Exams",
-      description: "Competitive exams, NEET, CUET & more",
+      description: "Gov. Exams, Computer Science, etc.",
       icon: <GraduationCap className="h-16 w-16" />,
       iconColor: "text-purple-500",
       route: "/exams",
@@ -247,9 +247,9 @@ export default function Page() {
             <h1 className="text-2xl lg:text-3xl font-bold">
               Explore Exam Categories
             </h1>
-            <p className="text-muted-foreground mt-2">
+            {/* <p className="text-muted-foreground mt-2">
               Find specialized content for various types of exams
-            </p>
+            </p> */}
           </div>
           {/* New three category cards */}
 
@@ -264,7 +264,7 @@ export default function Page() {
                 </CardHeader>
                 <CardContent className="text-center">
                   <h2 className="text-xl font-bold">{card.title}</h2>
-                  <p className="text-muted-foreground mt-2">
+                  <p className="text-muted-foreground mt-2 whitespace-nowrap overflow-hidden text-ellipsis">
                     {card.description}
                   </p>
                 </CardContent>
@@ -290,10 +290,9 @@ export default function Page() {
             <h1 className="text-2xl lg:text-3xl font-bold">
               10+ Years of Question Bank
             </h1>
-            <p className="text-muted-foreground mt-2">
-              Start Mock Test for Free. Get Instant Results. Get Detailed
-              Analysis.
-            </p>
+            {/* <p className="text-muted-foreground mt-2">
+              Explore the 10+ years of question bank
+            </p> */}
           </div>
 
           {/* Original two cards (NCERT and CBSE) */}

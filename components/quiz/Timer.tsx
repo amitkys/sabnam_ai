@@ -1,20 +1,23 @@
 import { useState, useEffect, memo } from "react";
+
 import { formatTime } from "@/lib/utiles/quiz-utiles";
 
 interface TimerProps {
-  initialTime: number;
+  initialTime: number; // in minutes
 }
 
 export const Timer = memo(({ initialTime }: TimerProps) => {
-  const [timeLeft, setTimeLeft] = useState(initialTime);
+  const [timeLeft, setTimeLeft] = useState(initialTime * 60); // convert minutes to seconds
 
   useEffect(() => {
     const intervalId = setInterval(() => {
       setTimeLeft((prevTime) => {
         if (prevTime <= 0) {
           clearInterval(intervalId);
+
           return 0;
         }
+
         return prevTime - 1;
       });
     }, 1000);

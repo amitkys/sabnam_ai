@@ -1,23 +1,14 @@
 "use client";
-import { useState } from "react";
-import { Star } from "lucide-react";
 
-const App = () => {
-  const [liked, setLiked] = useState(false);
+import { testing } from "@/utils/testingApi";
 
-  const toggleLike = () => {
-    setLiked(!liked);
-  };
+export default function Page() {
+  const { user, error, isLoading } = testing();
 
-  return (
-    <button onClick={toggleLike}>
-      {liked ? (
-        <Star className="text-foreground/75" fill="currentColor" />
-      ) : (
-        <Star className="text-foreground/75" />
-      )}
-    </button>
-  );
-};
+  if (isLoading) return <div>loading</div>;
+  if (error) return <div>{error.message}</div>;
 
-export default App;
+  console.log(user?.name);
+
+  return <div>Hello</div>;
+}

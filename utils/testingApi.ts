@@ -1,24 +1,17 @@
 "use client";
 import useSWR from "swr";
 
-export const fetcher = async (url: string): Promise<any> => {
-  const res = await fetch(url);
-
-  if (!res.ok) {
-    const errorResponse = await res.json();
-    const error = new Error(errorResponse.message || "Unknown error");
-
-    throw error;
-  }
-
-  return res.json();
-};
+import { fetcher } from "@/utils/fetcher";
+import { IUser } from "@/app/api/testing/route";
 
 export function testing() {
-  const { data, error, isLoading } = useSWR("/api/testing", fetcher);
+  const { data, error, isLoading } = useSWR<{ user: IUser }>(
+    "/api/testing",
+    fetcher,
+  );
 
   return {
-    data,
+    user: data?.user,
     error,
     isLoading,
   };
