@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { ResponsivePie } from "@nivo/pie";
 import { format } from "date-fns";
 import Markdown from "react-markdown";
@@ -8,10 +9,10 @@ import remarkMath from "remark-math";
 import Link from "next/link";
 import { GoHome } from "react-icons/go";
 import { Zap } from "lucide-react";
-import { toast } from "sonner";
 
 import { Separator } from "../ui/separator";
 
+import ExplainDrawer from "@/components/explain-drawer"; // Import the new ExplainDrawer component
 import {
   FirstTimeTooltip,
   FirstTimeTooltipProvider,
@@ -88,6 +89,13 @@ function Content({
 }: {
   testSeriesDetails: TestSeriesDetails;
 }) {
+  // State for the explain drawer
+  const [isExplainDrawerOpen, setIsExplainDrawerOpen] = useState(false);
+  const [currentQuestion, setCurrentQuestion] = useState<
+    TestSeriesDetails["questions"][number] | null
+  >(null);
+  const [currentUserAnswer, setCurrentUserAnswer] = useState(null);
+
   const latestAttempt =
     testSeriesDetails.userAttempts[testSeriesDetails.userAttempts.length - 1];
   const totalQuestions = testSeriesDetails.questions.length;
@@ -103,6 +111,13 @@ function Content({
     { id: "Incor.", label: "Incorrect", value: incorrectAnswers },
     { id: "Unans", label: "Unanswered", value: unansweredQuestions },
   ];
+
+  // Handle explain button click
+  const handleExplainClick = (question: any, userAnswer: any) => {
+    setCurrentQuestion(question);
+    setCurrentUserAnswer(userAnswer);
+    setIsExplainDrawerOpen(true);
+  };
 
   return (
     <div className="container mx-auto p-4 space-y-6 bg-background text-foreground mt-3 rounded-lg">
@@ -269,12 +284,12 @@ function Content({
                         Q. {index + 1}
                       </h3>
                       <div className="flex items-center gap-2">
-                        <button>
-                          <Badge
-                            onClick={() =>
-                              toast.info("AI integrated features coming soon")
-                            }
-                          >
+                        <button
+                          onClick={() =>
+                            handleExplainClick(question, userAnswer)
+                          }
+                        >
+                          <Badge>
                             <Zap className="w-3 h-3 mr-1" />
                             Explain
                           </Badge>
@@ -340,6 +355,16 @@ function Content({
           </ScrollArea>
         </CardContent>
       </Card>
+
+      {/* Explain Drawer */}
+      <ExplainDrawer
+        correctAnswer={currentQuestion?.correctAnswer || ""}
+        isOpen={isExplainDrawerOpen}
+        options={currentQuestion?.options || []}
+        question={currentQuestion}
+        userAnswer={currentUserAnswer}
+        onClose={() => setIsExplainDrawerOpen(false)}
+      />
     </div>
   );
 }
