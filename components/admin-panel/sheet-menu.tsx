@@ -9,6 +9,7 @@ import {
   SheetTrigger,
   SheetTitle,
 } from "@/components/ui/sheet";
+import Image from "next/image";
 
 export function SheetMenu() {
   return (
@@ -26,7 +27,7 @@ export function SheetMenu() {
             variant="link"
           >
             <a className="flex items-center gap-2" href="/home">
-              <PanelsTopLeft className="w-6 h-6 mr-1" />
+              <Image src={"/logo.svg"} width={40} height={40} alt="logo" />
               <SheetTitle className="font-bold text-lg">Sabnam AI</SheetTitle>
             </a>
           </Button>
