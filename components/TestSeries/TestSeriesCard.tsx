@@ -54,9 +54,10 @@ export const TestSeriesCard = ({
         <Badge className="absolute top-2 right-2" variant="secondary">
           Free
         </Badge>
-        <CardTitle className="text-lg">
-          {testSeries.title.split(" ").slice(2).join(" ")}
+        <CardTitle className="text-lg capitalize">
+          {testSeries.title.split(" ").slice(2).join(" ").replace("series", "Test Series")}
         </CardTitle>
+
       </CardHeader>
       <CardContent>
         <p className="text-sm text-muted-foreground">

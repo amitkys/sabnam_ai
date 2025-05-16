@@ -122,7 +122,7 @@ function Content({
   return (
     <div className="container mx-auto p-4 space-y-6 bg-background text-foreground mt-3 rounded-lg">
       <h1 className="text-base lg:text-lg font-bold mt-1">
-        {testSeriesDetails.title.split(" ").slice(2).join(" ")}
+        {testSeriesDetails.title.split(" ").slice(2).join(" ").replace("series", "Test Series")}
       </h1>
 
       <div className="grid gap-6 md:grid-cols-2">
@@ -321,18 +321,18 @@ function Content({
                           <div className="flex-shrink-0 mt-1">
                             <div
                               className={`w-4 h-4 rounded-full flex-shrink-0 ${option.text === question.correctAnswer
-                                  ? "bg-primary"
-                                  : userAnswer &&
-                                    option.text === userAnswer.userAnswer
-                                    ? "bg-destructive"
-                                    : "bg-muted"
+                                ? "bg-primary"
+                                : userAnswer &&
+                                  option.text === userAnswer.userAnswer
+                                  ? "bg-destructive"
+                                  : "bg-muted"
                                 }`}
                             />
                           </div>
                           <div
                             className={`flex-grow ${option.text === question.correctAnswer
-                                ? "font-medium"
-                                : ""
+                              ? "font-medium"
+                              : ""
                               }`}
                           >
                             <div className="text-sm lg:text-base text-foreground/75">
