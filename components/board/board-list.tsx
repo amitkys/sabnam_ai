@@ -47,7 +47,7 @@ export function BoardList() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {boards.map((board: Board) => (
             <Link key={board.id} href={`/board?type=${board.id}`}>
-              <Card className="cursor-pointer hover:bg-secondary transition-colors h-full">
+              <Card className="cursor-pointer hover:bg-secondary/30 transition-colors h-full">
                 <CardHeader className="p-4">
                   <div className="flex items-center gap-2 text-foreground/75">
                     <School className="h-5 w-5" />

@@ -62,7 +62,7 @@ export function ChapterList() {
               key={chap.id}
               href={`/board?type=${boardType}&standard=${standard}&subject=${subject}&chapter=${chap.id}`}
             >
-              <Card className="cursor-pointer hover:bg-secondary transition-colors h-full">
+              <Card className="cursor-pointer hover:bg-secondary/30 transition-colors h-full">
                 <CardHeader className="p-4">
                   <div className="flex items-center gap-2 text-foreground/75">
                     <BookText className="h-5 w-5" />
