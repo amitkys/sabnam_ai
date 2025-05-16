@@ -1,7 +1,7 @@
 import type { Chapter } from "@/lib/type/exam";
 
 import Link from "next/link";
-import { ArrowLeft, BookOpen } from "lucide-react";
+import { ArrowLeft, BookOpen, Layers } from "lucide-react"; // Import Layers icon
 
 import { SelectSeparator } from "../ui/select";
 
@@ -52,26 +52,40 @@ export function ChapterList() {
 
       <CardContent className="min-h-[calc(100vh-56px-64px-20px-24px-56px-48px)]">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {chapters.map((chap: Chapter) => (
-            <Link
-              key={chap.id}
-              href={`/exams?type=${examType}&subject=${subject}&chapter=${chap.id}`}
-            >
-              <Card className="cursor-pointer hover:bg-secondary/30 transition-colors h-full">
-                <CardHeader className="p-4">
-                  <div className="flex items-center gap-2 text-foreground/75">
-                    <BookOpen className="h-5 w-5" />
-                    <CardTitle
-                      className="text-lg truncate max-w-xs"
-                      title={`${chap.name}`}
-                    >
-                      {chap.name}
-                    </CardTitle>
-                  </div>
-                </CardHeader>
-              </Card>
-            </Link>
-          ))}
+          {chapters.map((chap: Chapter) => {
+            // Determine if this is the complete test series based on name
+            const isCompleteSeries = chap.name === "Complete Test Series";
+
+            return (
+              <Link
+                key={chap.id}
+                // Adjust the href for the complete test series
+                href={`/exams?type=${examType}&subject=${subject}&chapter=${isCompleteSeries ? "series" : chap.id}`}
+              >
+                <Card
+                  className={`cursor-pointer hover:bg-secondary/30 transition-colors h-full ${isCompleteSeries ? "bg-primary/5 hover:bg-primary/10" : ""
+                    }`}
+                >
+                  <CardHeader className="p-4">
+                    <div className="flex items-center gap-2 text-foreground/75">
+                      {/* Use a different icon for the complete test series */}
+                      {isCompleteSeries ? (
+                        <Layers className="h-5 w-5 text-green-600" />
+                      ) : (
+                        <BookOpen className="h-5 w-5" />
+                      )}
+                      <CardTitle
+                        className={`text-lg truncate max-w-xs ${isCompleteSeries ? "text-green-600" : ""}`}
+                        title={`${chap.name}`}
+                      >
+                        {chap.name}
+                      </CardTitle>
+                    </div>
+                  </CardHeader>
+                </Card>
+              </Link>
+            );
+          })}
         </div>
       </CardContent>
     </Card>

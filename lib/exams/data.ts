@@ -138,6 +138,10 @@ export const examData: ExamData = {
               id: "cpu-scheduling",
               name: "CPU Scheduling",
             },
+            {
+              id: "series",
+              name: "Complete Test Series",
+            },
           ],
         },
         {
