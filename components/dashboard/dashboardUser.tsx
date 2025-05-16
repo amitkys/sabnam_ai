@@ -1,3 +1,6 @@
+import { signOut } from "next-auth/react";
+import { LogOut } from "lucide-react";
+
 import { Button } from "../ui/button";
 import { Card, CardContent, CardFooter, CardHeader } from "../ui/card";
 import { Separator } from "../ui/separator";
@@ -53,7 +56,13 @@ export default function DashboardUser() {
         </CardContent>
 
         <CardFooter className="pt-0">
-          <Button className="w-full" size="sm" variant="destructive">
+          <Button
+            className="w-full"
+            size="sm"
+            variant="destructive"
+            onClick={() => signOut({ callbackUrl: "/" })}
+          >
+            <LogOut className="w-4 h-4 mr-3 " />
             Logout
           </Button>
         </CardFooter>

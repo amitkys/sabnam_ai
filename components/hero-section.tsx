@@ -104,16 +104,13 @@ export default function HeroSection() {
                     ...transitionVariants,
                   }}
                 >
-                  <div
-                    key={1}
-                    className="bg-foreground/10 rounded-[calc(var(--radius-xl)+0.125rem)]"
-                  >
+                  <div key={1} className="">
                     <Button
                       asChild
                       className="rounded-xl px-5 text-base"
                       size="lg"
                     >
-                      <Link href="#link">
+                      <Link href="/home">
                         <span className="text-nowrap">Start using</span>
                       </Link>
                     </Button>
