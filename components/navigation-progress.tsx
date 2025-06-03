@@ -1,6 +1,5 @@
-// ProgressBarProvider.tsx
+// ProgressBarProvider.tsx - WITH MUTED COLORS
 "use client";
-
 import { ProgressProvider } from "@bprogress/next/app";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
@@ -13,12 +12,12 @@ const ProgressBarProvider = ({ children }: { children: React.ReactNode }) => {
     setMounted(true);
   }, []);
 
-  const progressColor =
-    theme === "dark" ? "hsl(var(--primary-foreground))" : "hsl(var(--primary))";
-
-  if (!mounted) {
-    return <>{children}</>;
-  }
+  // Use muted colors for a more subtle appearance
+  const progressColor = mounted
+    ? theme === "dark"
+      ? "hsl(var(--primary-foreground) / 0.7)" // 70% opacity in dark mode
+      : "hsl(var(--primary) / 0.7)" // 70% opacity in light mode
+    : "rgb(59 130 246 / 0.7)"; // 70% opacity blue fallback
 
   return (
     <ProgressProvider
@@ -32,7 +31,7 @@ const ProgressBarProvider = ({ children }: { children: React.ReactNode }) => {
         easing: "cubic-bezier(0.4, 0, 0.2, 1)",
         speed: 400,
       }}
-      shallowRouting={false}
+      shallowRouting={false} // Disable shallow routing for progress bar
     >
       {children}
     </ProgressProvider>
