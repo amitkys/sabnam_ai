@@ -3,6 +3,7 @@
 import { Ellipsis, LogOut } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
+import Link from "next/link";
 
 import { cn } from "@/lib/utils";
 import { getMenuList } from "@/lib/menu-list";
@@ -68,7 +69,7 @@ export function Menu({ isOpen }: MenuProps) {
                                   : "ghost"
                               }
                             >
-                              <a href={href}>
+                              <Link href={href}>
                                 <span
                                   className={cn(isOpen === false ? "" : "mr-2")}
                                 >
@@ -84,7 +85,7 @@ export function Menu({ isOpen }: MenuProps) {
                                 >
                                   {label}
                                 </p>
-                              </a>
+                              </Link>
                             </Button>
                           </TooltipTrigger>
                           {isOpen === false && (
