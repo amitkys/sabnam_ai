@@ -132,6 +132,7 @@ export async function getAnalysisForTestAttempt(testAttemptId: string) {
         testSeries: {
           include: {
             questions: {
+              orderBy: { id: "asc" },
               include: {
                 options: true,
               },

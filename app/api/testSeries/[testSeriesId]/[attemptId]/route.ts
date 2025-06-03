@@ -39,6 +39,7 @@ export async function GET(
             duration: true,
             createdAt: true,
             questions: {
+              orderBy: { id: "asc" },
               select: {
                 id: true,
                 text: true,
