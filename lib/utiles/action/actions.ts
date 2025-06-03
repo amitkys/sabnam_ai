@@ -10,7 +10,9 @@ export async function getUser() {
     }
 
     return { data: user };
-  } catch (error: any) {
-    return { error: "Failed to fetch user", message: error.message };
+  } catch (error) {
+    console.log(error);
+
+    return { error: "Failed to fetch user" };
   }
 }

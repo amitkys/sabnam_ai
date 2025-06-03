@@ -2,7 +2,7 @@
 
 import { useTheme } from "next-themes";
 import { Toaster } from "sonner";
-import { inter } from "@/config/fonts";
+import { geist } from "@/config/fonts";
 
 export default function ToasterWrapper() {
   const { theme } = useTheme();
@@ -12,8 +12,9 @@ export default function ToasterWrapper() {
       richColors
       theme={theme === "light" ? "light" : "dark"} // Dynamically set theme
       toastOptions={{
-        className: inter.className,
+        className: geist.className,
       }}
+      position="top-center"
     />
   );
 }

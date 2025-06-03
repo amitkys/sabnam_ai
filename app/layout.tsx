@@ -5,6 +5,7 @@ import { ThemeProvider } from "@/components/provider/theme-provider";
 import SessionWrapper from "@/components/sessionProvider";
 import { inter } from "@/config/fonts";
 import ToasterWrapper from "@/components/ToasterWrapper";
+import NavigationProgress from "@/components/navigation-progress";
 
 export const metadata: Metadata = {
   title: "Sabnam",
@@ -26,6 +27,7 @@ export default function RootLayout({
             attribute="class"
             defaultTheme="system"
           >
+            <NavigationProgress />
             {children}
             <ToasterWrapper />
           </ThemeProvider>
