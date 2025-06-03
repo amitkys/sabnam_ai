@@ -3,7 +3,7 @@
 import type { TestSummaryResponse, UserType } from "@/lib/type";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter } from '@bprogress/next/app';
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";

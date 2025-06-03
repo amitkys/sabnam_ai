@@ -1,5 +1,5 @@
 "use client";
-import { useRouter } from "next/navigation";
+import { useRouter } from '@bprogress/next/app';
 import { CheckIcon } from "lucide-react";
 import React from "react";
 

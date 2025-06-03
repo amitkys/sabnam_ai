@@ -4,7 +4,7 @@ import type { FetchedTestSeriesData } from "@/lib/type";
 
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useRouter } from '@bprogress/next/app';
 import { toast } from "sonner";
 import Image from "next/image";
 

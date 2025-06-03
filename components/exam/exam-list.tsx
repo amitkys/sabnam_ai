@@ -2,7 +2,7 @@ import type { Exam } from "@/lib/type/exam";
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter } from '@bprogress/next/app';
 import { FileText, Search, Plus, ArrowLeft } from "lucide-react";
 import { DialogTitle } from "@radix-ui/react-dialog";
 

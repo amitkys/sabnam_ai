@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useRouter } from '@bprogress/next/app';
 import { useState, useCallback } from "react";
 import { toast } from "sonner";
 

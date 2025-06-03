@@ -3,7 +3,7 @@ import Link from "next/link";
 import { FaSquareXTwitter } from "react-icons/fa6";
 import { FaLinkedin } from "react-icons/fa";
 import { FaGithub } from "react-icons/fa";
-import { useRouter } from "next/navigation";
+import { useRouter } from '@bprogress/next/app';
 
 import { Button } from "@/components/ui/button";
 import { TypewriterEffectSmooth } from "@/components/ui/type-writter-effect";

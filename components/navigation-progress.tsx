@@ -1,3 +1,4 @@
+// ProgressBarProvider.tsx
 "use client";
 
 import { ProgressProvider } from "@bprogress/next/app";
@@ -8,12 +9,10 @@ const ProgressBarProvider = ({ children }: { children: React.ReactNode }) => {
   const { theme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
-  // Prevent hydration mismatch
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  // Use primary color from theme
   const progressColor =
     theme === "dark" ? "hsl(var(--primary-foreground))" : "hsl(var(--primary))";
 
@@ -23,17 +22,17 @@ const ProgressBarProvider = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <ProgressProvider
-      shallowRouting
       color={progressColor}
       height="2px"
       options={{
         showSpinner: false,
         trickle: true,
-        trickleSpeed: 200, // Faster trickle for smoother progress
-        minimum: 0.08, // Lower to ensure visibility for fast navigations
-        easing: "cubic-bezier(0.4, 0, 0.2, 1)", // Smoother easing curve
-        speed: 600, // Slower animation for fluid transitions
+        trickleSpeed: 150,
+        minimum: 0.08,
+        easing: "cubic-bezier(0.4, 0, 0.2, 1)",
+        speed: 400,
       }}
+      shallowRouting={false}
     >
       {children}
     </ProgressProvider>

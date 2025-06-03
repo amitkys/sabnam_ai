@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useRouter } from '@bprogress/next/app';
 import { useEffect, useState } from "react";
 
 interface SmartBackLinkProps extends React.HTMLAttributes<HTMLAnchorElement> {
