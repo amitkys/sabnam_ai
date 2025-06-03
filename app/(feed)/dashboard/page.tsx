@@ -52,7 +52,7 @@ export default function Page() {
             <DashboardUser />
           </div>
         </div>
-        <Card className="flex-grow flex flex-col h-full">
+        <Card className="flex-grow  flex-col h-full hidden">
           <CardHeader className="py-3">
             <CardTitle>History</CardTitle>
             <CardDescription>

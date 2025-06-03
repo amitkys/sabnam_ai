@@ -434,3 +434,24 @@ export async function SaveQuestionResponse({
 //     return { success: false, error: "Failed to save response" };
 //   }
 // }
+
+export async function SubmitTest({ testAttemptId }: { testAttemptId: string }) {
+  try {
+    // Update the TestAttempt score
+    await prisma.testAttempt.update({
+      where: {
+        id: testAttemptId,
+      },
+      data: {
+        completedAt: new Date(),
+      },
+    });
+
+    // Return success indicator
+    return { success: true };
+  } catch (error) {
+    console.error("Error saving question response:", error);
+
+    return { success: false, error: "Failed to save response" };
+  }
+}

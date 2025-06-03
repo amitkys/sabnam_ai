@@ -21,7 +21,6 @@ import {
   Pagination,
   PaginationContent,
   PaginationItem,
-  PaginationLink,
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
@@ -50,11 +49,11 @@ export default function DashBoardTableSkeleton({
     return (
       <>
         {/* First page */}
-        <PaginationItem>
+        {/* <PaginationItem>
           <PaginationLink className="opacity-70" isActive={currentPage === 1}>
             1
           </PaginationLink>
-        </PaginationItem>
+        </PaginationItem> */}
 
         {/* Show dots to indicate loading state */}
         <PaginationItem>

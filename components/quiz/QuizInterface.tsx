@@ -4,14 +4,14 @@ import type { FetchedTestSeriesData } from "@/lib/type";
 
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-import { useRouter } from '@bprogress/next/app';
+import { useRouter } from "@bprogress/next/app";
 import { toast } from "sonner";
 import Image from "next/image";
 
 import { useQuizStore } from "@/lib/store/useQuizStore";
 import { useFullscreen } from "@/hooks/use-fullscreen";
 import { Card } from "@/components/ui/card";
-import { SaveQuestionResponse } from "@/lib/actions";
+import { SaveQuestionResponse, SubmitTest } from "@/lib/actions";
 import { StartScreen } from "@/components/quiz/startScreen";
 import { QuizHeader } from "@/components/quiz/QuizHeader";
 import { QuestionCard } from "@/components/quiz/QuestionsCard";
@@ -177,7 +177,13 @@ export default function QuizInterface({
 
       await exitFullscreen();
       if (attemptId) {
-        router.push(`/analysis/${attemptId}`);
+        const result = await SubmitTest({ testAttemptId: attemptId });
+
+        if (!result.success) {
+          toast.error("Failed to submit test");
+        } else {
+          router.push(`/analysis/${attemptId}`);
+        }
       }
     } catch (error) {
       toast.error("Failed to submit test");
