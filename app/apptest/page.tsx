@@ -1,14 +1,17 @@
 "use client";
-import { useRouter } from "@bprogress/next/app";
 
-import { Button } from "@/components/ui/button";
-export default function AppTest() {
-  const router = useRouter();
+import { useTesting } from "@/utils/testingApi";
 
-  return (
-    <div>
-      <Button onClick={() => router.push("/home")}>go to home</Button>
-      <h1 className="text-foreground/20">App Test</h1>
-    </div>
-  );
+export default function TestPage() {
+  const { user, error, isLoading } = useTesting();
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
+
+  return <div>{user?.age}</div>;
 }
