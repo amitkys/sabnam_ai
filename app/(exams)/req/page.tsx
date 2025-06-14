@@ -1,7 +1,7 @@
 // src/pages/req.tsx
 "use client";
 import { useState } from "react";
-import { useRouter } from '@bprogress/next/app';
+import { useRouter } from "@bprogress/next/app";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { motion } from "framer-motion";
@@ -44,7 +44,7 @@ const itemVariants = {
     opacity: 1,
     y: 0,
     transition: {
-      type: "spring",
+      type: "spring" as const,
       stiffness: 100,
       damping: 12,
     },
