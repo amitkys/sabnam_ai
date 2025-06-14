@@ -6,7 +6,10 @@ import Markdown from "react-markdown";
 import rehypeKatex from "rehype-katex";
 import remarkMath from "remark-math";
 import { Loader2 } from "lucide-react";
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 
+import { geist } from "@/config/fonts";
 import { Button } from "@/components/ui/button";
 import {
   Drawer,
@@ -126,6 +129,54 @@ export default function ExplainDrawer({
                   <h3 className="font-medium mb-2">Question:</h3>
                   <div className="text-sm lg:text-base text-foreground/75">
                     <Markdown
+                      components={{
+                        code({
+                          node,
+                          inline,
+                          className,
+                          children,
+                          ...props
+                        }: {
+                          node?: any;
+                          inline?: boolean;
+                          className?: string;
+                          children?: React.ReactNode;
+                          [key: string]: any;
+                        }) {
+                          const match = /language-(\w+)/.exec(className || "");
+
+                          return !inline && match ? (
+                            <div
+                              className={`my-2 ${geist.className} overflow-x-auto scrollbar-hide text-xs md:text-base`}
+                            >
+                              <SyntaxHighlighter
+                                PreTag="div"
+                                codeTagProps={{}}
+                                customStyle={{
+                                  margin: 0,
+                                  borderRadius: "0.5rem",
+                                  whiteSpace: "pre",
+                                  display: "inline-block",
+                                  minWidth: "fit-content",
+                                  maxWidth: "100%",
+                                }}
+                                language={match[1]}
+                                style={oneDark}
+                                {...props}
+                              >
+                                {String(children).replace(/\n$/, "")}
+                              </SyntaxHighlighter>
+                            </div>
+                          ) : (
+                            <code
+                              className="bg-muted px-1 py-0.5 rounded break-words"
+                              {...props}
+                            >
+                              {children}
+                            </code>
+                          );
+                        },
+                      }}
                       rehypePlugins={[rehypeKatex]}
                       remarkPlugins={[remarkMath]}
                     >
@@ -176,6 +227,54 @@ export default function ExplainDrawer({
                           li: ({ children }) => (
                             <li className="mb-2">{children}</li>
                           ),
+                          code({
+                            node,
+                            inline,
+                            className,
+                            children,
+                            ...props
+                          }: {
+                            node?: any;
+                            inline?: boolean;
+                            className?: string;
+                            children?: React.ReactNode;
+                            [key: string]: any;
+                          }) {
+                            const match = /language-(\w+)/.exec(
+                              className || "",
+                            );
+
+                            return !inline && match ? (
+                              <div
+                                className={`my-2 ${geist.className} overflow-x-auto scrollbar-hide text-xs md:text-base`}
+                              >
+                                <SyntaxHighlighter
+                                  PreTag="div"
+                                  codeTagProps={{}}
+                                  customStyle={{
+                                    margin: 0,
+                                    borderRadius: "0.5rem",
+                                    whiteSpace: "pre",
+                                    display: "inline-block",
+                                    minWidth: "fit-content",
+                                    maxWidth: "100%",
+                                  }}
+                                  language={match[1]}
+                                  style={oneDark}
+                                  {...props}
+                                >
+                                  {String(children).replace(/\n$/, "")}
+                                </SyntaxHighlighter>
+                              </div>
+                            ) : (
+                              <code
+                                className="bg-muted px-1 py-0.5 rounded break-words"
+                                {...props}
+                              >
+                                {children}
+                              </code>
+                            );
+                          },
                         }}
                         rehypePlugins={[rehypeKatex]}
                         remarkPlugins={[remarkMath]}

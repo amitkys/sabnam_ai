@@ -1,17 +1,8 @@
-"use client";
-
-import { useTesting } from "@/utils/testingApi";
-
-export default function TestPage() {
-  const { user, error, isLoading } = useTesting();
-
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
-
-  if (error) {
-    return <div>Error: {error}</div>;
-  }
-
-  return <div>{user?.age}</div>;
+export default function Page() {
+  return (
+    <div>
+      <h1 className="text-2xl font-bold text-center">App Test Page</h1>
+      <p className="text-center">This is a test page for the app directory.</p>
+    </div>
+  );
 }

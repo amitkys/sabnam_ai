@@ -9,9 +9,12 @@ import remarkMath from "remark-math";
 import Link from "next/link";
 import { GoHome } from "react-icons/go";
 import { Zap } from "lucide-react";
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 
 import { Separator } from "../ui/separator";
 
+import { geist } from "@/config/fonts";
 import ExplainDrawer from "@/components/explain-drawer"; // Import the new ExplainDrawer component
 import {
   FirstTimeTooltip,
@@ -122,7 +125,11 @@ function Content({
   return (
     <div className="container mx-auto p-4 space-y-6 bg-background text-foreground mt-3 rounded-lg">
       <h1 className="text-base lg:text-lg font-bold mt-1">
-        {testSeriesDetails.title.split(" ").slice(2).join(" ").replace("series", "Test Series")}
+        {testSeriesDetails.title
+          .split(" ")
+          .slice(2)
+          .join(" ")
+          .replace("series", "Test Series")}
       </h1>
 
       <div className="grid gap-6 md:grid-cols-2">
@@ -309,6 +316,56 @@ function Content({
                     </div>
                     <div className="text-sm lg:text-base font-base font-semibold text-foreground/75">
                       <Markdown
+                        components={{
+                          code({
+                            node,
+                            inline,
+                            className,
+                            children,
+                            ...props
+                          }: {
+                            node?: any;
+                            inline?: boolean;
+                            className?: string;
+                            children?: React.ReactNode;
+                            [key: string]: any;
+                          }) {
+                            const match = /language-(\w+)/.exec(
+                              className || "",
+                            );
+
+                            return !inline && match ? (
+                              <div
+                                className={`my-2 ${geist.className} overflow-x-auto scrollbar-hide text-xs md:text-base`}
+                              >
+                                <SyntaxHighlighter
+                                  PreTag="div"
+                                  codeTagProps={{}}
+                                  customStyle={{
+                                    margin: 0,
+                                    borderRadius: "0.5rem",
+                                    whiteSpace: "pre",
+                                    display: "inline-block",
+                                    minWidth: "fit-content",
+                                    maxWidth: "100%",
+                                  }}
+                                  language={match[1]}
+                                  style={oneDark}
+                                  {...props}
+                                >
+                                  {String(children).replace(/\n$/, "")}
+                                </SyntaxHighlighter>
+                              </div>
+                            ) : (
+                              <code
+                                className="bg-muted px-1 py-0.5 rounded break-words"
+                                {...props}
+                              >
+                                {children}
+                              </code>
+                            );
+                          },
+                        }}
                         rehypePlugins={[rehypeKatex]}
                         remarkPlugins={[remarkMath]}
                       >
@@ -321,22 +378,73 @@ function Content({
                           <div className="flex-shrink-0 mt-1">
                             <div
                               className={`w-4 h-4 rounded-full flex-shrink-0 ${option.text === question.correctAnswer
-                                ? "bg-primary"
-                                : userAnswer &&
-                                  option.text === userAnswer.userAnswer
-                                  ? "bg-destructive"
-                                  : "bg-muted"
+                                  ? "bg-primary"
+                                  : userAnswer &&
+                                    option.text === userAnswer.userAnswer
+                                    ? "bg-destructive"
+                                    : "bg-muted"
                                 }`}
                             />
                           </div>
                           <div
                             className={`flex-grow ${option.text === question.correctAnswer
-                              ? "font-medium"
-                              : ""
+                                ? "font-medium"
+                                : ""
                               }`}
                           >
                             <div className="text-sm lg:text-base text-foreground/75">
                               <Markdown
+                                components={{
+                                  code({
+                                    node,
+                                    inline,
+                                    className,
+                                    children,
+                                    ...props
+                                  }: {
+                                    node?: any;
+                                    inline?: boolean;
+                                    className?: string;
+                                    children?: React.ReactNode;
+                                    [key: string]: any;
+                                  }) {
+                                    const match = /language-(\w+)/.exec(
+                                      className || "",
+                                    );
+
+                                    return !inline && match ? (
+                                      <div className="mt-2 inline-block text-xs">
+                                        <SyntaxHighlighter
+                                          PreTag="div"
+                                          codeTagProps={{}}
+                                          customStyle={{
+                                            margin: 0,
+                                            borderRadius: "0.375rem",
+                                            fontSize: "0.75rem",
+                                            whiteSpace: "pre-wrap",
+                                            wordBreak: "break-word",
+                                            overflowWrap: "break-word",
+                                            display: "inline-block",
+                                            minWidth: "fit-content",
+                                            maxWidth: "100%",
+                                          }}
+                                          language={match[1]}
+                                          style={oneDark}
+                                          {...props}
+                                        >
+                                          {String(children).replace(/\n$/, "")}
+                                        </SyntaxHighlighter>
+                                      </div>
+                                    ) : (
+                                      <code
+                                        className="bg-muted px-1 py-0.5 rounded text-xs break-words"
+                                        {...props}
+                                      >
+                                        {children}
+                                      </code>
+                                    );
+                                  },
+                                }}
                                 rehypePlugins={[rehypeKatex]}
                                 remarkPlugins={[remarkMath]}
                               >
