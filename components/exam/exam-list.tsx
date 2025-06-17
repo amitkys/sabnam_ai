@@ -46,10 +46,6 @@ export function ExamList() {
     return () => document.removeEventListener("keydown", down);
   }, []);
 
-  const handleRequestExam = () => {
-    router.push("/req");
-  };
-
   const handleSelectExam = (examId: string) => {
     setOpen(false);
     router.push(`/exams?type=${examId}`);
@@ -62,7 +58,7 @@ export function ExamList() {
 
   return (
     <>
-      <Card>
+      <Card className="bg-background">
         <CardHeader className="px-4 text-foreground/75">
           {/* Title row with back button */}
           <div className="flex items-center justify-between w-full mx-2">
@@ -88,9 +84,9 @@ export function ExamList() {
           <SelectSeparator className="my-2" />
 
           {/* Search and Request Row */}
-          <div className="flex flex-row items-center justify-between flex-wrap gap-2 mt-2">
+          <div className="flex flex-row items-center justify-end flex-wrap gap-2 mt-2">
             {/* Search Button */}
-            <div className="w-auto">
+            {/* <div className="w-auto">
               <Button
                 className="justify-start text-muted-foreground"
                 variant="outline"
@@ -102,17 +98,15 @@ export function ExamList() {
                   <span className="text-xs">Ctrl +</span>K
                 </kbd>
               </Button>
-            </div>
+            </div> */}
 
             {/* Request Exam Button */}
-            <div className="w-auto">
-              <Button onClick={handleRequestExam}>
+            {/* <div className="w-auto">
+              <Button variant="outline" onClick={() => router.push("/req")}>
                 <Plus className="h-4 w-4" />
-                <span className="ml-2 hidden sm:inline">
-                  Request for Exam Test
-                </span>
+                Request test series
               </Button>
-            </div>
+            </div> */}
           </div>
         </CardHeader>
 

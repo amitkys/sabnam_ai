@@ -22,7 +22,7 @@ export function ChapterList() {
   const chapters = currentSubject?.chapters || [];
 
   return (
-    <Card>
+    <Card className="bg-background">
       <CardHeader className="px-4 text-foreground/75">
         {/* Title row with back button */}
         <div className="flex items-center justify-between w-full mx-2">

@@ -1,18 +1,16 @@
 "use client";
 
-import type React from "react";
+import React from "react";
 
 import { useState } from "react";
-import { Book, School, GraduationCap, BookOpen } from "lucide-react";
+import { Book, School, GraduationCap, BookOpen, Trophy, FileText, Search } from "lucide-react";
 import { useRouter } from '@bprogress/next/app';
 
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
-  CardFooter,
   CardHeader,
+  CardTitle
 } from "@/components/ui/card";
 import {
   AlertDialog,
@@ -32,20 +30,20 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ContentLayout } from "@/components/admin-panel/content-layout";
-import { Loader } from "@/components/ui/loader"; // Import the Loader component
+import { Loader } from "@/components/ui/loader";
+import { geist } from "@/config/fonts";
+import { Command, CommandDialog, CommandInput, CommandList, CommandItem } from "@/components/ui/command";
+import { examData } from "@/lib/exams/data";
+import { Button } from "@/components/ui/button";
 
-type BoardCardData = {
-  title: string;
-  icon: React.ReactNode;
-  iconColor: string;
-};
-
-type CategoryCardData = {
+type CategoryCard = {
+  id: string;
   title: string;
   description: string;
   icon: React.ReactNode;
   iconColor: string;
-  route: string;
+  route?: string;
+  requiresSelection?: boolean;
 };
 
 type Selection = {
@@ -64,24 +62,65 @@ export default function Page() {
     subject: "",
   });
   const [loadingCard, setLoadingCard] = useState<string | null>(null);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
-  const handleExplore = (topic: string) => {
-    setLoadingCard(topic);
+  const searchResults = React.useMemo(() => {
+    if (!searchQuery) return [];
 
-    if (topic === "Competitive Exams") {
+    const results: Array<{
+      type: string;
+      exam?: string;
+      subject?: string;
+      chapter?: string;
+      url: string;
+    }> = [];
+
+    examData.exams.forEach(exam => {
+      if (exam.name.toLowerCase().includes(searchQuery.toLowerCase())) {
+        results.push({
+          type: 'exam',
+          exam: exam.name,
+          url: `/competitive-exams?type=${exam.id}`
+        });
+      }
+
+      exam.subjects.forEach(subject => {
+        subject.chapters.forEach(chapter => {
+          if (chapter.name.toLowerCase().includes(searchQuery.toLowerCase())) {
+            results.push({
+              type: 'chapter',
+              exam: exam.name,
+              subject: subject.name,
+              chapter: chapter.name,
+              url: `/competitive-exams?type=${exam.id}&subject=${subject.id}&chapter=${chapter.id}`
+            });
+          }
+        });
+      });
+    });
+
+    return results;
+  }, [searchQuery]);
+
+  const handleCardClick = (card: CategoryCard) => {
+    setLoadingCard(card.id);
+
+    if (card.route) {
       setTimeout(() => {
-        router.push("/competitive-exams");
+        router.push(card.route!);
         setLoadingCard(null);
       }, 500);
-
       return;
     }
 
-    setCurrentSelection({ topic, class: "", subject: "" });
-    setTimeout(() => {
-      setIsClassDialogOpen(true);
-      setLoadingCard(null);
-    }, 500);
+    if (card.requiresSelection) {
+      setCurrentSelection({ topic: card.title, class: "", subject: "" });
+      setTimeout(() => {
+        setIsClassDialogOpen(true);
+        setLoadingCard(null);
+      }, 500);
+    }
   };
 
   const handleClassSelect = (value: string) => {
@@ -97,18 +136,14 @@ export default function Page() {
   const handleFinalSubmit = () => {
     setLoadingCard("submit");
     setTimeout(() => {
-      router.push(
-        `/past10year?topic=${currentSelection.topic}&clas=${currentSelection.class}&subject=${currentSelection.subject}`,
-      );
-      setIsSubjectDialogOpen(false);
-      setLoadingCard(null);
-    }, 500);
-  };
+      const topic = currentSelection.topic.replace(/ /g, '-');
+      const subject = currentSelection.subject.replace(/ /g, '-');
 
-  const handleCategoryClick = (route: string, title: string) => {
-    setLoadingCard(title);
-    setTimeout(() => {
-      router.push(route);
+      router.push(
+        `/past10year?topic=${topic}&clas=${currentSelection.class}&subject=${subject}`
+      );
+
+      setIsSubjectDialogOpen(false);
       setLoadingCard(null);
     }, 500);
   };
@@ -131,40 +166,38 @@ export default function Page() {
     "English",
   ];
 
-  const boardCardsData: BoardCardData[] = [
+  const categoryCards: CategoryCard[] = [
     {
-      title: "NCERT",
-      icon: <Book className="h-16 w-16" />,
-      iconColor: "text-primary",
-    },
-    {
-      title: "CBSE",
-      icon: <School className="h-16 w-16" />,
+      id: "board",
+      title: "Board Exam Practice",
+      description: "Test-series for classes 9-12, across all major boards.",
+      icon: <School className="h-8 w-8" />,
       iconColor: "text-green-500",
-    },
-  ];
-
-  const categoryCardsData: CategoryCardData[] = [
-    {
-      title: "Exams",
-      description: "Gov. Exams, Computer Science, etc.",
-      icon: <GraduationCap className="h-16 w-16" />,
-      iconColor: "text-purple-500",
-      route: "/exams",
-    },
-    {
-      title: "Board Tests",
-      description: "Board exam preparations",
-      icon: <School className="h-16 w-16" />,
-      iconColor: "text-blue-500",
       route: "/board",
     },
     {
-      title: "Subject Tests",
-      description: "Practice tests for individual subjects",
-      icon: <BookOpen className="h-16 w-16" />,
-      iconColor: "text-green-500",
-      route: "/subjects",
+      id: "exams",
+      title: "Competitive & Entrance Prep",
+      description: "Get ready for ur entrance, academic and competitive exams.",
+      icon: <Trophy className="h-8 w-8" />,
+      iconColor: "text-yellow-500",
+      route: "/exams",
+    },
+    {
+      id: "ncert",
+      title: "NCERT",
+      description: "10+ years of NCERT questions across all subjects",
+      icon: <Book className="h-8 w-8" />,
+      iconColor: "text-primary",
+      requiresSelection: true,
+    },
+    {
+      id: "cbse",
+      title: "CBSE",
+      description: "10+ years of CBSE questions across all subjects",
+      icon: <GraduationCap className="h-8 w-8" />,
+      iconColor: "text-pink-500",
+      requiresSelection: true,
     },
   ];
 
@@ -172,7 +205,7 @@ export default function Page() {
     <AlertDialog open={isClassDialogOpen} onOpenChange={setIsClassDialogOpen}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Select your class</AlertDialogTitle>
+          <AlertDialogTitle className={geist.className}>Select your class</AlertDialogTitle>
           <AlertDialogDescription>
             Choose the class you want to explore for {currentSelection.topic}.
           </AlertDialogDescription>
@@ -200,7 +233,7 @@ export default function Page() {
     >
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Select your subject</AlertDialogTitle>
+          <AlertDialogTitle className={geist.className}>Select your subject</AlertDialogTitle>
           <AlertDialogDescription>
             Choose the subject you want to explore for {currentSelection.topic}{" "}
             {currentSelection.class}.
@@ -239,92 +272,96 @@ export default function Page() {
 
   return (
     <ContentLayout title="Home">
-      <div className="flex flex-col items-center gap-12 p-2">
-        {/* First section: Question Bank */}
-        <div className="w-full">
-          {/* Heading for first section */}
-          <div className="text-center mb-6">
-            <h1 className="text-2xl lg:text-3xl font-bold">
-              Explore Exam Categories
-            </h1>
-            {/* <p className="text-muted-foreground mt-2">
-              Find specialized content for various types of exams
-            </p> */}
-          </div>
-          {/* New three category cards */}
+      <div className="max-w-6xl mx-auto p-4">
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full">
-            {categoryCardsData.map((card, index) => (
-              <Card key={index} className="w-full relative">
-                <Badge className="absolute top-2 right-2" variant="secondary">
-                  Free
-                </Badge>
-                <CardHeader className="flex items-center justify-center">
-                  <div className={card.iconColor}>{card.icon}</div>
-                </CardHeader>
-                <CardContent className="text-center">
-                  <h2 className="text-xl font-bold">{card.title}</h2>
-                  <p className="text-muted-foreground mt-2 whitespace-nowrap overflow-hidden text-ellipsis">
-                    {card.description}
-                  </p>
-                </CardContent>
-                <CardFooter>
-                  <Button
-                    className="w-full"
-                    disabled={loadingCard === card.title}
-                    onClick={() => handleCategoryClick(card.route, card.title)}
-                  >
-                    {loadingCard === card.title && (
-                      <Loader className="mr-1" size="small" variant="spin" />
-                    )}
-                    Explore
-                  </Button>
-                </CardFooter>
-              </Card>
-            ))}
-          </div>
+        {/* Existing Content */}
+        <div className="grid grid-cols-1 gap-6">
+          <Card className="bg-background">
+            <CardHeader>
+              <CardTitle className={`${geist.className} text-2xl font-bold bg-gradient-to-r from-foreground to-foreground/65 bg-clip-text text-transparent`}>
+                Exam Preparations
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {categoryCards.filter(card => card.id === "board" || card.id === "exams").map((card) => (
+                <Card
+                  key={card.id}
+                  className={`
+                    cursor-pointer transition-all duration-200 ease-in-out hover:bg-background/70`}
+                  onClick={() => router.push(`${card.route}`)}
+                >
+                  <CardContent className="py-3 ">
+                    <div className="space-y-2 md:space-y-3">
+                      {/* Icon */}
+                      <div className="">
+                        {loadingCard === card.id ? (
+                          <Loader size="small" variant="spin" className="h-8 w-8" />
+                        ) : (
+                          <div className={card.iconColor}>
+                            {card.icon}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Heading */}
+                      <h3 className={`${geist.className} text-lg font-semibold`}>
+                        {card.title}
+                      </h3>
+
+                      {/* Description */}
+                      <p className={`${geist.className} text-sm text-muted-foreground`}>
+                        {card.description}
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </CardContent>
+          </Card>
+
+          <Card className="bg-background">
+            <CardHeader>
+              <CardTitle className={`${geist.className} text-2xl font-bold bg-gradient-to-r from-foreground to-foreground/65 bg-clip-text text-transparent`}>Question Banks</CardTitle>
+            </CardHeader>
+            <CardContent className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {categoryCards.filter(card => card.id === "ncert" || card.id === "cbse").map((card) => (
+                <Card
+                  key={card.id}
+                  className={`
+                    cursor-pointer transition-all duration-200 ease-in-out hover:bg-background/70
+                    ${loadingCard === card.id ? 'opacity-60 pointer-events-none' : ''}
+                  `}
+                  onClick={() => handleCardClick(card)}
+                >
+                  <CardContent className="py-3 px-6">
+                    <div className="space-y-3">
+                      {/* Icon */}
+                      <div className="">
+                        {loadingCard === card.id ? (
+                          <Loader size="small" variant="spin" className="h-8 w-8" />
+                        ) : (
+                          <div className={card.iconColor}>
+                            {card.icon}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Heading */}
+                      <h3 className={`${geist.className} text-lg font-semibold`}>
+                        {card.title} questions bank
+                      </h3>
+
+                      {/* Description */}
+                      <p className={`${geist.className} text-sm text-muted-foreground`}>
+                        {card.description}
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </CardContent>
+          </Card>
         </div>
-        <div className="w-full">
-          {/* Heading for second section */}
-          <div className="text-center mb-6">
-            <h1 className="text-2xl lg:text-3xl font-bold">
-              10+ Years of Question Bank
-            </h1>
-            {/* <p className="text-muted-foreground mt-2">
-              Explore the 10+ years of question bank
-            </p> */}
-          </div>
-
-          {/* Original two cards (NCERT and CBSE) */}
-          <div className="flex flex-col sm:flex-row w-full gap-4">
-            {boardCardsData.map((card, index) => (
-              <Card key={index} className="w-full sm:w-1/2 relative">
-                <Badge className="absolute top-2 right-2" variant="secondary">
-                  Free
-                </Badge>
-                <CardHeader className="flex items-center justify-center">
-                  <div className={card.iconColor}>{card.icon}</div>
-                </CardHeader>
-                <CardContent className="text-center">
-                  <h2 className="text-2xl font-bold">{card.title}</h2>
-                </CardContent>
-                <CardFooter>
-                  <Button
-                    className="w-full"
-                    disabled={loadingCard === card.title}
-                    onClick={() => handleExplore(card.title)}
-                  >
-                    {loadingCard === card.title && (
-                      <Loader className="mr-1" size="small" variant="spin" />
-                    )}
-                    Explore
-                  </Button>
-                </CardFooter>
-              </Card>
-            ))}
-          </div>
-        </div>
-
         {renderClassDialog()}
         {renderSubjectDialog()}
       </div>
