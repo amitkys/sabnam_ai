@@ -56,9 +56,9 @@ export function SubjectList() {
               href={`/exams?type=${examType}&subject=${subj.id}${subj.name === "Complete Test Series" ? "&chapter=series" : ""}`}
             >
               <Card
-                className={`cursor-pointer hover:bg-secondary/30 transition-colors h-full ${subj.name === "Complete Test Series"
-                    ? "bg-primary/5 hover:bg-primary/10"
-                    : ""
+                className={`cursor-pointer hover:bg-secondary/70 transition-colors h-full ${subj.name === "Complete Test Series"
+                  ? "bg-primary/5 hover:bg-primary/10"
+                  : ""
                   }`}
               >
                 <CardHeader className="p-4">

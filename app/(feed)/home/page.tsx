@@ -287,7 +287,7 @@ export default function Page() {
                 <Card
                   key={card.id}
                   className={`
-                    cursor-pointer transition-all duration-200 ease-in-out hover:bg-background/70`}
+                    cursor-pointer transition-all duration-200 ease-in-out hover:bg-secondary/70`}
                   onClick={() => router.push(`${card.route}`)}
                 >
                   <CardContent className="py-3 ">
@@ -328,7 +328,7 @@ export default function Page() {
                 <Card
                   key={card.id}
                   className={`
-                    cursor-pointer transition-all duration-200 ease-in-out hover:bg-background/70
+                    cursor-pointer transition-all duration-200 ease-in-out hover:bg-secondary/70
                     ${loadingCard === card.id ? 'opacity-60 pointer-events-none' : ''}
                   `}
                   onClick={() => handleCardClick(card)}

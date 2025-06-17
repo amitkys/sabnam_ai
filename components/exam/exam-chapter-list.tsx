@@ -63,7 +63,7 @@ export function ChapterList() {
                 href={`/exams?type=${examType}&subject=${subject}&chapter=${isCompleteSeries ? "series" : chap.id}`}
               >
                 <Card
-                  className={`cursor-pointer hover:bg-secondary/30 transition-colors h-full ${isCompleteSeries ? "bg-primary/5 hover:bg-primary/10" : ""
+                  className={`cursor-pointer hover:bg-secondary/70 transition-colors h-full ${isCompleteSeries ? "bg-primary/5 hover:bg-primary/10" : ""
                     }`}
                 >
                   <CardHeader className="p-4">

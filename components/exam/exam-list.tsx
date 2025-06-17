@@ -116,7 +116,7 @@ export function ExamList() {
               .sort((a, b) => (b.isFavourite ? 1 : 0) - (a.isFavourite ? 1 : 0))
               .map((exam: Exam) => (
                 <Link key={exam.id} href={`/exams?type=${exam.id}`}>
-                  <Card className="cursor-pointer hover:bg-secondary/30  transition-colors h-full">
+                  <Card className="cursor-pointer hover:bg-secondary/70  transition-colors h-full">
                     <CardHeader className="p-4">
                       <div className="flex items-center justify-between text-foreground/75">
                         <div className="flex items-center gap-2">
