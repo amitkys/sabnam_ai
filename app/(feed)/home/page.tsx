@@ -272,17 +272,26 @@ export default function Page() {
 
   return (
     <ContentLayout title="Home">
-      <div className="max-w-6xl mx-auto p-4">
+      <div className="max-w-6xl mx-auto">
+        <div className="flex justify-center items-center py-8">
+          <div className="inline-flex items-center gap-4 text-muted-foreground">
+            <div className="h-[3px] hidden md:block w-12 bg-gradient-to-r from-transparent via-primary to-border" />
+            <span className={`${geist.className} text-2xl md:text-4xl font-extrabold md:font-bold bg-gradient-to-r from-foreground to-foreground/65 bg-clip-text text-transparent`}>
+              Be the best — take the test
+            </span>
+            <div className="h-[3px] w-12 hidden md:block bg-gradient-to-l from-transparent via-primary to-border" />
+          </div>
+        </div>
 
         {/* Existing Content */}
-        <div className="grid grid-cols-1 gap-6">
+        <div className="grid grid-cols-1 gap-6 px-2">
           <Card className="bg-background">
             <CardHeader>
               <CardTitle className={`${geist.className} text-2xl font-bold bg-gradient-to-r from-foreground to-foreground/65 bg-clip-text text-transparent`}>
                 Exam Preparations
               </CardTitle>
             </CardHeader>
-            <CardContent className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <CardContent className="grid grid-cols-1 lg:grid-cols-2 gap-6 px-5"> {/* Added px-3 here */}
               {categoryCards.filter(card => card.id === "board" || card.id === "exams").map((card) => (
                 <Card
                   key={card.id}
@@ -290,17 +299,11 @@ export default function Page() {
                     cursor-pointer transition-all duration-200 ease-in-out hover:bg-secondary/70`}
                   onClick={() => router.push(`${card.route}`)}
                 >
-                  <CardContent className="py-3 ">
+                  <CardContent className="py-3"> {/* Modified padding here */}
                     <div className="space-y-2 md:space-y-3">
                       {/* Icon */}
-                      <div className="">
-                        {loadingCard === card.id ? (
-                          <Loader size="small" variant="spin" className="h-8 w-8" />
-                        ) : (
-                          <div className={card.iconColor}>
-                            {card.icon}
-                          </div>
-                        )}
+                      <div className={card.iconColor}>
+                        {card.icon}
                       </div>
 
                       {/* Heading */}
@@ -323,7 +326,7 @@ export default function Page() {
             <CardHeader>
               <CardTitle className={`${geist.className} text-2xl font-bold bg-gradient-to-r from-foreground to-foreground/65 bg-clip-text text-transparent`}>Question Banks</CardTitle>
             </CardHeader>
-            <CardContent className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <CardContent className="grid grid-cols-1 lg:grid-cols-2 gap-6 px-5">
               {categoryCards.filter(card => card.id === "ncert" || card.id === "cbse").map((card) => (
                 <Card
                   key={card.id}
@@ -333,17 +336,11 @@ export default function Page() {
                   `}
                   onClick={() => handleCardClick(card)}
                 >
-                  <CardContent className="py-3 px-6">
+                  <CardContent className="py-3">
                     <div className="space-y-3">
                       {/* Icon */}
-                      <div className="">
-                        {loadingCard === card.id ? (
-                          <Loader size="small" variant="spin" className="h-8 w-8" />
-                        ) : (
-                          <div className={card.iconColor}>
-                            {card.icon}
-                          </div>
-                        )}
+                      <div className={card.iconColor}>
+                        {card.icon}
                       </div>
 
                       {/* Heading */}
