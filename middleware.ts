@@ -6,23 +6,22 @@ import { NextResponse } from "next/server";
 // Define paths that don't require authentication
 const publicPaths = [
   "/login", 
-  "/", 
   "/home", 
+  "/apptest",
   "/exams", 
   "/board",
   "/api/board",
   "/api/exams",
-  "/api/past10thyear"
+  "/api/past10thyear",
 ];
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-
-  // Check for authentication token
   const token = await getToken({ req: request });
 
-  // Check if the path is public
-  const isPublicPath = publicPaths.some((path) => pathname.startsWith(path));
+  // Handle root path separately with exact match
+  const isRootPath = pathname === "/";
+  const isPublicPath = isRootPath || publicPaths.some((path) => pathname.startsWith(path));
 
   // If user is logged in and trying to access login page, redirect to home
   if (token && pathname === "/login") {
@@ -45,9 +44,9 @@ export const config = {
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
-     * - public folder
+     * - public folder contents
      * - api/auth routes
      */
-    "/((?!_next/static|_next/image|favicon.ico|public|api/auth).*)",
+    '/((?!_next/static|_next/image|favicon.ico|api/auth|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|css|js|json)$).*)',
   ],
 };

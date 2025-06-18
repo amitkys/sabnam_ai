@@ -1,8 +1,7 @@
-"use client";
-import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
+import Image from "next/image";
+
 export default function Page() {
   return (
-    <Button onClick={() => toast.error("login failed", { description: "please try again" })}>click to show toast</Button>
-  )
+    <Image src="/logo.svg" alt="test" width={100} height={100} />
+  );
 }

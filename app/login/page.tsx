@@ -21,10 +21,8 @@ export default function Page() {
       // If there's no redirect URL, default to home
       const callbackUrl = redirectUrl || "/home";
       await signIn("google", { callbackUrl });
-      toast.success("login successful");
     } catch (error) {
       console.error("Login error:", error);
-      toast.error("login failed");
     }
   };
 

@@ -24,13 +24,18 @@ export const useAuthStore = create<AuthState>()(
       },
       clearAuth: () => {
         console.log('Clearing auth state');
+        // Clear both state and storage
+        localStorage.removeItem('auth-storage');
         set({ isAuthenticated: false, redirectUrl: null });
       },
     }),
     {
       name: 'auth-storage',
-      // Only persist redirectUrl, not isAuthenticated (should be synced from session)
-      partialize: (state) => ({ redirectUrl: state.redirectUrl }),
+      // Persist both redirectUrl and isAuthenticated
+      partialize: (state) => ({ 
+        redirectUrl: state.redirectUrl,
+        isAuthenticated: state.isAuthenticated 
+      }),
     }
   )
 ) 

@@ -93,7 +93,7 @@ export function UserNav() {
             onClick={() => signOut({ callbackUrl: "/" })}
           >
             <LogOut className="w-4 h-4 mr-3 text-muted-foreground" />
-            Sign out
+            Logout
           </DropdownMenuItem>
         </DropdownMenuContent>
       )}

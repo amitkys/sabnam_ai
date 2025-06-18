@@ -8,6 +8,7 @@ import ToasterWrapper from "@/components/ToasterWrapper";
 import ProgressBarProvider from "@/components/navigation-progress";
 import AuthRedirect from "@/components/auth-redirect";
 import SessionSync from "@/components/session-sync";
+import AuthStatus from "@/utils/auth-status";
 
 export const metadata: Metadata = {
   title: "Sabnam",
@@ -30,6 +31,7 @@ export default function RootLayout({
             defaultTheme="system"
           >
             <SessionSync />
+            <AuthStatus />
             <ProgressBarProvider>{children}</ProgressBarProvider>
             <ToasterWrapper />
             <AuthRedirect />

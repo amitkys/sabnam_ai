@@ -48,10 +48,8 @@ export default function LoginDialog({
         setRedirectUrl(redirectTo);
       }
       await signIn("google");
-      toast.success("Login successful");
     } catch (error) {
       console.error("Login error:", error);
-      toast.error("Login failed. Please try again.");
       setLoading(false);
     }
   };
