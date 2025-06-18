@@ -136,7 +136,7 @@ export default function Pricing() {
               <Button
                 className="w-full"
                 onClick={() => {
-                  router.push("/login");
+                  router.push("/home");
                 }}
               >
                 Let's get started

@@ -21,8 +21,23 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
+import { useAuthStore } from "@/lib/store/auth-store";
+
 export function UserNav() {
   const { data: session, status } = useSession();
+  const { isAuthenticated } = useAuthStore();
+
+  // If not authenticated, show login button
+  if (!isAuthenticated) {
+    return (
+      <Link
+        href="/login"
+        className="text-sm bg-primary text-background px-2 md:px-3 py-1 rounded hover:bg-primary/90 transition-colors"
+      >
+        Login
+      </Link>
+    );
+  }
 
   // Extract user information from session
   const user = session?.user;

@@ -8,10 +8,10 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 const menuItems = [
-  { name: "Features", href: "#link" },
-  { name: "Solution", href: "#link" },
-  { name: "Pricing", href: "#link" },
-  { name: "About", href: "#link" },
+  { name: "Home", href: "/home" },
+  { name: "Board Exam", href: "/board" },
+  { name: "Competative Exam", href: "/exams" },
+  { name: "About", href: "/about" },
 ];
 
 export const HeroHeader = () => {
@@ -101,9 +101,6 @@ export const HeroHeader = () => {
                   size="sm"
                   variant="outline"
                 >
-                  <Link href="/login">
-                    <span>Login</span>
-                  </Link>
                 </Button>
                 <Button
                   asChild
@@ -111,7 +108,7 @@ export const HeroHeader = () => {
                   size="sm"
                 >
                   <Link href="/login">
-                    <span>Sign Up</span>
+                    <span>Login</span>
                   </Link>
                 </Button>
                 <Button
@@ -119,7 +116,7 @@ export const HeroHeader = () => {
                   className={cn(isScrolled ? "lg:inline-flex" : "hidden")}
                   size="sm"
                 >
-                  <Link href="/login">
+                  <Link href="/home">
                     <span>Get Started</span>
                   </Link>
                 </Button>

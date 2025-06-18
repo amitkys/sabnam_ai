@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   CirclePlus,
+  Trophy,
   LayoutGrid,
   LucideIcon,
   Book,
@@ -62,8 +63,8 @@ export function getMenuList(pathname: string): Group[] {
         },
         {
           href: "/exams",
-          label: "More Exams",
-          icon: BookPlus,
+          label: "Competi. & Other",
+          icon: Trophy,
           // submenus: [
           //   {
           //     href: "/CBSE/10th",

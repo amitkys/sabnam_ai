@@ -1,9 +1,10 @@
 "use client";
 
-import { Ellipsis, LogOut } from "lucide-react";
-import { usePathname } from "next/navigation";
+import { Ellipsis, LogOut, LogIn } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
 import Link from "next/link";
+import { useAuthStore } from "@/lib/store/auth-store";
 
 import { cn } from "@/lib/utils";
 import { getMenuList } from "@/lib/menu-list";
@@ -73,7 +74,7 @@ export function Menu({ isOpen }: MenuProps) {
                                 <span
                                   className={cn(isOpen === false ? "" : "mr-2")}
                                 >
-                                  <Icon size={18} />
+                                  <Icon className={cn(href.startsWith("/board") ? "text-green-500" : href.startsWith("/exams") ? "text-yellow-500" : "")} size={18} />
                                 </span>
                                 <p
                                   className={cn(
@@ -118,26 +119,50 @@ export function Menu({ isOpen }: MenuProps) {
             <TooltipProvider disableHoverableContent>
               <Tooltip delayDuration={100}>
                 <TooltipTrigger asChild>
-                  <Button
-                    className="w-full justify-center h-10 mt-5"
-                    variant="outline"
-                    onClick={() => signOut({ callbackUrl: "/" })}
-                  >
-                    <span className={cn(isOpen === false ? "" : "mr-2")}>
-                      <LogOut size={18} />
-                    </span>
-                    <p
-                      className={cn(
-                        "whitespace-nowrap",
-                        isOpen === false ? "opacity-0 hidden" : "opacity-100",
-                      )}
+                  {useAuthStore((state) => state.isAuthenticated) ? (
+                    <Button
+                      className="w-full justify-center h-10 mt-5"
+                      variant="outline"
+                      onClick={() => signOut({ callbackUrl: "/" })}
                     >
-                      Logout
-                    </p>
-                  </Button>
+                      <span className={cn(isOpen === false ? "" : "mr-2")}>
+                        <LogOut size={18} />
+                      </span>
+                      <p
+                        className={cn(
+                          "whitespace-nowrap",
+                          isOpen === false ? "opacity-0 hidden" : "opacity-100",
+                        )}
+                      >
+                        Logout
+                      </p>
+                    </Button>
+                  ) : (
+                    <Button
+                      asChild
+                      className="w-full justify-center h-10 mt-5"
+                      variant="outline"
+                    >
+                      <Link href="/login">
+                        <span className={cn(isOpen === false ? "" : "mr-2")}>
+                          <LogIn size={18} />
+                        </span>
+                        <p
+                          className={cn(
+                            "whitespace-nowrap",
+                            isOpen === false ? "opacity-0 hidden" : "opacity-100",
+                          )}
+                        >
+                          Login
+                        </p>
+                      </Link>
+                    </Button>
+                  )}
                 </TooltipTrigger>
                 {isOpen === false && (
-                  <TooltipContent side="right">Logout</TooltipContent>
+                  <TooltipContent side="right">
+                    {useAuthStore((state) => state.isAuthenticated) ? "Logout" : "Login"}
+                  </TooltipContent>
                 )}
               </Tooltip>
             </TooltipProvider>

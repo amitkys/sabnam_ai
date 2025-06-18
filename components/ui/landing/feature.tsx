@@ -111,7 +111,7 @@ export default function Feature() {
                     : "text-muted-foreground",
                 )}
               >
-                <Link href={"/login"}>
+                <Link href={"/home"}>
                   <span>Learn more</span>
                 </Link>
                 <ArrowRight

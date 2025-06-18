@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import Link from "next/link";
-import { ArrowRight, ChevronRight } from "lucide-react";
+import { ArrowRight, ArrowRightFromLine, ChevronRight, Rocket } from "lucide-react";
 import Image from "next/image";
 import { toast } from "sonner";
 
@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { TextEffect } from "@/components/ui/text-effect";
 import { AnimatedGroup } from "@/components/ui/animated-group";
 import { HeroHeader } from "@/components/hero5-header";
+import { geist } from "@/config/fonts";
 
 const transitionVariants = {
   item: {
@@ -52,7 +53,7 @@ export default function HeroSection() {
                 <AnimatedGroup variants={transitionVariants}>
                   <Link
                     className="hover:bg-background dark:hover:border-t-border bg-muted group mx-auto flex w-fit items-center gap-4 rounded-full border p-1 pl-4 shadow-md shadow-zinc-950/5 transition-colors duration-300 dark:border-t-white/5 dark:shadow-zinc-950"
-                    href="#link"
+                    href="/home"
                   >
                     <span className="text-foreground text-sm">
                       Introducing Sabnam AI
@@ -82,14 +83,12 @@ export default function HeroSection() {
                 </TextEffect>
                 <TextEffect
                   as="p"
-                  className="mx-auto mt-8 max-w-2xl text-balance text-base md:text-lg"
+                  className={`mx-auto mt-8 max-w-2xl text-balance text-base md:text-lg`}
                   delay={0.5}
                   per="line"
                   preset="fade-in-blur"
                   speedSegment={0.3}
-                >
-                  Sabnam AI have variety of Test Series, Let's Explore..!
-                </TextEffect>
+                >On demand test series, with AI help, will leverage your knowledge.</TextEffect>
 
                 <AnimatedGroup
                   className="mt-12 flex flex-col items-center justify-center gap-2 md:flex-row"
@@ -112,7 +111,8 @@ export default function HeroSection() {
                       size="lg"
                     >
                       <Link href="/home">
-                        <span className="text-nowrap">Start using</span>
+                        <span className="text-nowrap">Get Started</span>
+                        <Rocket className="ml-1 size-4" />
                       </Link>
                     </Button>
                   </div>
@@ -157,14 +157,14 @@ export default function HeroSection() {
                     alt="app screen"
                     className="bg-background aspect-15/8 relative hidden dark:block"
                     height="1440"
-                    src="/sabnam-home-dark.png"
+                    src="/sabnam-new-dark.png"
                     width="2700"
                   />
                   <Image
                     alt="app screen"
                     className="z-2 border-border/25 aspect-15/8 relative rounded-2xl border dark:hidden"
                     height="1440"
-                    src="/sabnam-home-light.png"
+                    src="/sabnam-new-light.png"
                     width="2700"
                   />
                 </div>
