@@ -6,6 +6,8 @@ import SessionWrapper from "@/components/sessionProvider";
 import { inter } from "@/config/fonts";
 import ToasterWrapper from "@/components/ToasterWrapper";
 import ProgressBarProvider from "@/components/navigation-progress";
+import AuthRedirect from "@/components/auth-redirect";
+import SessionSync from "@/components/session-sync";
 
 export const metadata: Metadata = {
   title: "Sabnam",
@@ -27,8 +29,10 @@ export default function RootLayout({
             attribute="class"
             defaultTheme="system"
           >
+            <SessionSync />
             <ProgressBarProvider>{children}</ProgressBarProvider>
             <ToasterWrapper />
+            <AuthRedirect />
           </ThemeProvider>
         </body>
       </html>

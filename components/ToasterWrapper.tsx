@@ -10,11 +10,10 @@ export default function ToasterWrapper() {
   return (
     <Toaster
       richColors
-      theme={theme === "light" ? "light" : "dark"} // Dynamically set theme
+      theme={theme === "light" ? "dark" : "light"} // Dynamically set theme
       toastOptions={{
         className: geist.className,
       }}
-      position="top-center"
     />
   );
 }

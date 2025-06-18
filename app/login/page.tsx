@@ -4,6 +4,8 @@ import { FaGoogle } from "react-icons/fa";
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { motion } from "framer-motion";
+import { useAuthStore } from "@/lib/store/auth-store";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Loader } from "@/components/ui/loader";
@@ -11,10 +13,19 @@ import { Card } from "@/components/ui/card";
 
 export default function Page() {
   const [loading, setLoading] = useState(false);
+  const { redirectUrl, setRedirectUrl } = useAuthStore();
 
-  const handleLogin = () => {
-    setLoading(true);
-    signIn("google", { callbackUrl: "/home" });
+  const handleLogin = async () => {
+    try {
+      setLoading(true);
+      // If there's no redirect URL, default to home
+      const callbackUrl = redirectUrl || "/home";
+      await signIn("google", { callbackUrl });
+      toast.success("login successful");
+    } catch (error) {
+      console.error("Login error:", error);
+      toast.error("login failed");
+    }
   };
 
   return (

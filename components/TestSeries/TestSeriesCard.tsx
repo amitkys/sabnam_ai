@@ -17,6 +17,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { getTestAttemptId } from "@/lib/actions";
 import { formatDuration } from "@/utils/utils";
+import LoginDialog from '../loginDailog';
+import { useAuthStore } from '@/lib/store/auth-store';
 
 export const TestSeriesCard = ({
   testSeries,
@@ -26,10 +28,16 @@ export const TestSeriesCard = ({
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
+  const { isAuthenticated } = useAuthStore();
+  const [showLoginDialog, setShowLoginDialog] = useState(false);
+
   const handleNavigation = useCallback(async () => {
+    if (!isAuthenticated) {
+      setShowLoginDialog(true);
+      return;
+    }
     try {
       setLoading(true);
-      // Create a toast with a specific ID
 
       const testAttemptId = await getTestAttemptId(testSeries.id);
 
@@ -88,6 +96,11 @@ export const TestSeriesCard = ({
           ) : (
             "Start Test"
           )}
+
+          <LoginDialog
+            open={showLoginDialog}
+            onOpenChange={setShowLoginDialog}
+          />
         </Button>
       </CardFooter>
     </Card>

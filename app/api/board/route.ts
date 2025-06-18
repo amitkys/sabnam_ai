@@ -11,21 +11,12 @@ export async function GET(req: NextRequest) {
     const subject = searchParams.get("subject");
     const chapter = searchParams.get("chapter");
     const session = await GetServerSessionHere();
-    const userId = session.user.id;
+    const userId = session?.user?.id;
 
     if (!board || !standard || !subject || !chapter) {
       return Response.json(
         {
           message: "Required data not provided",
-        },
-        { status: 400 },
-      );
-    }
-
-    if (!userId) {
-      return Response.json(
-        {
-          message: "User not found",
         },
         { status: 400 },
       );
@@ -41,7 +32,7 @@ export async function GET(req: NextRequest) {
         },
       },
       include: {
-        testAttempts: {
+        testAttempts: userId ? {
           where: {
             userId: userId,
           },
@@ -53,7 +44,7 @@ export async function GET(req: NextRequest) {
             score: true,
             completedAt: true,
           },
-        },
+        } : undefined,
         _count: {
           select: {
             questions: true,
@@ -64,6 +55,15 @@ export async function GET(req: NextRequest) {
 
     // map the response with attempt test details
     const responseData = testSeries.map((series) => {
+      if (!userId) {
+        return {
+          id: series.id,
+          title: series.title,
+          duration: series.duration,
+          totalQuestions: series._count.questions,
+        };
+      }
+
       const hasAttempted = series.testAttempts.length > 0;
       const lastScore = hasAttempted ? series.testAttempts[0].score : null;
       const isCompleted = hasAttempted

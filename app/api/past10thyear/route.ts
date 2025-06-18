@@ -11,21 +11,12 @@ export async function GET(req: NextRequest) {
     const className = searchParams.get("class");
     const year = searchParams.get("year");
     const session = await GetServerSessionHere();
-    const userId = session.user.id;
+    const userId = session?.user?.id;
 
     if (!topic || !subject || !className || !year) {
       return Response.json(
         {
           message: "Required data not provided",
-        },
-        { status: 400 },
-      );
-    }
-
-    if (!userId) {
-      return Response.json(
-        {
-          message: "user not authenticated",
         },
         { status: 400 },
       );
@@ -44,7 +35,7 @@ export async function GET(req: NextRequest) {
         },
       },
       include: {
-        testAttempts: {
+        testAttempts: userId ? {
           where: {
             userId: userId,
           },
@@ -56,7 +47,7 @@ export async function GET(req: NextRequest) {
             score: true,
             completedAt: true,
           },
-        },
+        } : undefined,
         _count: {
           select: {
             questions: true,
@@ -67,6 +58,15 @@ export async function GET(req: NextRequest) {
 
     // Map the response to include attempt status, last score, and question count
     const responseData = testSeries.map((series) => {
+      if (!userId) {
+        return {
+          id: series.id,
+          title: series.title,
+          duration: series.duration,
+          totalQuestions: series._count.questions,
+        };
+      }
+
       const hasAttempted = series.testAttempts.length > 0;
       const lastScore = hasAttempted ? series.testAttempts[0].score : null;
       const isCompleted = hasAttempted

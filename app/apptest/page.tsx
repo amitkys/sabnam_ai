@@ -1,1 +1,8 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+"use client";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+export default function Page() {
+  return (
+    <Button onClick={() => toast.error("login failed", { description: "please try again" })}>click to show toast</Button>
+  )
+}
