@@ -68,9 +68,9 @@ export const TestSeriesCard = ({
 
       </CardHeader>
       <CardContent>
-        <p className="text-sm text-muted-foreground">
+        {/* <p className="text-sm text-muted-foreground">
           Duration: {formatDuration(testSeries.duration)}
-        </p>
+        </p> */}
         <p className="text-sm text-muted-foreground">
           Questions: {testSeries.totalQuestions}
         </p>

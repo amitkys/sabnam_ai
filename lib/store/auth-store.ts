@@ -19,7 +19,7 @@ export const useAuthStore = create<AuthState>()(
         set({ redirectUrl: url });
       },
       setIsAuthenticated: (isAuthenticated) => {
-        console.log('Setting authentication state:', isAuthenticated);
+        // console.log('Setting authentication state:', isAuthenticated);
         set({ isAuthenticated });
       },
       clearAuth: () => {

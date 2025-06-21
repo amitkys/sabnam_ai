@@ -14,23 +14,22 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-
+import { useQuizStore } from "@/lib/store/useQuizStore"
 interface QuizHeaderProps {
   duration: number;
   onExit: () => void;
   onSubmit: () => void;
-  isSubmitting: boolean;
 }
 
 export const QuizHeader = ({
   duration,
   onExit,
   onSubmit,
-  isSubmitting,
 }: QuizHeaderProps) => {
+  const { isSubmitting } = useQuizStore();
   return (
-    <div className="flex justify-between items-center">
-      <Timer initialTime={duration} />
+    <div className="flex justify-end items-center">
+      {/* <Timer initialTime={duration} /> */}
       <div className="flex space-x-2">
         <ModeToggle />
         <AlertDialog>
@@ -49,32 +48,36 @@ export const QuizHeader = ({
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel>Continue test</AlertDialogCancel>
-              <AlertDialogAction onClick={onSubmit}>
+              <AlertDialogAction onClick={onSubmit} disabled={isSubmitting}>
                 Submit test
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
 
-        <AlertDialog>
-          <AlertDialogTrigger asChild>
-            <Button variant="destructive">Exit</Button>
-          </AlertDialogTrigger>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Exit the test?</AlertDialogTitle>
-              <AlertDialogDescription>
-                Your progress has been saved. You can continue this test later
-                from your dashboard.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Continue test</AlertDialogCancel>
-              <AlertDialogAction onClick={onExit}>Exit</AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
-      </div>
+      <AlertDialog>
+        <AlertDialogTrigger asChild>
+          <Button disabled={isSubmitting} variant="destructive">
+            Exit
+          </Button>
+        </AlertDialogTrigger>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Exit the test?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Your progress has been saved. You can continue this test later
+              from your dashboard.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Continue test</AlertDialogCancel>
+            <AlertDialogAction onClick={onExit} disabled={isSubmitting}>
+              Exit
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
+    </div >
   );
 };

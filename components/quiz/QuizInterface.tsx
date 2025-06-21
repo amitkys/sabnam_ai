@@ -17,6 +17,7 @@ import { QuizHeader } from "@/components/quiz/QuizHeader";
 import { QuestionCard } from "@/components/quiz/QuestionsCard";
 import { QuestionNavigation } from "@/components/quiz/QuestionNavigation";
 import { QuizActions } from "@/components/quiz/QuizActions";
+import { Loader } from "../ui/loader";
 
 type ActionButtonType = "save" | "later" | "skip" | null;
 
@@ -166,46 +167,43 @@ export default function QuizInterface({
 
   // Handle test submission
   const handleSubmit = async () => {
+    setIsSubmitting(true);
     if (!testData?.testAttempt?.testSeries || !session?.user?.id) return;
 
-    setIsSubmitting(true);
 
     try {
-      toast.success("Test submitted successfully");
-
-      setIsSubmitting(false);
-
       await exitFullscreen();
       if (attemptId) {
-        const result = await SubmitTest({ testAttemptId: attemptId });
+        // used toast promise to show loading, success and error messages
+        await toast.promise(
+          async () => {
+            const result = await SubmitTest({ testAttemptId: attemptId });
 
-        if (!result.success) {
-          toast.error("Failed to submit test");
-        } else {
-          router.push(`/analysis/${attemptId}`);
-        }
+            if (!result.success) {
+              throw new Error("Failed to submit test");
+            } else {
+              router.push(`/analysis/${attemptId}`);
+            }
+          },
+          {
+            loading: "Submitting test...",
+            success: "Test submitted successfully",
+            error: "Failed to submit test",
+          },
+        );
       }
     } catch (error) {
       toast.error("Failed to submit test");
-      setIsSubmitting(false);
     }
   };
 
-  // Loading state check
-  if (status === "loading") {
-    return (
-      <div className="min-h-screen flex items-center flex-col justify-center space-x-2">
-        <Image
-          alt="Loading illustration"
-          height={400}
-          src={"/dog.svg"}
-          width={400}
-        />
-        <p className="text-lg font-medium text-foreground/75">
-          Loading your test series, please wait...
-        </p>
+  if (isSubmitting) {
+    return <div className="min-h-screen flex items-center justify-center">
+      <div className="flex flex-col items-center justify-center">
+      <Loader variant="spin" size="medium" />
+      {/* <p className="text-lg font-medium text-foreground/75">Submitting test...</p> */}
       </div>
-    );
+    </div>
   }
 
   // Start screen check
@@ -232,7 +230,6 @@ export default function QuizInterface({
         <div className="border border-border rounded-lg p-4 space-y-4 h-full flex flex-col">
           <QuizHeader
             duration={testData.testAttempt.testSeries.duration}
-            isSubmitting={isSubmitting}
             onExit={handleExit}
             onSubmit={handleSubmit}
           />

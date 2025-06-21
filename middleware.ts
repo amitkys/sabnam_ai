@@ -10,6 +10,7 @@ const publicPaths = [
   "/apptest",
   "/exams", 
   "/board",
+  "/past10year",
   "/api/board",
   "/api/exams",
   "/api/past10thyear",
