@@ -42,7 +42,7 @@ export const boardExam = {
                   name: "7. Coordinate Geometry",
                 },
                 {
-                  id: "introduction-to-trigonometry",
+                  id: "trigonometry",
                   name: "8. Introduction to Trigonometry",
                 },
                 {
