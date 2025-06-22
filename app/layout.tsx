@@ -4,7 +4,6 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/provider/theme-provider";
 import { GeistSans } from 'geist/font/sans';
 import { GeistMono } from 'geist/font/mono';
-
 import SessionWrapper from "@/components/sessionProvider";
 import ToasterWrapper from "@/components/ToasterWrapper";
 import ProgressBarProvider from "@/components/navigation-progress";
@@ -27,7 +26,7 @@ export default function RootLayout({
   return (
     <SessionWrapper>
       <html suppressHydrationWarning lang="en">
-        <body className={`${GeistSans.className} antialiased bg-background text-foreground`}>
+        <body className={`${GeistSans.className} ${GeistMono.variable} antialiased bg-background text-foreground`}>
           <ThemeProvider
             disableTransitionOnChange
             enableSystem

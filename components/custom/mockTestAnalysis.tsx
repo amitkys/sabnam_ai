@@ -14,7 +14,6 @@ import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 
 import { Separator } from "../ui/separator";
 
-import { geist } from "@/config/fonts";
 import ExplainDrawer from "@/components/explain-drawer"; // Import the new ExplainDrawer component
 import {
   FirstTimeTooltip,
@@ -336,7 +335,7 @@ function Content({
 
                             return !inline && match ? (
                               <div
-                                className={`my-2 ${geist.className} overflow-x-auto scrollbar-hide text-xs md:text-base`}
+                                className={`my-2 overflow-x-auto scrollbar-hide text-xs md:text-base`}
                               >
                                 <SyntaxHighlighter
                                   PreTag="div"
@@ -378,18 +377,18 @@ function Content({
                           <div className="flex-shrink-0 mt-1">
                             <div
                               className={`w-4 h-4 rounded-full flex-shrink-0 ${option.text === question.correctAnswer
-                                  ? "bg-primary"
-                                  : userAnswer &&
-                                    option.text === userAnswer.userAnswer
-                                    ? "bg-destructive"
-                                    : "bg-muted"
+                                ? "bg-primary"
+                                : userAnswer &&
+                                  option.text === userAnswer.userAnswer
+                                  ? "bg-destructive"
+                                  : "bg-muted"
                                 }`}
                             />
                           </div>
                           <div
                             className={`flex-grow ${option.text === question.correctAnswer
-                                ? "font-medium"
-                                : ""
+                              ? "font-medium"
+                              : ""
                               }`}
                           >
                             <div className="text-sm lg:text-base text-foreground/75">

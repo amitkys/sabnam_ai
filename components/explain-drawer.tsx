@@ -9,7 +9,6 @@ import { Loader2 } from "lucide-react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 
-import { geist } from "@/config/fonts";
 import { Button } from "@/components/ui/button";
 import {
   Drawer,
@@ -147,7 +146,7 @@ export default function ExplainDrawer({
 
                           return !inline && match ? (
                             <div
-                              className={`my-2 ${geist.className} overflow-x-auto scrollbar-hide text-xs md:text-base`}
+                              className={`my-2 overflow-x-auto scrollbar-hide text-xs md:text-base`}
                             >
                               <SyntaxHighlighter
                                 PreTag="div"
@@ -246,7 +245,7 @@ export default function ExplainDrawer({
 
                             return !inline && match ? (
                               <div
-                                className={`my-2 ${geist.className} overflow-x-auto scrollbar-hide text-xs md:text-base`}
+                                className={`my-2 overflow-x-auto scrollbar-hide text-xs md:text-base`}
                               >
                                 <SyntaxHighlighter
                                   PreTag="div"

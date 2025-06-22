@@ -31,7 +31,6 @@ import {
 } from "@/components/ui/select";
 import { ContentLayout } from "@/components/admin-panel/content-layout";
 import { Loader } from "@/components/ui/loader";
-import { geist } from "@/config/fonts";
 import { Command, CommandDialog, CommandInput, CommandList, CommandItem } from "@/components/ui/command";
 import { examData } from "@/lib/exams/data";
 import { Button } from "@/components/ui/button";
@@ -205,7 +204,7 @@ export default function Page() {
     <AlertDialog open={isClassDialogOpen} onOpenChange={setIsClassDialogOpen}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle className={geist.className}>Select your class</AlertDialogTitle>
+          <AlertDialogTitle>Select your class</AlertDialogTitle>
           <AlertDialogDescription>
             Choose the class you want to explore for {currentSelection.topic}.
           </AlertDialogDescription>
@@ -233,7 +232,7 @@ export default function Page() {
     >
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle className={geist.className}>Select your subject</AlertDialogTitle>
+          <AlertDialogTitle>Select your subject</AlertDialogTitle>
           <AlertDialogDescription>
             Choose the subject you want to explore for {currentSelection.topic}{" "}
             {currentSelection.class}.
@@ -276,7 +275,7 @@ export default function Page() {
         <div className="flex justify-center items-center py-8">
           <div className="inline-flex items-center gap-4 text-muted-foreground">
             <div className="h-[3px] hidden md:block w-12 bg-gradient-to-r from-transparent via-primary to-border" />
-            <span className={`${geist.className} text-2xl md:text-4xl font-extrabold md:font-bold bg-gradient-to-r from-foreground to-foreground/65 bg-clip-text text-transparent`}>
+            <span className={`text-2xl md:text-4xl font-extrabold md:font-bold bg-gradient-to-r from-foreground to-foreground/65 bg-clip-text text-transparent`}>
               Be the best — give a test
             </span>
             <div className="h-[3px] w-12 hidden md:block bg-gradient-to-l from-transparent via-primary to-border" />
@@ -287,7 +286,7 @@ export default function Page() {
         <div className="grid grid-cols-1 gap-6 px-2">
           <Card className="bg-background">
             <CardHeader>
-              <CardTitle className={`${geist.className} text-2xl font-bold bg-gradient-to-r from-foreground to-foreground/65 bg-clip-text text-transparent`}>
+              <CardTitle className={`text-2xl font-bold bg-gradient-to-r from-foreground to-foreground/65 bg-clip-text text-transparent`}>
                 Exam Preparations
               </CardTitle>
             </CardHeader>
@@ -307,12 +306,12 @@ export default function Page() {
                       </div>
 
                       {/* Heading */}
-                      <h3 className={`${geist.className} text-lg font-semibold`}>
+                      <h3 className={`text-lg font-semibold`}>
                         {card.title}
                       </h3>
 
                       {/* Description */}
-                      <p className={`${geist.className} text-sm text-muted-foreground`}>
+                      <p className={`text-sm text-muted-foreground`}>
                         {card.description}
                       </p>
                     </div>
@@ -324,7 +323,7 @@ export default function Page() {
 
           <Card className="bg-background">
             <CardHeader>
-              <CardTitle className={`${geist.className} text-2xl font-bold bg-gradient-to-r from-foreground to-foreground/65 bg-clip-text text-transparent`}>Question Banks</CardTitle>
+              <CardTitle className={`text-2xl font-bold bg-gradient-to-r from-foreground to-foreground/65 bg-clip-text text-transparent`}>Question Banks</CardTitle>
             </CardHeader>
             <CardContent className="grid grid-cols-1 lg:grid-cols-2 gap-6 px-5">
               {categoryCards.filter(card => card.id === "ncert" || card.id === "cbse").map((card) => (
@@ -344,12 +343,12 @@ export default function Page() {
                       </div>
 
                       {/* Heading */}
-                      <h3 className={`${geist.className} text-lg font-semibold`}>
+                      <h3 className={`text-lg font-semibold`}>
                         {card.title} questions bank
                       </h3>
 
                       {/* Description */}
-                      <p className={`${geist.className} text-sm text-muted-foreground`}>
+                      <p className={`text-sm text-muted-foreground`}>
                         {card.description}
                       </p>
                     </div>

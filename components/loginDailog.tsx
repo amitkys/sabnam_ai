@@ -14,7 +14,6 @@ import { useState, useEffect } from "react";
 import { Loader } from "@/components/ui/loader";
 import { FaGoogle } from "react-icons/fa";
 import { toast } from "sonner";
-import { geist } from "@/config/fonts";
 import { useSearchParams } from "next/navigation";
 
 interface LoginDialogProps {
@@ -57,7 +56,7 @@ export default function LoginDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="">
-        <DialogHeader className={`${geist.className}`}>
+        <DialogHeader>
           <DialogTitle className="text-center sm:text-left">Login to Continue</DialogTitle>
           <DialogDescription className="text-center sm:text-left">
             You will be redirected back here after login.

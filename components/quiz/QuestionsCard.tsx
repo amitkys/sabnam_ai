@@ -12,7 +12,6 @@ import "katex/dist/katex.min.css";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 // eslint-disable-next-line import/order
 import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
-import { geist } from "@/config/fonts";
 
 interface QuestionOption {
   id: string;
@@ -72,7 +71,7 @@ export const QuestionCard = ({
                   return !inline && match ? (
                     // Code block wrapper with horizontal scroll only for questions
                     <div
-                      className={`my-2 ${geist.className}  overflow-x-auto scrollbar-hide text-xs md:text-base`}
+                      className={`my-2 overflow-x-auto scrollbar-hide text-xs md:text-base`}
                     >
                       <SyntaxHighlighter
                         PreTag="div"

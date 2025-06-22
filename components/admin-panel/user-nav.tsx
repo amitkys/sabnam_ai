@@ -32,7 +32,7 @@ export function UserNav() {
     return (
       <Link
         href="/login"
-        className="text-sm bg-primary text-background px-2 md:px-3 py-1 rounded hover:bg-primary/90 transition-colors"
+        className="text-sm font-semibold bg-primary text-background px-2 md:px-3 py-1 rounded hover:bg-primary/90 transition-colors"
       >
         Login
       </Link>
