@@ -53,6 +53,9 @@ import {
 import { getDashboardTableData } from "@/utils/Dashboard";
 import { TestAttemptResponse } from "@/app/api/(dashboard)/dashboardTable/route";
 import { formatTestDate } from "@/utils/utils";
+import { deleteAttempt } from "@/lib/actions";
+import { toast } from "sonner";
+import { mutate } from "swr";
 
 export default function DashBoardTable() {
   const [filterby, setFilterby] = useState<string>("recent");
@@ -301,7 +304,21 @@ export default function DashBoardTable() {
                         >
                           <ChartLine className="mr-2 h-4 w-4" /> Analysis
                         </DropdownMenuItem>
-                        <DropdownMenuItem>
+                        <DropdownMenuItem onClick={async () => {
+                          try {
+                            await toast.promise(
+                              deleteAttempt(test.attemptId),
+                              {
+                                loading: "Deleting...",
+                                success: "Test deleted successfully",
+                                error: "Failed to delete test",
+                              }
+                            );
+                            mutate(`api/dashboardTable?filterBy=${filterby}&page=${currentPage}&pageSize=${pageSize}`);
+                          } catch (error) {
+                            console.error("Unexpected error:", error);
+                          }
+                        }}>
                           <Trash2 className="mr-2 h-4 w-4 text-red-500" />{" "}
                           Delete
                         </DropdownMenuItem>

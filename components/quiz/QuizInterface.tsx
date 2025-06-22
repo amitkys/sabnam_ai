@@ -71,6 +71,7 @@ export default function QuizInterface({
 
   // Handle exiting the test
   const handleExit = async () => {
+    setIsSubmitting(true);
     await exitFullscreen();
     router.push("/");
   };
@@ -200,8 +201,8 @@ export default function QuizInterface({
   if (isSubmitting) {
     return <div className="min-h-screen flex items-center justify-center">
       <div className="flex flex-col items-center justify-center">
-      <Loader variant="spin" size="medium" />
-      {/* <p className="text-lg font-medium text-foreground/75">Submitting test...</p> */}
+        <Loader variant="spin" size="medium" />
+        {/* <p className="text-lg font-medium text-foreground/75">Submitting test...</p> */}
       </div>
     </div>
   }

@@ -13,16 +13,12 @@ const ProgressBarProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   // Use muted colors for a more subtle appearance
-  const progressColor = mounted
-    ? theme === "dark"
-      ? "hsl(var(--primary) / 0.7)" // 70% opacity in dark mode
-      : "blue" // 70% opacity in light mode
-    : "blue"; // 70% opacity blue fallback
+  const progressColor = mounted ? "hsl(var(--primary) / 0.7)" : "hsl(var(--primary) / 0.7)";
 
   return (
     <ProgressProvider
       color={progressColor}
-      height="2.5px"
+      height="3.5px"
       options={{
         showSpinner: false,
         trickle: true,

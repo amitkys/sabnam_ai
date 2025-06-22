@@ -456,3 +456,27 @@ export async function SubmitTest({ testAttemptId }: { testAttemptId: string }) {
     return { success: false, error: "Failed to save response" };
   }
 }
+
+export async function deleteAttempt(testAttemptId: string) {
+  try {
+    await prisma.answer.deleteMany({
+      where: {
+        testAttemptId: testAttemptId,
+      },
+    });
+
+    const result = await prisma.testAttempt.delete({
+      where: {
+        id: testAttemptId,
+      },
+    });
+
+    console.log("deleted test attempt", result)
+
+    return { success: true };
+  } catch (error) {
+    console.error("Error deleting test attempt:", error);
+
+    return { success: false, error: "Failed to delete test attempt" };
+  }
+}

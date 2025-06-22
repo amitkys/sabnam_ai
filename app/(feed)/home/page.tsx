@@ -276,7 +276,7 @@ export default function Page() {
           <div className="inline-flex items-center gap-4 text-muted-foreground">
             <div className="h-[3px] hidden md:block w-12 bg-gradient-to-r from-transparent via-primary to-border" />
             <span className={`text-2xl md:text-4xl font-extrabold md:font-bold bg-gradient-to-r from-foreground to-foreground/65 bg-clip-text text-transparent`}>
-              Be the best — give a test
+              Be the best — Give a test
             </span>
             <div className="h-[3px] w-12 hidden md:block bg-gradient-to-l from-transparent via-primary to-border" />
           </div>
