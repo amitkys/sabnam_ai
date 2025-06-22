@@ -2,8 +2,10 @@ import type { Metadata } from "next";
 
 import "./globals.css";
 import { ThemeProvider } from "@/components/provider/theme-provider";
+import { GeistSans } from 'geist/font/sans';
+import { GeistMono } from 'geist/font/mono';
+
 import SessionWrapper from "@/components/sessionProvider";
-import { inter } from "@/config/fonts";
 import ToasterWrapper from "@/components/ToasterWrapper";
 import ProgressBarProvider from "@/components/navigation-progress";
 import AuthRedirect from "@/components/auth-redirect";
@@ -15,6 +17,8 @@ export const metadata: Metadata = {
   description: "Sabnam - Your Learning Companion",
 };
 
+
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -23,7 +27,7 @@ export default function RootLayout({
   return (
     <SessionWrapper>
       <html suppressHydrationWarning lang="en">
-        <body className={`${inter.className} antialiased bg-background text-foreground`}>
+        <body className={`${GeistSans.className} antialiased bg-background text-foreground`}>
           <ThemeProvider
             disableTransitionOnChange
             enableSystem

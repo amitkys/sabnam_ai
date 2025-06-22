@@ -41,6 +41,7 @@
     "cmdk": "^1.1.1",
     "date-fns": "^4.1.0",
     "framer-motion": "^12.18.1",
+    "geist": "^1.4.2",
     "immer": "^10.1.1",
     "justd-icons": "^1.10.27",
     "katex": "^0.16.22",
