@@ -45,7 +45,7 @@ export const TestSeriesCard = ({
         Promise.resolve(), // Empty promise since we already have the result
         {
           loading: "A new test on the way...",
-          success: "You are ready to go!",
+          success: "Test starting...",
           error: "Failed to create test attempt",
         },
       );
@@ -92,7 +92,7 @@ export const TestSeriesCard = ({
               <Loader size="small" variant="spin" />
             </div>
           ) : testSeries.hasAttempted ? (
-            "Start New test"
+            "Start New Test"
           ) : (
             "Start Test"
           )}

@@ -55,7 +55,7 @@ import { TestAttemptResponse } from "@/app/api/(dashboard)/dashboardTable/route"
 import { formatTestDate } from "@/utils/utils";
 import { deleteAttempt } from "@/lib/actions";
 import { toast } from "sonner";
-import { mutate } from "swr";
+import { mutate, useSWRConfig } from "swr";
 
 export default function DashBoardTable() {
   const [filterby, setFilterby] = useState<string>("recent");
@@ -304,24 +304,28 @@ export default function DashBoardTable() {
                         >
                           <ChartLine className="mr-2 h-4 w-4" /> Analysis
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={async () => {
-                          try {
-                            await toast.promise(
-                              deleteAttempt(test.attemptId),
-                              {
-                                loading: "Deleting...",
-                                success: "Test deleted successfully",
-                                error: "Failed to delete test",
+                        <DropdownMenuItem
+                          onClick={async () => {
+                            const deletePromise = deleteAttempt(test.attemptId);
+
+                            toast.promise(deletePromise, {
+                              loading: 'Deleting test...',
+                              success: () => {
+                                // Mutate the cache to refresh the data
+                                mutate(`/api/dashboardTable?filterBy=${filterby}&page=${currentPage}&pageSize=${pageSize}`);
+                                return 'Test deleted successfully';
+                              },
+                              error: (error) => {
+                                console.error("Deletion error:", error);
+                                return 'Failed to delete test. Please try again.';
                               }
-                            );
-                            mutate(`api/dashboardTable?filterBy=${filterby}&page=${currentPage}&pageSize=${pageSize}`);
-                          } catch (error) {
-                            console.error("Unexpected error:", error);
-                          }
-                        }}>
-                          <Trash2 className="mr-2 h-4 w-4 text-red-500" />{" "}
+                            });
+                          }}
+                        >
+                          <Trash2 className="mr-2 h-4 w-4 text-red-500" />
                           Delete
                         </DropdownMenuItem>
+
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>

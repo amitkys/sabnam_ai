@@ -4,12 +4,12 @@ import { ResponseData } from "@/app/api/(dashboard)/dashboardTable/route";
 import { fetcher } from "@/utils/fetcher";
 
 export function getDashboardTableData(
-  filterBy: string,
+  filterby: string,
   currentPage: number,
   pageSize: number,
 ) {
   const { data, error, isLoading } = useSWR<ResponseData>(
-    `api/dashboardTable?filterBy=${filterBy}&page=${currentPage}&pageSize=${pageSize}`,
+    `/api/dashboardTable?filterBy=${filterby}&page=${currentPage}&pageSize=${pageSize}`,
     fetcher,
   );
 

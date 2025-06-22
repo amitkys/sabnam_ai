@@ -2,6 +2,7 @@
 import { Data, TestAttemptSubmission } from "@/lib/type";
 import prisma from "@/lib/db";
 import { GetServerSessionHere } from "@/auth.config";
+import { revalidatePath } from "next/cache";
 export async function CreateTest(data: Data) {
   const session = await GetServerSessionHere();
 
@@ -473,6 +474,7 @@ export async function deleteAttempt(testAttemptId: string) {
 
     console.log("deleted test attempt", result)
 
+    revalidatePath("/api/dashboardTable")
     return { success: true };
   } catch (error) {
     console.error("Error deleting test attempt:", error);
