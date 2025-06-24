@@ -31,7 +31,7 @@ export default function RootLayout({
             disableTransitionOnChange
             enableSystem
             attribute="class"
-            defaultTheme="system"
+            defaultTheme="light"
           >
             <SessionSync />
             <AuthStatus />

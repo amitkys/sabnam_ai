@@ -1,217 +1,212 @@
-"use client";
-import { useRouter } from '@bprogress/next/app';
-import { CheckIcon } from "lucide-react";
-import React from "react";
+"use client"
+import { useRouter } from "next/navigation"
+import { CheckIcon, Sparkles, Zap, Crown } from "lucide-react"
+import { useState } from "react"
 
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { cn } from "@/lib/utils"
 
 export default function Pricing() {
-  const router = useRouter();
+  const router = useRouter()
+  const [isHovered, setIsHovered] = useState(false)
+
+  const features = [
+    {
+      text: "Unlimited users",
+      icon: CheckIcon,
+    },
+    {
+      text: "Unlimited Test attempts",
+      icon: CheckIcon,
+    },
+    {
+      text: "3 AI tokens per day",
+      icon: Zap,
+      highlight: true,
+    },
+    {
+      text: "Cross-platform sync",
+      icon: CheckIcon,
+    },
+    {
+      text: "Bilingual support",
+      icon: CheckIcon,
+    },
+    {
+      text: "Progress analytics",
+      icon: CheckIcon,
+    },
+  ]
 
   return (
-    <>
-      {/* Pricing */}
-      <div className="container mx-auto px-4 md:px-6 2xl:max-w-[1400px] ">
-        {/* Title */}
-        <div className="max-w-2xl mx-auto text-center mb-10 lg:mb-14">
-          <h2 className="scroll-m-20 border-b pb-2 text-3xl md:text-6xl font-semibold tracking-tight transition-colors first:mt-0 antialiased">
-            Pricing
-          </h2>
-          <p className="mt-1 text-muted-foreground">
-            For new users, it's free!
-          </p>
-          <div className="mt-4">
-            <Badge className="bg-yellow-200 text-yellow-800">
-              Offer valid for a limited time
+    <div className="container mx-auto px-4 md:px-6 2xl:max-w-[1400px] py-16">
+      {/* Enhanced Title Section */}
+      <div className="max-w-3xl mx-auto text-center mb-16">
+        <div className="flex items-center justify-center gap-2 mb-4">
+          <Crown className="h-6 w-6 text-primary" />
+          <Badge variant="secondary" className="text-sm font-medium">
+            Special Launch Offer
+          </Badge>
+        </div>
+        <h2 className="text-4xl md:text-6xl font-bold tracking-tight mb-4 bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+          Simple Pricing
+        </h2>
+        <p className="text-lg text-muted-foreground mb-6">
+          Start your Journey from here.
+        </p>
+        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/20">
+          <Sparkles className="h-4 w-4 text-yellow-600" />
+          <span className="text-sm font-medium text-yellow-700 dark:text-yellow-300">
+            Limited time offer - Get started today!
+          </span>
+        </div>
+      </div>
+
+      {/* Enhanced Pricing Card */}
+      <div className="flex justify-center pt-6">
+        <Card
+          className={cn(
+            "relative overflow-hidden border-0 bg-gradient-to-br from-background to-muted/20 backdrop-blur-sm transition-all duration-500 ease-out w-full max-w-lg",
+            isHovered ? "shadow-2xl shadow-primary/20 translate-y-[-8px] scale-[1.02]" : "shadow-xl hover:shadow-2xl",
+          )}
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+        >
+          {/* Gradient Background */}
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-secondary/5" />
+
+          {/* Popular Badge */}
+          <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10 mt-6">
+            <Badge className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground px-4 py-1.5 text-sm font-semibold shadow-lg whitespace-nowrap">
+              🔥 MOST POPULAR
             </Badge>
           </div>
-        </div>
-        {/* End Title */}
-        {/* Switch */}
-        {/* <div className="flex justify-center items-center">
-          <Label className="me-3" htmlFor="payment-schedule">
-            Monthly
-          </Label>
-          <Switch id="payment-schedule" />
-          <Label className="relative ms-3" htmlFor="payment-schedule">
-            Annual
-            <span className="absolute -top-10 start-auto -end-28">
-              <span className="flex items-center">
-                <svg
-                  className="w-14 h-8 -me-6"
-                  fill="none"
-                  height={25}
-                  viewBox="0 0 45 25"
-                  width={45}
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    className="text-muted-foreground"
-                    d="M43.2951 3.47877C43.8357 3.59191 44.3656 3.24541 44.4788 2.70484C44.5919 2.16427 44.2454 1.63433 43.7049 1.52119L43.2951 3.47877ZM4.63031 24.4936C4.90293 24.9739 5.51329 25.1423 5.99361 24.8697L13.8208 20.4272C14.3011 20.1546 14.4695 19.5443 14.1969 19.0639C13.9242 18.5836 13.3139 18.4152 12.8336 18.6879L5.87608 22.6367L1.92723 15.6792C1.65462 15.1989 1.04426 15.0305 0.563943 15.3031C0.0836291 15.5757 -0.0847477 16.1861 0.187863 16.6664L4.63031 24.4936ZM43.7049 1.52119C32.7389 -0.77401 23.9595 0.99522 17.3905 5.28788C10.8356 9.57127 6.58742 16.2977 4.53601 23.7341L6.46399 24.2659C8.41258 17.2023 12.4144 10.9287 18.4845 6.96211C24.5405 3.00476 32.7611 1.27399 43.2951 3.47877L43.7049 1.52119Z"
-                    fill="currentColor"
-                  />
-                </svg>
-                <Badge className="mt-3 uppercase">Save up to 10%</Badge>
-              </span>
-            </span>
-          </Label>
-        </div> */}
-        {/* End Switch */}
-        {/* Grid */}
-        <div className="mt-12 flex justify-center">
-          {/* Card */}
-          {/* <Card className="flex flex-col">
-            <CardHeader className="text-center pb-2">
-              <CardTitle className="mb-7">Free</CardTitle>
-              <span className="font-bold text-5xl">Free</span>
-            </CardHeader>
-            <CardDescription className="text-center">
-              Forever free
-            </CardDescription>
-            <CardContent className="flex-1">
-              <ul className="mt-7 space-y-2.5 text-sm">
-                <li className="flex space-x-2">
-                  <CheckIcon className="flex-shrink-0 mt-0.5 h-4 w-4" />
-                  <span className="text-muted-foreground">1 user</span>
-                </li>
-                <li className="flex space-x-2">
-                  <CheckIcon className="flex-shrink-0 mt-0.5 h-4 w-4" />
-                  <span className="text-muted-foreground">Plan features</span>
-                </li>
-                <li className="flex space-x-2">
-                  <CheckIcon className="flex-shrink-0 mt-0.5 h-4 w-4" />
-                  <span className="text-muted-foreground">Product support</span>
-                </li>
-              </ul>
-            </CardContent>
-            <CardFooter>
-              <Button className="w-full" variant={"outline"}>
-                Sign up
-              </Button>
-            </CardFooter>
-          </Card> */}
-          {/* End Card */}
-          {/* Card */}
-          <Card className="border-primary flex flex-col w-full max-w-xl">
-            <CardHeader className="text-center pb-2">
-              <Badge className="uppercase w-max self-center mb-3">
-                Most popular
-              </Badge>
-              <CardTitle className="!mb-7">Startup</CardTitle>
-              <span className="font-bold text-5xl">₹00</span>
-            </CardHeader>
-            <CardDescription className="text-center w-11/12 mx-auto">
-              All the basics for starting a new business
-            </CardDescription>
-            <CardContent className="flex-1">
-              <ul className="mt-7 space-y-2.5 text-sm">
-                <li className="flex space-x-2">
-                  <CheckIcon className="flex-shrink-0 mt-0.5 h-4 w-4" />
-                  <span className="text-muted-foreground">Unlimited users</span>
-                </li>
-                <li className="flex space-x-2">
-                  <CheckIcon className="flex-shrink-0 mt-0.5 h-4 w-4" />
-                  <span className="text-muted-foreground">
-                    Unlimited Test attempts
+
+          <CardHeader className="relative z-10 text-center pt-8 mt-4">
+            <CardTitle className="text-2xl font-bold">Startup Plan</CardTitle>
+            <div className="mb-4">
+              <div className="flex items-center justify-center gap-2">
+                <span className="text-6xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+                  ₹0
+                </span>
+                <div className="text-left">
+                  <div className="text-sm text-muted-foreground line-through">₹999</div>
+                  <div className="text-sm font-medium text-green-600">100% OFF</div>
+                </div>
+              </div>
+              <p className="text-sm text-muted-foreground mt-2">Forever free for early adopters</p>
+            </div>
+          </CardHeader>
+
+          {/* <CardDescription className="text-center px-6 mb-6 text-base">
+
+          </CardDescription> */}
+
+          <CardContent className="relative z-10 px-6">
+            <ul className="space-y-4">
+              {features.map((feature, index) => (
+                <li key={index} className="flex items-center gap-3 group">
+                  <div
+                    className={cn(
+                      "flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center transition-all duration-300",
+                      feature.highlight
+                        ? "bg-gradient-to-r from-yellow-500 to-orange-500 text-white"
+                        : "bg-primary/10 text-primary group-hover:bg-primary/20",
+                    )}
+                  >
+                    <feature.icon className="w-3 h-3" />
+                  </div>
+                  <span
+                    className={cn(
+                      "text-sm font-medium transition-colors duration-300",
+                      feature.highlight
+                        ? "text-foreground font-semibold"
+                        : "text-muted-foreground group-hover:text-foreground",
+                    )}
+                  >
+                    {feature.text}
                   </span>
+                  {feature.highlight && (
+                    <Badge variant="secondary" className="ml-auto text-xs">
+                      AI Powered
+                    </Badge>
+                  )}
                 </li>
-                <li className="flex space-x-2">
-                  <CheckIcon className="flex-shrink-0 mt-0.5 h-4 w-4" />
-                  <span className="text-muted-foreground">
-                    3 AI token a day
-                  </span>
-                </li>
-              </ul>
-            </CardContent>
-            <CardFooter>
-              <Button
-                className="w-full"
-                onClick={() => {
-                  router.push("/home");
-                }}
-              >
-                Let's get started
-              </Button>
-            </CardFooter>
-          </Card>
-          {/* End Card */}
-          {/* Card */}
-          {/* <Card className="flex flex-col">
-            <CardHeader className="text-center pb-2">
-              <CardTitle className="mb-7">Team</CardTitle>
-              <span className="font-bold text-5xl">£89</span>
-            </CardHeader>
-            <CardDescription className="text-center  w-11/12 mx-auto">
-              Everything you need for a growing business
-            </CardDescription>
-            <CardContent className="flex-1">
-              <ul className="mt-7 space-y-2.5 text-sm">
-                <li className="flex space-x-2">
-                  <CheckIcon className="flex-shrink-0 mt-0.5 h-4 w-4" />
-                  <span className="text-muted-foreground">5 user</span>
-                </li>
-                <li className="flex space-x-2">
-                  <CheckIcon className="flex-shrink-0 mt-0.5 h-4 w-4" />
-                  <span className="text-muted-foreground">Plan features</span>
-                </li>
-                <li className="flex space-x-2">
-                  <CheckIcon className="flex-shrink-0 mt-0.5 h-4 w-4" />
-                  <span className="text-muted-foreground">Product support</span>
-                </li>
-              </ul>
-            </CardContent>
-            <CardFooter>
-              <Button className="w-full" variant={"outline"}>
-                Sign up
-              </Button>
-            </CardFooter>
-          </Card> */}
-          {/* End Card */}
-          {/* Card */}
-          {/* <Card className="flex flex-col">
-            <CardHeader className="text-center pb-2">
-              <CardTitle className="mb-7">Enterprise</CardTitle>
-              <span className="font-bold text-5xl">149</span>
-            </CardHeader>
-            <CardDescription className="text-center  w-11/12 mx-auto">
-              Advanced features for scaling your business
-            </CardDescription>
-            <CardContent>
-              <ul className="mt-7 space-y-2.5 text-sm">
-                <li className="flex space-x-2">
-                  <CheckIcon className="flex-shrink-0 mt-0.5 h-4 w-4" />
-                  <span className="text-muted-foreground">10 user</span>
-                </li>
-                <li className="flex space-x-2">
-                  <CheckIcon className="flex-shrink-0 mt-0.5 h-4 w-4" />
-                  <span className="text-muted-foreground">Plan features</span>
-                </li>
-                <li className="flex space-x-2">
-                  <CheckIcon className="flex-shrink-0 mt-0.5 h-4 w-4" />
-                  <span className="text-muted-foreground">Product support</span>
-                </li>
-              </ul>
-            </CardContent>
-            <CardFooter>
-              <Button className="w-full" variant={"outline"}>
-                Sign up
-              </Button>
-            </CardFooter>
-          </Card> */}
-          {/* End Card */}
-        </div>
-        {/* End Grid */}
+              ))}
+            </ul>
+          </CardContent>
+
+          <CardFooter className="relative z-10 p-6 pt-8">
+            <Button
+              className={cn(
+                "w-full h-12 text-base font-semibold transition-all duration-300 bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary shadow-lg hover:shadow-xl",
+                isHovered ? "scale-[1.02]" : "",
+              )}
+              onClick={() => {
+                router.push("/home")
+              }}
+            >
+              <Sparkles className="w-4 h-4 mr-2" />
+              Start Your Journey Free
+            </Button>
+            <p className="text-xs text-muted-foreground text-center mt-3 w-full">
+              No credit card required • Cancel anytime • Upgrade when ready
+            </p>
+          </CardFooter>
+
+          {/* Animated Border */}
+          <div
+            className={cn(
+              "absolute inset-0 rounded-lg opacity-0 transition-opacity duration-500",
+              isHovered ? "opacity-20" : "",
+            )}
+            style={{
+              backgroundImage: isHovered
+                ? "linear-gradient(45deg, hsl(var(--primary)) 0%, hsl(var(--secondary)) 50%, hsl(var(--primary)) 100%)"
+                : undefined,
+              backgroundSize: "200% 200%",
+              animation: isHovered ? "gradient 3s ease infinite" : undefined,
+            }}
+          />
+        </Card>
       </div>
-      {/* End Pricing */}
-    </>
-  );
+
+      {/* Bottom CTA Section */}
+      <div className="text-center mt-12 max-w-2xl mx-auto">
+        {/* <p className="text-muted-foreground mb-4">
+          Join thousands of students who are already acing their exams with our platform.
+        </p> */}
+        <div className="flex items-center justify-center gap-6 text-sm text-muted-foreground">
+          <div className="flex items-center gap-2">
+            <CheckIcon className="w-4 h-4 text-green-500" />
+            <span>No setup fees</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <CheckIcon className="w-4 h-4 text-green-500" />
+            <span>Instant access</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <CheckIcon className="w-4 h-4 text-green-500" />
+            <span>24/7 support</span>
+          </div>
+        </div>
+      </div>
+
+      <style jsx>{`
+        @keyframes gradient {
+          0% {
+            background-position: 0% 50%;
+          }
+          50% {
+            background-position: 100% 50%;
+          }
+          100% {
+            background-position: 0% 50%;
+          }
+        }
+      `}</style>
+    </div>
+  )
 }

@@ -1,16 +1,16 @@
-"use client";
-import Link from "next/link";
-import { FaSquareXTwitter } from "react-icons/fa6";
-import { FaLinkedin } from "react-icons/fa";
-import { FaGithub } from "react-icons/fa";
-import { useRouter } from '@bprogress/next/app';
+"use client"
+import Link from "next/link"
+import { FaSquareXTwitter } from "react-icons/fa6"
+import { FaLinkedin } from "react-icons/fa"
+import { FaGithub } from "react-icons/fa"
+import { useRouter } from "next/navigation"
 
-import { Button } from "@/components/ui/button";
-import { TypewriterEffectSmooth } from "@/components/ui/type-writter-effect";
-import { ModeToggle } from "@/components/mode-toggle";
+import { Button } from "@/components/ui/button"
+import { TypewriterEffectSmooth } from "@/components/ui/type-writter-effect"
+import { ModeToggle } from "@/components/mode-toggle"
 
 export default function TypeWritter() {
-  const router = useRouter();
+  const router = useRouter()
   const words = [
     {
       text: "Let's",
@@ -28,7 +28,7 @@ export default function TypeWritter() {
       text: "AI",
       className: "text-pink-500 dark:text-pink-500",
     },
-  ];
+  ]
 
   return (
     <div className="flex flex-col items-center justify-between h-[40rem] relative">
@@ -37,18 +37,15 @@ export default function TypeWritter() {
         <p className="text-base md:text-lg">Why are you waiting for?</p>
         <TypewriterEffectSmooth words={words} />
         <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 space-x-0 md:space-x-4">
-          <Button
-            className="w-[22rem] md:w-[40rem]"
-            onClick={() => router.push("/home")}
-          >
+          <Button className="w-[22rem] md:w-[40rem]" onClick={() => router.push("/home")}>
             Get Started
           </Button>
         </div>
       </div>
 
-      {/* Footer section */}
+      {/* Footer section - Fixed for cross-browser compatibility */}
       <footer className="w-full py-4 border-t border-border/40">
-        <div className="container flex flex-col items-center justify-center gap-2">
+        <div className="w-full max-w-7xl mx-auto px-4 flex flex-col items-center justify-center gap-2">
           <div className="flex items-center justify-center space-x-4">
             <Link
               aria-label="X (Twitter)"
@@ -79,11 +76,11 @@ export default function TypeWritter() {
             </Link>
             <ModeToggle />
           </div>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-xs text-muted-foreground text-center">
             © {new Date().getFullYear()} Sabnam AI. All rights reserved.
           </p>
         </div>
       </footer>
     </div>
-  );
+  )
 }
