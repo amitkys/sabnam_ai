@@ -40,17 +40,6 @@ interface QuizState {
   isSubmitting: boolean;
   setIsSubmitting: (value: boolean) => void;
 
-  // Reset (optional utility)
-  resetQuiz: () => void;
-}
-
-export const useQuizStore = create<QuizState>((set) => ({
-  testData: null,
-  setTestData: (data) => set({ testData: data }),
-
-  currentQuestion: 0,
-  setCurrentQuestion: (index) => set({ currentQuestion: index }),
-
   questionStatus: {},
   setQuestionStatus: (questionId, status) =>
     set((state) => ({
@@ -113,6 +102,8 @@ interface QuizState {
   setTestData: (data: FetchedTestSeriesData) => void;
   // Current question index
   currentQuestion: number;
+  testTitle: string;
+  setTestTitle: (title: string) => void;
   setCurrentQuestion: (index: number) => void;
   // Track status of each question
   questionStatus: Record<string, QuestionStatusType>;
@@ -141,8 +132,14 @@ interface QuizState {
 
 export const useQuizStore = create<QuizState>((set) => ({
   testData: null,
+  testTitle: "",
+  // Set test title
+  setTestTitle: (title) => set({ testTitle: title }),
+  
   // In setTestData function of useQuizStore
   setTestData: (data) => {
+    // Set the test title from the test series data
+    const testTitle = data?.testAttempt?.testSeries?.title || '';
     const questionStatusMap: Record<string, QuestionStatusType> = {};
     const answersMap: Record<string, Answer> = {};
 
@@ -213,10 +210,10 @@ export const useQuizStore = create<QuizState>((set) => ({
 
     set({
       testData: data,
+      testTitle: testTitle,
       questionStatus: questionStatusMap,
       selectedAnswers: answersMap,
       currentQuestion: lastAnsweredIndex,
-      // hasStarted: !!data.testAttempt?.startedAt,
       hasStarted: false,
       startTime:
         data.testAttempt?.startedAt instanceof Date

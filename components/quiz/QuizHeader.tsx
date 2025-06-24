@@ -26,10 +26,11 @@ export const QuizHeader = ({
   onExit,
   onSubmit,
 }: QuizHeaderProps) => {
-  const { isSubmitting } = useQuizStore();
+  const { isSubmitting, testTitle } = useQuizStore();
   return (
-    <div className="flex justify-end items-center">
+    <div className="flex justify-between items-center">
       {/* <Timer initialTime={duration} /> */}
+      <p className="ml-2 mt-2 test-base font-bold">{testTitle.split(" ").slice(3).join(" ")}</p>
       <div className="flex space-x-2">
         <ModeToggle />
         <AlertDialog>
@@ -55,29 +56,29 @@ export const QuizHeader = ({
           </AlertDialogContent>
         </AlertDialog>
 
-      <AlertDialog>
-        <AlertDialogTrigger asChild>
-          <Button disabled={isSubmitting} variant="destructive">
-            Exit
-          </Button>
-        </AlertDialogTrigger>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Exit the test?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Your progress has been saved. You can continue this test later
-              from your dashboard.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Continue test</AlertDialogCancel>
-            <AlertDialogAction onClick={onExit} disabled={isSubmitting}>
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button disabled={isSubmitting} variant="destructive">
               Exit
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </div>
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Exit the test?</AlertDialogTitle>
+              <AlertDialogDescription>
+                Your progress has been saved. You can continue this test later
+                from your dashboard.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Continue test</AlertDialogCancel>
+              <AlertDialogAction onClick={onExit} disabled={isSubmitting}>
+                Exit
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </div>
     </div >
   );
 };
