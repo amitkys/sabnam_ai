@@ -13,9 +13,12 @@ import AuthStatus from "@/utils/auth-status";
 
 export const metadata: Metadata = {
   title: "Sabnam",
+  manifest: "/manifest.json",
   description: "Sabnam - Your Learning Companion",
   icons: {
-    icon: "/favicon.svg"
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+    ]
   }
 };
 
