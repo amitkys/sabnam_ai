@@ -14,6 +14,9 @@ import AuthStatus from "@/utils/auth-status";
 export const metadata: Metadata = {
   title: "Sabnam",
   description: "Sabnam - Your Learning Companion",
+  icons: {
+    icon: "/favicon.svg"
+  }
 };
 
 
