@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   description: "Sabnam - Your Learning Companion",
   icons: {
     icon: [
-      { url: "/vercel.svg", type: "image/svg+xml" },
+      { url: "/meta/favicon.ico" },
     ]
   }
 };
