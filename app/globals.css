@@ -121,9 +121,9 @@ body {
   --sidebar-border: 223.8136 0.0001% 92.1478%;
   --sidebar-ring: 0 0% 0%;
   --font-sans: Geist, sans-serif;
-  --font-serif: Georgia, serif;
+  --font-serif: Geist, sans-serif;
   --font-mono: Geist Mono, monospace;
-  --radius: 0.95rem;
+  --radius: 0.5rem;
   --shadow-2xs: 0px 1px 2px 0px hsl(0 0% 0% / 0.09);
   --shadow-xs: 0px 1px 2px 0px hsl(0 0% 0% / 0.09);
   --shadow-sm: 0px 1px 2px 0px hsl(0 0% 0% / 0.18), 0px 1px 2px -1px hsl(0 0% 0% / 0.18);
@@ -132,28 +132,30 @@ body {
   --shadow-lg: 0px 1px 2px 0px hsl(0 0% 0% / 0.18), 0px 4px 6px -1px hsl(0 0% 0% / 0.18);
   --shadow-xl: 0px 1px 2px 0px hsl(0 0% 0% / 0.18), 0px 8px 10px -1px hsl(0 0% 0% / 0.18);
   --shadow-2xl: 0px 1px 2px 0px hsl(0 0% 0% / 0.45);
+  --tracking-normal: 0em;
+  --spacing: 0.25rem;
 }
 
 .dark {
   --background: 0 0% 0%;
-  --foreground: 223.8136 -172.5242% 100.0000%;
+  --foreground: 223.8136 0.0004% 98.0256%;
   --card: 223.8136 0.0000% 3.5452%;
   --card-foreground: 223.8136 -172.5242% 100.0000%;
   --popover: 223.8136 0.0000% 6.8692%;
   --popover-foreground: 223.8136 -172.5242% 100.0000%;
-  --primary: 223.8136 -172.5242% 100.0000%;
+  --primary: 223.8136 0.0001% 89.8161%;
   --primary-foreground: 0 0% 0%;
-  --secondary: 223.8136 0.0000% 13.1499%;
-  --secondary-foreground: 223.8136 -172.5242% 100.0000%;
-  --muted: 223.8136 0.0000% 11.3040%;
-  --muted-foreground: 223.8136 0.0000% 64.4710%;
+  --secondary: 223.8136 0.0000% 14.9382%;
+  --secondary-foreground: 223.8136 0.0004% 98.0256%;
+  --muted: 223.8136 0.0000% 14.9382%;
+  --muted-foreground: 223.8136 0.0000% 63.0163%;
   --accent: 223.8136 0.0000% 19.8916%;
   --accent-foreground: 223.8136 -172.5242% 100.0000%;
   --destructive: 359.9132 100.2494% 67.8807%;
   --destructive-foreground: 0 0% 0%;
   --border: 223.8136 0.0000% 14.0871%;
   --input: 223.8136 0.0000% 19.8916%;
-  --ring: 223.8136 0.0000% 64.4710%;
+  --ring: 223.8136 0.0000% 45.1519%;
   --chart-1: 40.6655 100.2361% 50.9228%;
   --chart-2: 218.1624 90.0354% 55.1618%;
   --chart-3: 223.8136 0.0000% 45.6078%;
@@ -166,11 +168,11 @@ body {
   --sidebar-accent: 223.8136 0.0000% 19.8916%;
   --sidebar-accent-foreground: 223.8136 -172.5242% 100.0000%;
   --sidebar-border: 223.8136 0.0000% 19.8916%;
-  --sidebar-ring: 223.8136 0.0000% 64.4710%;
+  --sidebar-ring: 223.8136 0.0000% 79.2139%;
   --font-sans: Geist, sans-serif;
-  --font-serif: Georgia, serif;
+  --font-serif: Geist, sans-serif;
   --font-mono: Geist Mono, monospace;
-  --radius: 0.95rem;
+  --radius: 0.5rem;
   --shadow-2xs: 0px 1px 2px 0px hsl(0 0% 0% / 0.09);
   --shadow-xs: 0px 1px 2px 0px hsl(0 0% 0% / 0.09);
   --shadow-sm: 0px 1px 2px 0px hsl(0 0% 0% / 0.18), 0px 1px 2px -1px hsl(0 0% 0% / 0.18);
@@ -180,6 +182,7 @@ body {
   --shadow-xl: 0px 1px 2px 0px hsl(0 0% 0% / 0.18), 0px 8px 10px -1px hsl(0 0% 0% / 0.18);
   --shadow-2xl: 0px 1px 2px 0px hsl(0 0% 0% / 0.45);
 }
+
 
 /*native shadcn */
 
