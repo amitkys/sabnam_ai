@@ -8,9 +8,9 @@ const markdownContent = `
 
 Here is a table:
 
-| A | B |
-|---|---|
-| 1 | 2 |
+| Amit kumar | Badal raj | Deepak kumar | Deepak kumar |
+|---|---|---|---|
+| 1 | 2 | 3 | 4 |
 
 \`\`\`rust
 fn main() {

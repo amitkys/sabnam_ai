@@ -426,7 +426,7 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
   const commonComponents = {
     table: ({ children }: ComponentProps) => (
       <div className="my-6">
-        <div className="overflow-hidden rounded-lg border border-border shadow-sm">
+        <div className="overflow-hidden rounded-lg border border-border shadow-sm custom-scrollbar">
           <div className="overflow-x-auto">
             <table className="w-full border-collapse">
               {children}
