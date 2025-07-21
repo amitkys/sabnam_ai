@@ -30,7 +30,9 @@ export const QuizHeader = ({
   return (
     <div className="flex justify-between items-center">
       {/* <Timer initialTime={duration} /> */}
-      <p className="ml-2 mt-2 test-base font-bold">{testTitle.split(" ").slice(3).join(" ")}</p>
+      <p className="ml-2 mt-2 test-base font-bold max-w-[200px] truncate" title={testTitle.split(" ").slice(2).join(" ")}>
+        {testTitle.split(" ").slice(2).join(" ").toLocaleUpperCase()}
+      </p>
       <div className="flex space-x-2">
         <ModeToggle />
         <AlertDialog>

@@ -226,7 +226,7 @@ export default function QuizInterface({
     : "";
 
   return (
-    <div className="min-h-screen bg-background text-foreground mb-48 sm:mb-0 transition-colors">
+    <div className="min-h-screen bg-background text-foreground mb-48 sm:mb-0 transition-colors no-scrollbar">
       <div className="flex-grow max-w-7xl mx-auto w-full">
         <div className="border border-border rounded-lg p-4 space-y-4 h-full flex flex-col">
           <QuizHeader
@@ -257,11 +257,14 @@ export default function QuizInterface({
           </div>
           <QuizActions
             activeButton={activeButton}
-            isAnswerSelected={!!selectedAnswers[currentQuestionData?.id]}
             isSaving={isSaving}
             onLater={() => handleQuestionAction("later")}
             onSave={() => handleQuestionAction("solved")}
             onSkip={() => handleQuestionAction("skipped")}
+            onPrevQuestion={() => handleQuestionNavigation(currentQuestion - 1)}
+            onNextQuestion={() => handleQuestionNavigation(currentQuestion + 1)}
+            hasPreviousQuestion={currentQuestion > 0}
+            hasNextQuestion={currentQuestion < questions.length - 1}
           />
         </div>
       </div>

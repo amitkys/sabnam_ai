@@ -1,39 +1,129 @@
-If needed for any calculation type of question or mathematical and use this rules:
+# AI Question Generation Guidelines
 
-1. JSON Formatting
--> Use double quotes for all property names and string values.
--> Add commas after each property and array element.
-
-2. LaTeX and Math Expressions:
--> Use $ delimiters consistently for math expressions (e.g., $x^2$).
--> Use double backslashes for LaTeX commands (e.g., \\alpha, \\frac{x+1}{x-1}).
--> Properly escape special LaTeX structures like fractions (e.g., $\\frac{x+1}{x-1}$).
-
-3. Validation and Formatting:
--> A function normalizes delimiters to $ and ensures proper backslash escaping.
--> JSON structure is validated to ensure compatibility.
-
-4. Dependencies:
--> Use react-markdown, remark-math, and rehype-katex for markdown and LaTeX rendering.
-
-5. Data Structure:
--> Follow the Data interface with testseries (title, duration) and questions (text, answer, options with text).
-
-Example: 
-
+## 1. JSON Structure
+```json
 {
   "testseries": {
-    "title": "Math Quiz",
-    "duration": 600
+    "title": "Test Series Title",
+    "duration": 90  // Duration in minutes
   },
   "questions": [
     {
-      "text": "$\\frac{x+1}{2} = 3$",
-      "answer": "$x = 5$",
+      "text": "Markdown formatted question text with all supported elements",
+      "answer": "Correct answer text",
       "options": [
-        { "text": "$x = 3$" },
-        { "text": "$x = 5$" }
+        { "text": "Option 1" },
+        { "text": "Option 2" },
+        { "text": "Option 3" },
+        { "text": "Option 4" }
       ]
     }
   ]
 }
+```
+
+## 2. Supported Markdown Features
+
+### Text Formatting
+- **Headers**: `# H1` through `###### H6`
+- **Bold**: `**bold text**`
+- *Italic*: `*italic text*`
+- ~~Strikethrough~~: `~~strikethrough~~`
+- `Inline code`: \`code\`
+- [Links](https://example.com): `[text](https://example.com)`
+
+### Lists
+- Unordered:
+  ```
+  - Item 1
+  - Item 2
+    - Subitem
+  ```
+- Ordered:
+  ```
+  1. First
+  2. Second
+  ```
+
+### Tables
+```
+| Header 1 | Header 2 |
+|----------|----------|
+| Cell 1   | Cell 2   |
+| Cell 3   | Cell 4   |
+```
+
+### Code Blocks
+\`\`\`languageeverythign
+// Your code here
+function example() {
+  return "Hello, world!";
+}
+\`\`\`
+
+### Images
+`![Alt text](https://example.com/image.jpg "Optional title")`
+
+## 3. Mathematical Notation
+- Inline math: `$E = mc^2$`
+- Display math:
+  ```
+  $$
+  \sum_{i=1}^n i = \frac{n(n+1)}{2}
+  $$
+  ```
+
+### Supported LaTeX Packages
+- amsmath
+- amssymb
+- amsfonts
+- amsthm
+- mathtools
+- bm
+- physics
+
+## 4. Best Practices
+
+### Question Text
+- Use code blocks for code examples
+- Include relevant diagrams or tables when needed
+
+### Options
+- we support same markdown as question text
+- "answer" should be one of the options, with same typography
+
+### Code Examples
+- Include complete, runnable examples when possible
+- Add comments to explain complex code
+- Use appropriate syntax highlighting
+- Keep examples focused and minimal
+
+## 5. Example Question
+
+```json
+{
+  "testseries": {
+    "title": "CS OS Series - 3",
+    "duration": 90
+  },
+  "questions": [
+    {
+      "text": "##### Process Scheduling\n\nConsider the following processes with their arrival times and burst times (in ms):\n\n| Process | Arrival Time | Burst Time |\n|---------|--------------|------------|\n| P1      | 0            | 5          |\n| P2      | 1            | 3          |\n| P3      | 2            | 8          |\n\nWhat is the average waiting time using Shortest Job First (SJF) scheduling?\n\n```c\n// Example of process scheduling in C\nstruct Process {\n  int pid;\n  int arrival_time;\n  int burst_time;\n};\n\n// SJF scheduling implementation\nvoid scheduleSJF(struct Process proc[], int n) {\n  // Implementation here\n}\n```",
+      "answer": "5.67 ms",
+      "options": [
+        { "text": "4.33 ms" },
+        { "text": "5.00 ms" },
+        { "text": "5.67 ms" },
+        { "text": "6.33 ms" }
+      ]
+    }
+  ]
+}
+```
+
+## 6. Validation Rules
+- JSON must be valid and properly escaped
+- All questions must have at least 2 options
+- Correct answer must be one of the provided options
+- Math expressions must be properly escaped with double backslashes
+- Image URLs must be HTTPS

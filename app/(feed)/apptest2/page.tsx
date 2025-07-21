@@ -1,5 +1,5 @@
 export default function Page() {
   return (
-    <div>Hello</div>
+    <div className="font-mono">this is me hello world</div>
   )
 }

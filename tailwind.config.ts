@@ -12,8 +12,9 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ["Inter", "ui-sans-serif", "system-ui"],
-        serif: ["Noto Serif Devanagari", "ui-serif", "Georgia"],
+        sans: ['var(--font-geist-sans)', 'Inter', 'ui-sans-serif', 'system-ui'],
+        mono: ['var(--font-geist-mono)', 'ui-monospace', 'monospace'],
+        serif: ['Noto Serif Devanagari', 'ui-serif', 'Georgia'],
       },
       width: {
         "60": "15rem",

@@ -31,8 +31,8 @@ export default function RootLayout({
 }>) {
   return (
     <SessionWrapper>
-      <html suppressHydrationWarning lang="en">
-        <body className={`${GeistSans.className} ${GeistMono.variable} antialiased bg-background text-foreground`}>
+      <html suppressHydrationWarning lang="en" className={`${GeistSans.variable} ${GeistMono.variable}`}>
+        <body className="font-sans antialiased bg-background text-foreground"> 
           <ThemeProvider
             disableTransitionOnChange
             enableSystem

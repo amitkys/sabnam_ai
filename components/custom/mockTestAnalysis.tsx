@@ -3,18 +3,13 @@
 import { useState } from "react";
 import { ResponsivePie } from "@nivo/pie";
 import { format } from "date-fns";
-import Markdown from "react-markdown";
-import rehypeKatex from "rehype-katex";
-import remarkMath from "remark-math";
 import Link from "next/link";
 import { GoHome } from "react-icons/go";
 import { Zap } from "lucide-react";
-import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 
 import { Separator } from "../ui/separator";
-
-import ExplainDrawer from "@/components/explain-drawer"; // Import the new ExplainDrawer component
+import { MarkdownRenderer } from "@/components/newMarkdownRender";
+import ExplainDrawer from "@/components/explain-drawer";
 import {
   FirstTimeTooltip,
   FirstTimeTooltipProvider,
@@ -32,7 +27,6 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import "katex/dist/katex.min.css"; // Import KaTeX styles
 
 interface TestSeriesDetails {
   title: string;
@@ -290,7 +284,7 @@ function Content({
                         Q. {index + 1}
                       </h3>
                       <div className="flex items-center gap-2">
-                        <button
+                        {/* <button
                           onClick={() =>
                             handleExplainClick(question, userAnswer)
                           }
@@ -299,7 +293,7 @@ function Content({
                             <Zap className="w-3 h-3 mr-1" />
                             Explain
                           </Badge>
-                        </button>
+                        </button> */}
                         {userAnswer ? (
                           <Badge
                             variant={
@@ -314,62 +308,11 @@ function Content({
                       </div>
                     </div>
                     <div className="text-sm lg:text-base font-base font-semibold text-foreground/75">
-                      <Markdown
-                        components={{
-                          code({
-                            node,
-                            inline,
-                            className,
-                            children,
-                            ...props
-                          }: {
-                            node?: any;
-                            inline?: boolean;
-                            className?: string;
-                            children?: React.ReactNode;
-                            [key: string]: any;
-                          }) {
-                            const match = /language-(\w+)/.exec(
-                              className || "",
-                            );
-
-                            return !inline && match ? (
-                              <div
-                                className={`my-2 overflow-x-auto scrollbar-hide text-xs md:text-base`}
-                              >
-                                <SyntaxHighlighter
-                                  PreTag="div"
-                                  codeTagProps={{}}
-                                  customStyle={{
-                                    margin: 0,
-                                    borderRadius: "0.5rem",
-                                    whiteSpace: "pre",
-                                    display: "inline-block",
-                                    minWidth: "fit-content",
-                                    maxWidth: "100%",
-                                  }}
-                                  language={match[1]}
-                                  style={oneDark}
-                                  {...props}
-                                >
-                                  {String(children).replace(/\n$/, "")}
-                                </SyntaxHighlighter>
-                              </div>
-                            ) : (
-                              <code
-                                className="bg-muted px-1 py-0.5 rounded break-words"
-                                {...props}
-                              >
-                                {children}
-                              </code>
-                            );
-                          },
-                        }}
-                        rehypePlugins={[rehypeKatex]}
-                        remarkPlugins={[remarkMath]}
-                      >
-                        {question.text}
-                      </Markdown>
+                      <MarkdownRenderer 
+                        content={question.text} 
+                        variant="question"
+                        className="prose-sm lg:prose-base"
+                      />
                     </div>
                     <ul className="space-y-1 mb-10">
                       {question.options.map((option) => (
@@ -392,63 +335,11 @@ function Content({
                               }`}
                           >
                             <div className="text-sm lg:text-base text-foreground/75">
-                              <Markdown
-                                components={{
-                                  code({
-                                    node,
-                                    inline,
-                                    className,
-                                    children,
-                                    ...props
-                                  }: {
-                                    node?: any;
-                                    inline?: boolean;
-                                    className?: string;
-                                    children?: React.ReactNode;
-                                    [key: string]: any;
-                                  }) {
-                                    const match = /language-(\w+)/.exec(
-                                      className || "",
-                                    );
-
-                                    return !inline && match ? (
-                                      <div className="mt-2 inline-block text-xs">
-                                        <SyntaxHighlighter
-                                          PreTag="div"
-                                          codeTagProps={{}}
-                                          customStyle={{
-                                            margin: 0,
-                                            borderRadius: "0.375rem",
-                                            fontSize: "0.75rem",
-                                            whiteSpace: "pre-wrap",
-                                            wordBreak: "break-word",
-                                            overflowWrap: "break-word",
-                                            display: "inline-block",
-                                            minWidth: "fit-content",
-                                            maxWidth: "100%",
-                                          }}
-                                          language={match[1]}
-                                          style={oneDark}
-                                          {...props}
-                                        >
-                                          {String(children).replace(/\n$/, "")}
-                                        </SyntaxHighlighter>
-                                      </div>
-                                    ) : (
-                                      <code
-                                        className="bg-muted px-1 py-0.5 rounded text-xs break-words"
-                                        {...props}
-                                      >
-                                        {children}
-                                      </code>
-                                    );
-                                  },
-                                }}
-                                rehypePlugins={[rehypeKatex]}
-                                remarkPlugins={[remarkMath]}
-                              >
-                                {option.text}
-                              </Markdown>
+                              <MarkdownRenderer
+                                content={option.text}
+                                variant="option"
+                                className="prose-sm lg:prose-base"
+                              />
                             </div>
                           </div>
                         </li>
