@@ -1,6 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { Loader } from "@/components/ui/loader";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface QuizActionsProps {
   onSave: () => void;
@@ -32,27 +38,45 @@ export const QuizActions = ({
       <div className="max-w-7xl mx-auto">
         {/* Mobile Navigation - Only visible on mobile, above Save & Next */}
         <div className="flex justify-between w-full mb-3 sm:hidden">
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={onPrevQuestion}
-            disabled={!hasPreviousQuestion || isSaving}
-            aria-label="Previous Question"
-            className="h-10 w-10"
-          >
-            <ChevronLeft className="h-5 w-5" />
-          </Button>
+          <TooltipProvider>
+            <Tooltip delayDuration={100}>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={onPrevQuestion}
+                  disabled={!hasPreviousQuestion || isSaving}
+                  aria-label="Previous Question"
+                  className="h-10 w-10"
+                >
+                  <ChevronLeft className="h-5 w-5" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Previous Question</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
           
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={onNextQuestion}
-            disabled={!hasNextQuestion || isSaving}
-            aria-label="Next Question"
-            className="h-10 w-10"
-          >
-            <ChevronRight className="h-5 w-5" />
-          </Button>
+          <TooltipProvider>
+            <Tooltip delayDuration={100}>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={onNextQuestion}
+                  disabled={!hasNextQuestion || isSaving}
+                  aria-label="Next Question"
+                  className="h-10 w-10"
+                >
+                  <ChevronRight className="h-5 w-5" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Next Question</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
 
         {/* Action Buttons */}
@@ -114,27 +138,45 @@ export const QuizActions = ({
             </Button>
 
             {/* Desktop Navigation - Only visible on desktop, right side of Save & Next */}
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={onPrevQuestion}
-              disabled={!hasPreviousQuestion || isSaving}
-              aria-label="Previous Question"
-              className="hidden sm:flex h-10 w-10"
-            >
-              <ChevronLeft className="h-5 w-5" />
-            </Button>
+            <TooltipProvider>
+              <Tooltip delayDuration={100}>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={onPrevQuestion}
+                    disabled={!hasPreviousQuestion || isSaving}
+                    aria-label="Previous Question"
+                    className="hidden sm:flex h-10 w-10"
+                  >
+                    <ChevronLeft className="h-5 w-5" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Previous Question</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
             
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={onNextQuestion}
-              disabled={!hasNextQuestion || isSaving}
-              aria-label="Next Question"
-              className="hidden sm:flex h-10 w-10"
-            >
-              <ChevronRight className="h-5 w-5" />
-            </Button>
+            <TooltipProvider>
+              <Tooltip delayDuration={100}>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={onNextQuestion}
+                    disabled={!hasNextQuestion || isSaving}
+                    aria-label="Next Question"
+                    className="hidden sm:flex h-10 w-10"
+                  >
+                    <ChevronRight className="h-5 w-5" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Next Question</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
         </div>
       </div>

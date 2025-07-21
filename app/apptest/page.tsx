@@ -1,5 +1,4 @@
 // Demo usage
-"use client";
 import { MarkdownRenderer } from "@/components/newMarkdownRender";
 
 const markdownContent = `
@@ -16,7 +15,7 @@ Here is a table:
 \`\`\`rust
 fn main() {
 // error: semicolon is missing
-  println!("hello world");
+  println!("hello woddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddrld");
   for i in 1..4 {
     println!("{}", i);
   }

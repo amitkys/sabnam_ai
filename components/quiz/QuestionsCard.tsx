@@ -4,7 +4,6 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { MarkdownRenderer } from "@/components/newMarkdownRender"; // Your new reusable component
 
 interface QuestionOption {
@@ -35,7 +34,6 @@ export const QuestionCard = ({
   onAnswerSelect,
 }: QuestionCardProps) => {
   return (
-    <ScrollArea className="max-h-[80vh] overflow-y-auto no-scrollbar">
       <Card className="bg-transparent border px-6 pb-6">
         {/* Question Header */}
         <div className="flex flex-col mb-2">
@@ -90,6 +88,5 @@ export const QuestionCard = ({
           ))}
         </RadioGroup>
       </Card>
-    </ScrollArea>
   );
 };

@@ -270,8 +270,7 @@ function Content({
           <CardTitle>Question Analysis</CardTitle>
         </CardHeader>
         <CardContent>
-          <ScrollArea className="h-[60vh]">
-            <div className="space-y-6">
+          <div className="space-y-6">
               {testSeriesDetails.questions.map((question, index) => {
                 const userAnswer = latestAttempt?.answers.find(
                   (a) => a.questionId === question.id,
@@ -350,7 +349,6 @@ function Content({
                 );
               })}
             </div>
-          </ScrollArea>
         </CardContent>
       </Card>
 
