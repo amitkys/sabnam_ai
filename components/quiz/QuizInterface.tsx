@@ -234,9 +234,9 @@ export default function QuizInterface({
             onExit={handleExit}
             onSubmit={handleSubmit}
           />
-          <div className="flex flex-col lg:flex-row gap-6 flex-grow">
-            <div className="flex-1 overflow-auto">
-              <Card className="bg-card text-card-foreground border border-border">
+          <div className="flex flex-col lg:flex-row gap-6 flex-grow min-h-0">
+            <div className="flex-1 flex flex-col min-h-0">
+              <Card className="bg-card text-card-foreground border border-border flex-1 flex flex-col min-h-0">
                 <QuestionCard
                   currentNumber={currentQuestion + 1}
                   question={currentQuestionData}

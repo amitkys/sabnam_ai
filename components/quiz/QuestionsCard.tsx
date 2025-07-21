@@ -34,7 +34,7 @@ export const QuestionCard = ({
   onAnswerSelect,
 }: QuestionCardProps) => {
   return (
-      <Card className="bg-transparent border px-6 pb-6">
+      <Card className="bg-transparent border px-6 pb-6 overflow-y-auto no-scrollbar" style={{ maxHeight: 'calc(100vh - 200px)' }}>
         {/* Question Header */}
         <div className="flex flex-col mb-2">
           <div className="text-muted-foreground text-sm mt-1 p-2 border-b border-border">
