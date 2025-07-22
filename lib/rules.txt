@@ -5,16 +5,16 @@
 {
   "testseries": {
     "title": "Test Series Title",
-    "duration": 90  // Duration in minutes
+    "duration": 90
   },
   "questions": [
     {
-      "text": "Markdown formatted question text with all supported elements",
-      "answer": "Correct answer text",
+      "text": "##### $E = mc^2$ inline math\n\n```python\n# Code example\nprint(\"Hello\")\n```\n\n| Header 1 | Header 2 |\n|----------|----------|\n| Cell 1   | Cell 2   |",
+      "answer": "Correct answer",
       "options": [
         { "text": "Option 1" },
         { "text": "Option 2" },
-        { "text": "Option 3" },
+        { "text": "Correct answer" },
         { "text": "Option 4" }
       ]
     }
@@ -22,108 +22,64 @@
 }
 ```
 
-## 2. Supported Markdown Features
+## 2. Formatting Rules
 
-### Text Formatting
-- **Headers**: `# H1` through `###### H6`
-- **Bold**: `**bold text**`
-- *Italic*: `*italic text*`
-- ~~Strikethrough~~: `~~strikethrough~~`
-- `Inline code`: \`code\`
-- [Links](https://example.com): `[text](https://example.com)`
+### Question Structure
+- Every question must start with `#####`
+- Question title should be same as provided in picture, do not modify
+- Use `\n` for line breaks in these cases:
+  - Before and after code blocks
+  - Before and after tables
+  - Before and after images
+  - Before and after blockquotes
+  - Between distinct sections of a question
 
-### Lists
-- Unordered:
-  ```
-  - Item 1
-  - Item 2
-    - Subitem
-  ```
-- Ordered:
-  ```
-  1. First
-  2. Second
-  ```
-
-### Tables
-```
-| Header 1 | Header 2 |
-|----------|----------|
-| Cell 1   | Cell 2   |
-| Cell 3   | Cell 4   |
-```
+### Math Expressions
+- Always use `$` for both inline and display math
+- Example: `$E = mc^2$` or `$$\nE = mc^2\n$$`
 
 ### Code Blocks
-\`\`\`languageeverythign
-// Your code here
-function example() {
-  return "Hello, world!";
-}
-\`\`\`
+- Use triple backticks with language specification
+- Add `\n` before and after the code block
 
-### Images
-`![Alt text](https://example.com/image.jpg "Optional title")`
+### Tables
+- Use markdown table syntax
+- Add `\n` before and after the table
 
-## 3. Mathematical Notation
-- Inline math: `$E = mc^2$`
-- Display math:
-  ```
-  $$
-  \sum_{i=1}^n i = \frac{n(n+1)}{2}
-  $$
-  ```
+## 3. Requirements
 
-### Supported LaTeX Packages
-- amsmath
-- amssymb
-- amsfonts
-- amsthm
-- mathtools
-- bm
-- physics
-
-## 4. Best Practices
-
-### Question Text
-- Use code blocks for code examples
-- Include relevant diagrams or tables when needed
+### Questions
+- Must start with `#####` prefix
+- Must use `$` for all math expressions, even single ones
+- Must use `\n` for proper spacing around blocks
 
 ### Options
-- we support same markdown as question text
-- "answer" should be one of the options, with same typography
+- One option must exactly match the "answer" field
+- Support same markdown as question text
 
-### Code Examples
-- Include complete, runnable examples when possible
-- Add comments to explain complex code
-- Use appropriate syntax highlighting
-- Keep examples focused and minimal
+### Validation
+- JSON must be valid
+- Math expressions must be properly escaped
 
-## 5. Example Question
+## 4. Example
 
 ```json
 {
   "testseries": {
-    "title": "CS OS Series - 3",
-    "duration": 90
+    "title": "Mathematics Test Series",
+    "duration": 60
   },
   "questions": [
     {
-      "text": "##### Process Scheduling\n\nConsider the following processes with their arrival times and burst times (in ms):\n\n| Process | Arrival Time | Burst Time |\n|---------|--------------|------------|\n| P1      | 0            | 5          |\n| P2      | 1            | 3          |\n| P3      | 2            | 8          |\n\nWhat is the average waiting time using Shortest Job First (SJF) scheduling?\n\n```c\n// Example of process scheduling in C\nstruct Process {\n  int pid;\n  int arrival_time;\n  int burst_time;\n};\n\n// SJF scheduling implementation\nvoid scheduleSJF(struct Process proc[], int n) {\n  // Implementation here\n}\n```",
-      "answer": "5.67 ms",
+      "text": "##### Find the roots of the equation $x^2 - 5x + 6 = 0$\n\n```python\n# Python code to find roots\nimport math\n\ndef find_roots(a, b, c):\n    d = b**2 - 4*a*c\n    root1 = (-b + math.sqrt(d)) / (2*a)\n    root2 = (-b - math.sqrt(d)) / (2*a)\n    return root1, root2\n```",
+      "answer": "2 and 3",
       "options": [
-        { "text": "4.33 ms" },
-        { "text": "5.00 ms" },
-        { "text": "5.67 ms" },
-        { "text": "6.33 ms" }
+        { "text": "1 and 6" },
+        { "text": "2 and 3" },
+        { "text": "-2 and -3" },
+        { "text": "-1 and -6" }
       ]
     }
   ]
 }
 ```
-
-## 6. Validation Rules
-- JSON must be valid and properly escaped
-- All questions must have at least 2 options
-- Correct answer must be one of the provided options
-- Math expressions must be properly escaped with double backslashes
-- Image URLs must be HTTPS

@@ -82,7 +82,7 @@ function ContentPage() {
   const [shouldFetch, setShouldFetch] = useState(false);
   const testSeriesRef = useRef<HTMLDivElement>(null);
 
-  const years = Array.from({ length: 13 }, (_, i) => 2024 - i);
+  const years = Array.from({ length: 14 }, (_, i) => 2025 - i);
 
   const {
     data: testSeriesData,
