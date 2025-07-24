@@ -1,11 +1,22 @@
 "use client";
 
 import { useState } from "react";
-import { ResponsivePie } from "@nivo/pie";
+import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 import { format } from "date-fns";
 import Link from "next/link";
 import { GoHome } from "react-icons/go";
-import { Zap } from "lucide-react";
+import {
+  Zap,
+  Clock,
+  Target,
+  TrendingUp,
+  CheckCircle2,
+  XCircle,
+  MinusCircle,
+  Calendar,
+  Award,
+  BarChart3
+} from "lucide-react";
 
 import { Separator } from "../ui/separator";
 import { MarkdownRenderer } from "@/components/newMarkdownRender";
@@ -23,10 +34,10 @@ import {
   BreadcrumbSeparator,
   BreadcrumbPage,
 } from "@/components/ui/breadcrumb";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 interface TestSeriesDetails {
   title: string;
@@ -49,6 +60,7 @@ interface TestSeriesDetails {
   }[];
   totalMarks: number;
 }
+
 export default function MockTestAnalysis({
   testSeriesDetails,
 }: {
@@ -101,11 +113,27 @@ function Content({
   const incorrectAnswers = answeredQuestions - correctAnswers;
   const unansweredQuestions = totalQuestions - answeredQuestions;
   const percentageCorrect = (correctAnswers / totalQuestions) * 100;
+  const accuracy = answeredQuestions > 0 ? (correctAnswers / answeredQuestions) * 100 : 0;
 
   const chartData = [
-    { id: "Corr.", label: "Correct", value: correctAnswers },
-    { id: "Incor.", label: "Incorrect", value: incorrectAnswers },
-    { id: "Unans", label: "Unanswered", value: unansweredQuestions },
+    {
+      name: "Correct",
+      value: correctAnswers,
+      color: "hsl(var(--primary))",
+      icon: CheckCircle2
+    },
+    {
+      name: "Incorrect",
+      value: incorrectAnswers,
+      color: "hsl(var(--destructive))",
+      icon: XCircle
+    },
+    {
+      name: "Unanswered",
+      value: unansweredQuestions,
+      color: "hsl(var(--muted-foreground))",
+      icon: MinusCircle
+    },
   ];
 
   // Handle explain button click
@@ -115,240 +143,341 @@ function Content({
     setIsExplainDrawerOpen(true);
   };
 
-  return (
-    <div className="container mx-auto p-4 space-y-6 bg-background text-foreground mt-3 rounded-lg">
-      <h1 className="text-base lg:text-lg font-bold mt-1">
-        {testSeriesDetails.title
-          .split(" ")
-          .slice(2)
-          .join(" ")
-          .replace("series", "Test Series")}
-      </h1>
+  // Custom tooltip for pie chart
+  const CustomTooltip = ({ active, payload }: any) => {
+    if (active && payload && payload.length) {
+      const data = payload[0];
+      return (
+        <div className="bg-background border border-border rounded-lg p-3 shadow-lg">
+          <p className="font-medium">{data.name}</p>
+          <p className="text-sm text-muted-foreground">
+            {data.value} questions ({((data.value / totalQuestions) * 100).toFixed(1)}%)
+          </p>
+        </div>
+      );
+    }
+    return null;
+  };
 
-      <div className="grid gap-6 md:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>Summary</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex justify-between items-center">
-              <span>Total Marks:</span>
-              <span className="text-2xl font-bold">
-                {testSeriesDetails.totalMarks}
-              </span>
+  // Calculate time taken
+  const timeTaken = latestAttempt?.startedAt && latestAttempt?.completedAt
+    ? Math.round((new Date(latestAttempt.completedAt).getTime() - new Date(latestAttempt.startedAt).getTime()) / (1000 * 60))
+    : null;
+
+  return (
+    <div className="container mx-auto px-4 py-6 space-y-8 max-w-7xl">
+      {/* Header Section */}
+      <div className="space-y-2">
+        <h1 className="text-2xl lg:text-3xl font-bold tracking-tight">
+          {testSeriesDetails.title
+            .split(" ")
+            .slice(2)
+            .join(" ")
+            .replace("series", "Test Series")}
+        </h1>
+        <p className="text-muted-foreground">
+          Detailed analysis of your test performance
+        </p>
+      </div>
+
+      {/* Stats Overview Cards */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <Card className="border-l-4 border-l-primary">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Score</p>
+                <p className="text-2xl font-bold">{correctAnswers}/{testSeriesDetails.totalMarks}</p>
+              </div>
+              <Award className="h-8 w-8 text-primary" />
             </div>
-            <div className="flex justify-between items-center">
-              <span>Your Score:</span>
-              <span>
-                {correctAnswers} / {testSeriesDetails.totalMarks}
-              </span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span>Questions Answered:</span>
-              <span>
-                {answeredQuestions} / {totalQuestions}
-              </span>
-            </div>
-            <Progress className="h-2" value={percentageCorrect} />
-            <p className="text-sm text-muted-foreground text-center">
-              {percentageCorrect.toFixed(1)}% Correct
-            </p>
-            {latestAttempt && (
-              <>
-                <div className="text-sm">
-                  <strong>Started:</strong>{" "}
-                  {format(new Date(latestAttempt.startedAt), "PPpp")}
-                </div>
-                {latestAttempt.completedAt && (
-                  <div className="text-sm">
-                    <strong>Completed:</strong>{" "}
-                    {format(new Date(latestAttempt.completedAt), "PPpp")}
-                  </div>
-                )}
-              </>
-            )}
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Performance Chart</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div style={{ height: 300 }}>
-              <ResponsivePie
-                activeOuterRadiusOffset={8}
-                arcLabelsSkipAngle={10}
-                arcLabelsTextColor={{
-                  from: "color",
-                  modifiers: [["darker", 2]],
-                }}
-                arcLinkLabelsColor={{ from: "color" }}
-                arcLinkLabelsSkipAngle={10}
-                arcLinkLabelsTextColor="hsl(var(--foreground))"
-                arcLinkLabelsThickness={2}
-                borderColor={{
-                  from: "color",
-                  modifiers: [["darker", 0.2]],
-                }}
-                borderWidth={1}
-                colors={({ id }) => {
-                  if (id === "Corr.") return "hsl(var(--primary))";
-                  if (id === "Incor.") return "hsl(var(--destructive))";
+        <Card className="border-l-4 border-l-green-500">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Accuracy</p>
+                <p className="text-2xl font-bold">{accuracy.toFixed(1)}%</p>
+              </div>
+              <Target className="h-8 w-8 text-green-500" />
+            </div>
+          </CardContent>
+        </Card>
 
-                  return "hsl(var(--muted))";
-                }}
-                cornerRadius={3}
-                data={chartData}
-                innerRadius={0.5}
-                legends={[
-                  {
-                    anchor: "bottom",
-                    direction: "row",
-                    justify: false,
-                    translateX: 0,
-                    translateY: 56,
-                    itemsSpacing: 0,
-                    itemWidth: 100,
-                    itemHeight: 18,
-                    itemTextColor: "hsl(var(--foreground))",
-                    itemDirection: "left-to-right",
-                    itemOpacity: 1,
-                    symbolSize: 18,
-                    symbolShape: "circle",
-                  },
-                ]}
-                margin={{ top: 40, right: 80, bottom: 80, left: 80 }}
-                padAngle={0.7}
-                theme={{
-                  labels: {
-                    text: {
-                      fontSize: 14,
-                      fill: "hsl(var(--foreground))",
-                    },
-                  },
-                  legends: {
-                    text: {
-                      fontSize: 12,
-                      fill: "hsl(var(--foreground))",
-                    },
-                  },
-                  tooltip: {
-                    container: {
-                      background: "hsl(var(--background))",
-                      color: "hsl(var(--foreground))",
-                      fontSize: 12,
-                      borderRadius: 4,
-                      boxShadow: "0 1px 2px rgba(0, 0, 0, 0.25)",
-                      padding: "8px 12px",
-                    },
-                  },
-                }}
-                tooltip={({ datum }) => (
-                  <div
-                    style={{
-                      padding: "6px 10px",
-                      background: "hsl(var(--card))",
-                      border: "1px solid hsl(var(--border))",
-                      color: "hsl(var(--foreground))",
-                      borderRadius: "4px",
-                      boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-                    }}
-                  >
-                    <strong>{datum.label}:</strong> {datum.value} (
-                    {((datum.value / totalQuestions) * 100).toFixed(1)}%)
-                  </div>
-                )}
-              />
+        <Card className="border-l-4 border-l-blue-500">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Attempted</p>
+                <p className="text-2xl font-bold">{answeredQuestions}/{totalQuestions}</p>
+              </div>
+              <TrendingUp className="h-8 w-8 text-blue-500" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-l-4 border-l-orange-500">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Time Taken</p>
+                <p className="text-2xl font-bold">{timeTaken ? `${timeTaken}m` : 'N/A'}</p>
+              </div>
+              <Clock className="h-8 w-8 text-orange-500" />
             </div>
           </CardContent>
         </Card>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Question Analysis</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-6">
-              {testSeriesDetails.questions.map((question, index) => {
-                const userAnswer = latestAttempt?.answers.find(
-                  (a) => a.questionId === question.id,
-                );
+      {/* Main Analysis Section */}
+      <div className="grid gap-6 lg:grid-cols-3">
+        {/* Performance Summary */}
+        <Card className="lg:col-span-1">
+          <CardHeader className="pb-4">
+            <CardTitle className="flex items-center gap-2">
+              <BarChart3 className="h-5 w-5" />
+              Performance Summary
+            </CardTitle>
+            <CardDescription>
+              Overview of your test performance
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-3">
+              <div className="flex justify-between items-center">
+                <span className="text-sm font-medium">Overall Progress</span>
+                <span className="text-sm text-muted-foreground">
+                  {percentageCorrect.toFixed(1)}%
+                </span>
+              </div>
+              <Progress value={percentageCorrect} className="h-2" />
+            </div>
 
+            <Separator />
+
+            <div className="space-y-3">
+              {chartData.map((item, index) => {
+                const Icon = item.icon;
                 return (
-                  <div key={question.id} className="space-y-3">
-                    <div className="flex justify-between items-start">
-                      <h3 className="text-sm lg:text-base font-medium">
-                        Q. {index + 1}
-                      </h3>
-                      <div className="flex items-center gap-2">
-                        {/* <button
-                          onClick={() =>
-                            handleExplainClick(question, userAnswer)
-                          }
-                        >
-                          <Badge>
-                            <Zap className="w-3 h-3 mr-1" />
-                            Explain
-                          </Badge>
-                        </button> */}
-                        {userAnswer ? (
-                          <Badge
-                            variant={
-                              userAnswer.isCorrect ? "default" : "destructive"
-                            }
-                          >
-                            {userAnswer.isCorrect ? "Correct" : "Incorrect"}
-                          </Badge>
-                        ) : (
-                          <Badge variant="secondary">Unanswered</Badge>
-                        )}
-                      </div>
+                  <div key={index} className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Icon className="h-4 w-4" style={{ color: item.color }} />
+                      <span className="text-sm font-medium">{item.name}</span>
                     </div>
-                    <div className="text-sm lg:text-base font-base font-semibold text-foreground/75">
-                      <MarkdownRenderer 
-                        content={question.text} 
-                        variant="question"
-                        className="prose-sm lg:prose-base"
-                      />
+                    <div className="text-right">
+                      <span className="text-sm font-bold">{item.value}</span>
+                      <span className="text-xs text-muted-foreground ml-1">
+                        ({((item.value / totalQuestions) * 100).toFixed(1)}%)
+                      </span>
                     </div>
-                    <ul className="space-y-1 mb-10">
-                      {question.options.map((option) => (
-                        <li key={option.id} className="flex items-start gap-2">
-                          <div className="flex-shrink-0 mt-1">
-                            <div
-                              className={`w-4 h-4 rounded-full flex-shrink-0 ${option.text === question.correctAnswer
-                                ? "bg-primary"
-                                : userAnswer &&
-                                  option.text === userAnswer.userAnswer
-                                  ? "bg-destructive"
-                                  : "bg-muted"
-                                }`}
-                            />
-                          </div>
-                          <div
-                            className={`flex-grow ${option.text === question.correctAnswer
-                              ? "font-medium"
-                              : ""
-                              }`}
-                          >
-                            <div className="text-sm lg:text-base text-foreground/75">
-                              <MarkdownRenderer
-                                content={option.text}
-                                variant="option"
-                                className="prose-sm lg:prose-base"
-                              />
-                            </div>
-                          </div>
-                        </li>
-                      ))}
-                    </ul>
-                    <Separator className="mt-10" />
                   </div>
                 );
               })}
             </div>
+
+            {latestAttempt && (
+              <>
+                <Separator />
+                <div className="space-y-2 text-sm">
+                  <div className="flex items-center gap-2">
+                    <Calendar className="h-4 w-4 text-muted-foreground" />
+                    <div>
+                      <p className="font-medium">Started</p>
+                      <p className="text-muted-foreground">
+                        {format(new Date(latestAttempt.startedAt), "PPpp")}
+                      </p>
+                    </div>
+                  </div>
+                  {latestAttempt.completedAt && (
+                    <div className="flex items-center gap-2">
+                      <CheckCircle2 className="h-4 w-4 text-muted-foreground" />
+                      <div>
+                        <p className="font-medium">Completed</p>
+                        <p className="text-muted-foreground">
+                          {format(new Date(latestAttempt.completedAt), "PPpp")}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Performance Chart */}
+        <Card className="lg:col-span-2">
+          <CardHeader className="pb-4">
+            <CardTitle className="flex items-center gap-2">
+              <TrendingUp className="h-5 w-5" />
+              Performance Breakdown
+            </CardTitle>
+            <CardDescription>
+              Visual representation of your test results
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="h-[300px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={chartData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={60}
+                    outerRadius={120}
+                    paddingAngle={2}
+                    dataKey="value"
+                  >
+                    {chartData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip content={<CustomTooltip />} />
+                  <Legend
+                    verticalAlign="bottom"
+                    height={36}
+                    formatter={(value, entry) => (
+                      <span style={{ color: entry.color }}>{value}</span>
+                    )}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Question Analysis */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Target className="h-5 w-5" />
+            Question-wise Analysis
+          </CardTitle>
+          <CardDescription>
+            Detailed breakdown of each question and your responses
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-6">
+            {testSeriesDetails.questions.map((question, index) => {
+              const userAnswer = latestAttempt?.answers.find(
+                (a) => a.questionId === question.id,
+              );
+
+              return (
+                <div
+                  key={question.id}
+                  className="p-4 border border-border rounded-lg space-y-4 hover:shadow-sm transition-shadow"
+                >
+                  <div className="flex justify-between items-start">
+                    <div className="flex items-center gap-3">
+                      <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-primary font-medium text-sm">
+                        {index + 1}
+                      </div>
+                      <h3 className="text-base font-semibold">
+                        Question {index + 1}
+                      </h3>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {/* <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleExplainClick(question, userAnswer)}
+                          className="h-8"
+                        >
+                          <Zap className="w-3 h-3 mr-1" />
+                          Explain
+                        </Button> */}
+                      {userAnswer ? (
+                        <Badge
+                          variant={userAnswer.isCorrect ? "default" : "destructive"}
+                          className="h-6"
+                        >
+                          {userAnswer.isCorrect ? (
+                            <CheckCircle2 className="w-3 h-3 mr-1" />
+                          ) : (
+                            <XCircle className="w-3 h-3 mr-1" />
+                          )}
+                          {userAnswer.isCorrect ? "Correct" : "Incorrect"}
+                        </Badge>
+                      ) : (
+                        <Badge variant="secondary" className="h-6">
+                          <MinusCircle className="w-3 h-3 mr-1" />
+                          Unanswered
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="bg-muted/30 p-3 rounded-lg">
+                    <MarkdownRenderer
+                      content={question.text}
+                      variant="question"
+                      className="prose-sm lg:prose-base"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    {question.options.map((option) => {
+                      const isCorrect = option.text === question.correctAnswer;
+                      const isUserSelected = userAnswer && option.text === userAnswer.userAnswer;
+
+                      return (
+                        <div
+                          key={option.id}
+                          className={`flex items-start gap-3 p-3 rounded-lg border transition-colors ${isCorrect
+                            ? 'border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950/20'
+                            : isUserSelected
+                              ? 'border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-950/20'
+                              : 'border-border bg-background'
+                            }`}
+                        >
+                          <div className="flex-shrink-0 mt-0.5">
+                            <div
+                              className={`w-4 h-4 rounded-full flex items-center justify-center ${isCorrect
+                                ? "bg-green-500"
+                                : isUserSelected
+                                  ? "bg-red-500"
+                                  : "bg-muted border-2 border-muted-foreground"
+                                }`}
+                            >
+                              {isCorrect && <CheckCircle2 className="w-2 h-2 text-white" />}
+                              {isUserSelected && !isCorrect && <XCircle className="w-2 h-2 text-white" />}
+                            </div>
+                          </div>
+                          <div className="flex-grow">
+                            <MarkdownRenderer
+                              content={option.text}
+                              variant="option"
+                              className="prose-sm lg:prose-base"
+                            />
+                          </div>
+                          {isCorrect && (
+                            <Badge variant="outline" className="text-xs bg-green-100 dark:bg-green-900/20">
+                              Correct
+                            </Badge>
+                          )}
+                          {isUserSelected && !isCorrect && (
+                            <Badge variant="outline" className="text-xs bg-red-100 dark:bg-red-900/20">
+                              Your Answer
+                            </Badge>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {index < testSeriesDetails.questions.length - 1 && (
+                    <Separator className="mt-6" />
+                  )}
+                </div>
+              );
+            })}
+          </div>
         </CardContent>
       </Card>
 
