@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
+import { Pie, PieChart } from "recharts";
 import { format } from "date-fns";
 import Link from "next/link";
 import { GoHome } from "react-icons/go";
@@ -39,6 +39,14 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { reduceHeader } from "@/utils/utils";
+import {
+  ChartConfig,
+  ChartContainer,
+  ChartLegend,
+  ChartLegendContent,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
 
 interface TestSeriesDetails {
   title: string;
@@ -117,47 +125,34 @@ function Content({
   const accuracy = answeredQuestions > 0 ? (correctAnswers / answeredQuestions) * 100 : 0;
 
   const chartData = [
-    {
-      name: "Correct",
-      value: correctAnswers,
-      color: "hsl(var(--primary))",
-      icon: CheckCircle2
-    },
-    {
-      name: "Incorrect",
-      value: incorrectAnswers,
-      color: "hsl(var(--destructive))",
-      icon: XCircle
-    },
-    {
-      name: "Unanswered",
-      value: unansweredQuestions,
-      color: "hsl(var(--muted-foreground))",
-      icon: MinusCircle
-    },
+    { name: "Correct", value: correctAnswers, fill: "var(--color-correct)" },
+    { name: "Incorrect", value: incorrectAnswers, fill: "var(--color-incorrect)" },
+    { name: "Unanswered", value: unansweredQuestions, fill: "var(--color-unanswered)" },
   ];
+
+  const chartConfig = {
+    value: {
+      label: "Questions",
+    },
+    correct: {
+      label: "Correct",
+      color: "hsl(var(--primary))",
+    },
+    incorrect: {
+      label: "Incorrect",
+      color: "hsl(var(--destructive))",
+    },
+    unanswered: {
+      label: "Unanswered",
+      color: "hsl(var(--muted-foreground))",
+    },
+  } satisfies ChartConfig;
 
   // Handle explain button click
   const handleExplainClick = (question: any, userAnswer: any) => {
     setCurrentQuestion(question);
     setCurrentUserAnswer(userAnswer);
     setIsExplainDrawerOpen(true);
-  };
-
-  // Custom tooltip for pie chart
-  const CustomTooltip = ({ active, payload }: any) => {
-    if (active && payload && payload.length) {
-      const data = payload[0];
-      return (
-        <div className="bg-background border border-border rounded-lg p-3 shadow-lg">
-          <p className="font-medium">{data.name}</p>
-          <p className="text-sm text-muted-foreground">
-            {data.value} questions ({((data.value / totalQuestions) * 100).toFixed(1)}%)
-          </p>
-        </div>
-      );
-    }
-    return null;
   };
 
   // Calculate time taken
@@ -260,11 +255,10 @@ function Content({
 
             <div className="space-y-3">
               {chartData.map((item, index) => {
-                const Icon = item.icon;
                 return (
                   <div key={index} className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <Icon className="h-4 w-4" style={{ color: item.color }} />
+                      <span className="h-4 w-4 rounded-full" style={{ backgroundColor: item.fill }} />
                       <span className="text-sm font-medium">{item.name}</span>
                     </div>
                     <div className="text-right">
@@ -321,31 +315,28 @@ function Content({
           </CardHeader>
           <CardContent>
             <div className="h-[300px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
+              <ChartContainer
+                config={chartConfig}
+                className="mx-auto aspect-square h-full"
+              >
                 <PieChart>
+                  <ChartTooltip
+                    cursor={true}
+                    content={<ChartTooltipContent hideLabel />}
+                  />
                   <Pie
                     data={chartData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={60}
-                    outerRadius={120}
-                    paddingAngle={2}
                     dataKey="value"
-                  >
-                    {chartData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip content={<CustomTooltip />} />
-                  <Legend
-                    verticalAlign="bottom"
-                    height={36}
-                    formatter={(value, entry) => (
-                      <span style={{ color: entry.color }}>{value}</span>
-                    )}
+                    nameKey="name"
+                    innerRadius={60}
+                    strokeWidth={5}
+                  />
+                  <ChartLegend
+                    content={<ChartLegendContent nameKey="name" />}
+                    className="-translate-y-2 flex-wrap gap-2 [&>*]:basis-1/4 [&>*]:justify-center"
                   />
                 </PieChart>
-              </ResponsiveContainer>
+              </ChartContainer>
             </div>
           </CardContent>
         </Card>

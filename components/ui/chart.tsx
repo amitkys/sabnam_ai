@@ -306,7 +306,7 @@ const ChartLegendContent = React.forwardRef<
                   }}
                 />
               )}
-              {itemConfig?.label}
+              <span className="text-xs">{itemConfig?.label || item.value}</span>
             </div>
           )
         })}

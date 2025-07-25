@@ -7,7 +7,7 @@
     "dev": "next dev --turbopack",
     "build": "prisma generate &&  prisma db push && next build",
     "start": "next start",
-    "lint": "eslint . --ext .ts,.tsx -c .eslintrc.json --fix"
+    "lint": "eslint . --ext .ts,.tsx --config eslint.config.mjs --fix"
   },
   "dependencies": {
     "@bprogress/next": "^3.2.12",
