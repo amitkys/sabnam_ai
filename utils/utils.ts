@@ -63,3 +63,24 @@ export const formatDuration = (minutes: number): string => {
 
   return `${hours} ${hours === 1 ? "hour" : "hours"} ${remainingMinutes} ${remainingMinutes === 1 ? "minute" : "minutes"}`;
 };
+
+
+export const reduceHeader = (header: string, length: number): string => {
+  const match = header.match(/^(#+)(\s+)(.*)$/);
+  if (!match) return header; // return as-is if it's not a valid markdown header
+
+  const [, hashes, spaces, text] = match;
+  const newHashes = "#".repeat(hashes.length + length);
+  return `${newHashes}${spaces}${text}`;
+};
+
+export const increaseHeader = (header: string, length: number): string => {
+  const match = header.match(/^(#+)(\s+)(.*)$/);
+  if (!match) return header; // return as-is if it's not a valid markdown header
+
+  const [, hashes, spaces, text] = match;
+  const newLength = Math.max(hashes.length - length, 1); // Minimum 1 # to stay valid
+  const newHashes = "#".repeat(newLength);
+  return `${newHashes}${spaces}${text}`;
+};
+

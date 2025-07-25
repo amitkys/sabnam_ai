@@ -38,6 +38,7 @@ import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { reduceHeader } from "@/utils/utils";
 
 interface TestSeriesDetails {
   title: string;
@@ -361,7 +362,7 @@ function Content({
             Detailed breakdown of each question and your responses
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-1.5 md:p-4 lg:p-6">
           <div className="space-y-6">
             {testSeriesDetails.questions.map((question, index) => {
               const userAnswer = latestAttempt?.answers.find(
@@ -379,7 +380,7 @@ function Content({
                         {index + 1}
                       </div>
                       <h3 className="text-base font-semibold">
-                        Question {index + 1}
+                        Question
                       </h3>
                     </div>
                     <div className="flex items-center gap-2">
@@ -415,7 +416,7 @@ function Content({
 
                   <div className="bg-muted/30 p-3 rounded-lg">
                     <MarkdownRenderer
-                      content={question.text}
+                      content={reduceHeader(question.text, 1)}
                       variant="question"
                       className="prose-sm lg:prose-base"
                     />
@@ -463,7 +464,7 @@ function Content({
                           )}
                           {isUserSelected && !isCorrect && (
                             <Badge variant="outline" className="text-xs bg-red-100 dark:bg-red-900/20">
-                              Your Answer
+                              Yours
                             </Badge>
                           )}
                         </div>
