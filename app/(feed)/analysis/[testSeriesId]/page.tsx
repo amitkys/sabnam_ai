@@ -1,4 +1,4 @@
-import MockTestAnalysis from "@/components/custom/mockTestAnalysis";
+import TestAnalysis from "@/components/analysis/TestAnalysis";
 import { getAnalysisForTestAttempt } from "@/lib/actions";
 
 // Define the type for the component's props
@@ -11,5 +11,5 @@ export default async function Page(props: { params: Params }) {
 
   console.log(testSeriesDetails);
 
-  return <MockTestAnalysis testSeriesDetails={testSeriesDetails} />;
+  return <TestAnalysis testSeriesDetails={testSeriesDetails} />;
 }
