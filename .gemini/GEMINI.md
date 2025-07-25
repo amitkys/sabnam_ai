@@ -4,6 +4,10 @@
 
 - nextjs, typescript, prisma
 
+## Package manager
+
+- pnpm
+
 ## UI
 
 - Shadcn & tailwindcss(version 3)
