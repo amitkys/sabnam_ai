@@ -1,5 +1,7 @@
 // @/lib/board/data.ts
-export const boardExam = {
+import type { EducationalData } from "@/lib/type/board";
+
+export const boardExam: EducationalData = {
   boards: [
     {
       id: "bseb",
@@ -236,6 +238,26 @@ export const boardExam = {
             },
           ],
         },
+        {
+          id: "8th",
+          name: "Class 8",
+          subjects: [
+            {
+              id: "math",
+              name: "Mathematics",
+              chapters: [
+                {
+                  id: "linear-equation-in-one-variable",
+                  name: "Linear Equation in One Variable",
+                },
+                {
+                  id: "square-and-square-root",
+                  name: "Square and Square Root",
+                },
+              ],
+            },
+          ],
+        }
       ],
     },
     {
