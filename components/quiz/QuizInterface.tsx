@@ -73,7 +73,7 @@ export default function QuizInterface({
   const handleExit = async () => {
     setIsSubmitting(true);
     await exitFullscreen();
-    router.push("/");
+    window.location.href = "/home";
   };
 
   // Handle question navigation

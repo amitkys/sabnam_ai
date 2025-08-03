@@ -37,6 +37,8 @@
 ### Math Expressions
 - Always use `$` for both inline and display math
 - Example: `$E = mc^2$` or `$$\nE = mc^2\n$$`
+- Uses \\dfrac{...}{...} for clean, readable fractions
+- Maintains mathematical clarity and professionalism
 
 ### Code Blocks
 - Use triple backticks with language specification
