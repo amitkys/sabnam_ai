@@ -273,12 +273,12 @@ export default function Page() {
     <ContentLayout title="Home">
       <div className="max-w-6xl mx-auto">
         <div className="flex justify-center items-center py-8">
-          <div className="inline-flex items-center gap-4 text-muted-foreground">
-            <div className="h-[3px] hidden md:block w-12 bg-gradient-to-r from-transparent via-primary to-border" />
-            <span className={`text-2xl md:text-4xl font-extrabold md:font-bold bg-gradient-to-r from-foreground to-foreground/65 bg-clip-text text-transparent`}>
-              Be the best — Give a test
-            </span>
-            <div className="h-[3px] w-12 hidden md:block bg-gradient-to-l from-transparent via-primary to-border" />
+          <div className="text-center mb-3">
+            <h1 className="text-[31px] md:text-5xl font-extrabold tracking-tight text-gray-900 dark:text-white">
+              <span className="bg-gradient-to-r from-primary to-secondary-foreground bg-clip-text text-transparent">
+                Be the Best, Give a Test
+              </span>
+            </h1>
           </div>
         </div>
 
