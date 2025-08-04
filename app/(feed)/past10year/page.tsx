@@ -37,6 +37,7 @@ export interface TestSeriesResponse {
     lastScore: number | null;
     isCompleted: boolean;
     totalQuestions: number;
+    level: string;
   }[];
 }
 

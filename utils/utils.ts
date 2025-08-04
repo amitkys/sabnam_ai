@@ -84,3 +84,29 @@ export const increaseHeader = (header: string, length: number): string => {
   return `${newHashes}${spaces}${text}`;
 };
 
+export const getBadgeVariant = (level: string): "easy" | "medium" | "hard" | "outline" | "default" | "destructive" | "secondary" => {
+  switch (level) {
+    case "e":
+      return "easy";
+    case "m":
+      return "medium";
+    case "h":
+      return "hard";
+    default:
+      return "outline";
+  }
+};
+
+export const getBadgeLabel = (level: string): string => {
+  switch (level) {
+    case "e":
+      return "Easy";
+    case "m":
+      return "Medium";
+    case "h":
+      return "Hard";
+    default:
+      return "Not Specified";
+  }
+};
+

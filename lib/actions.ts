@@ -12,6 +12,7 @@ export async function CreateTest(data: Data) {
       data: {
         title: data.testseries.title,
         duration: data.testseries.duration,
+        level: data.testseries.level,
         userId: session.user.id, // Associate test series with user
         questions: {
           create: data.questions.map((question) => ({

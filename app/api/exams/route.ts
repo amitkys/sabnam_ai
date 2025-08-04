@@ -62,6 +62,7 @@ export async function GET(req: NextRequest) {
           title: series.title,
           duration: series.duration,
           totalQuestions: series._count.questions,
+          level: series.level,
         };
       }
 
@@ -79,6 +80,7 @@ export async function GET(req: NextRequest) {
         lastScore,
         isCompleted,
         totalQuestions: series._count.questions,
+        level: series.level,
       };
     });
 

@@ -43,6 +43,8 @@ export function ChapterContent() {
     isLoading,
   } = useSWR<IMainTestSeriesResponse>(url, fetcher);
 
+  console.log(testSeriesData);
+
   // If required data is missing, render nothing or a message
   if (!boardType || !standard || !subject || !chapter) {
     return (

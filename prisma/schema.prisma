@@ -26,6 +26,7 @@ model TestSeries {
   testAttempts TestAttempt[]
   createdAt    DateTime      @default(now())
   duration     Int
+  level        String        @default("n") //n for not specified, e for easy, m for medium, h for hard
   user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId       String
 }

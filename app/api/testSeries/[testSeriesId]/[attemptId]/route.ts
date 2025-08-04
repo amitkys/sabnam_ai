@@ -38,6 +38,7 @@ export async function GET(
             title: true,
             duration: true,
             createdAt: true,
+            level: true,
             questions: {
               orderBy: { id: "asc" },
               select: {

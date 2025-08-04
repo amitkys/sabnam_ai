@@ -80,7 +80,7 @@ function Content({ chapterName, subjectName }: ContentProps) {
     error,
     isLoading,
   } = useSWR<IMainTestSeriesResponse>(
-    `/api/math?claas=10th&subject=${subjectName}&chapter=${chapterName}`,
+    `/apq/math?claas=10th&subject=${subjectName}&chapter=${chapterName}`,
     fetcher,
   );
 

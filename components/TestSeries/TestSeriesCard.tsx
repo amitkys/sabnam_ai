@@ -19,6 +19,7 @@ import { getTestAttemptId } from "@/lib/actions";
 import { formatDuration } from "@/utils/utils";
 import LoginDialog from '../loginDailog';
 import { useAuthStore } from '@/lib/store/auth-store';
+import { getBadgeLabel, getBadgeVariant } from '@/utils/utils';
 
 export const TestSeriesCard = ({
   testSeries,
@@ -59,8 +60,8 @@ export const TestSeriesCard = ({
   return (
     <Card className="w-full mx-auto">
       <CardHeader className="relative">
-        <Badge className="absolute top-2 right-2" variant="secondary">
-          Free
+        <Badge className="absolute top-2 right-2" variant={getBadgeVariant(testSeries.level)}>
+          {getBadgeLabel(testSeries.level)}
         </Badge>
         <CardTitle className="text-lg capitalize">
           {testSeries.title.split(" ").slice(2).join(" ").replace("series", "Test Series")}

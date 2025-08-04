@@ -165,6 +165,7 @@ export interface Data {
   testseries: {
     title: string;
     duration: number;
+    level: string;
   };
   questions: {
     text: string;
@@ -246,6 +247,7 @@ export interface TestSeriesResponse {
     lastScore: number | null;
     isCompleted: boolean;
     totalQuestions: number;
+    level: string;
   }>;
 }
 
@@ -314,5 +316,6 @@ export interface IMainTestSeriesResponse {
     lastScore: number | null;
     isCompleted: boolean;
     totalQuestions: number;
+    level: string;
   }[];
 }
