@@ -48,9 +48,9 @@ export default function Page() {
           <DashBoardTable />
 
           {/* User Profile Card */}
-          <div className="w-full lg:w-1/4 mt-0">
+          {/* <div className="w-full lg:w-1/4 mt-0">
             <DashboardUser />
-          </div>
+          </div> */}
         </div>
         <Card className="flex-grow  flex-col h-full hidden">
           <CardHeader className="py-3">
