@@ -65,7 +65,6 @@ export default function LoginDialog({
         <div className="flex flex-col space-y-4 pt-4">
           <Button
             className="w-full flex items-center justify-center space-x-2"
-            variant="outline"
             onClick={handleGoogleSignIn}
             disabled={loading}
           >
