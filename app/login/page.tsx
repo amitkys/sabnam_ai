@@ -44,7 +44,6 @@ export default function Page() {
           <Button
             className="w-full h-12 flex items-center justify-center space-x-2"
             disabled={loading}
-            variant="outline"
             onClick={handleLogin}
           >
             {loading ? (
