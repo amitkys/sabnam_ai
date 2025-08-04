@@ -85,7 +85,7 @@ export const TestSeriesCard = ({
         <Button
           className="max-w-7xl w-full"
           disabled={loading}
-          variant={testSeries.hasAttempted ? "outline" : "default"}
+          // variant={testSeries.hasAttempted ? "outline" : "default"}
           onClick={handleNavigation}
         >
           {loading ? (
@@ -93,7 +93,7 @@ export const TestSeriesCard = ({
               <Loader size="small" variant="spin" />
             </div>
           ) : testSeries.hasAttempted ? (
-            "Start New Test"
+            "Retake Test"
           ) : (
             "Start Test"
           )}
