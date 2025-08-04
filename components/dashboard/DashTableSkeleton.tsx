@@ -1,4 +1,5 @@
-import { ArrowDown, ArrowUp, Clock, EllipsisVertical } from "lucide-react";
+"use client";
+import { ArrowDown, ArrowUp, Clock, Calendar } from "lucide-react";
 
 import {
   Select,
@@ -24,6 +25,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface PaginationSkeleton {
   currentPage: number;
@@ -33,34 +35,19 @@ interface PaginationSkeleton {
 }
 
 export default function DashBoardTableSkeleton({
-  currentPage,
   dataLength,
-  // maximumPage,
   currentFilter,
 }: PaginationSkeleton) {
-  // Create array for skeleton placeholder rows - default to 3 rows
   const skeletonRows = Array(dataLength || 3).fill(null);
 
-  // For the skeleton state, we want to show a simpler pagination
-  // that won't conflict with the final loaded state
   const renderSkeletonPageNumbers = () => {
-    // Show limited pagination in skeleton to avoid jarring transitions
-    // when real data loads (which might have very different page counts)
     return (
       <>
-        {/* First page */}
-        {/* <PaginationItem>
-          <PaginationLink className="opacity-70" isActive={currentPage === 1}>
-            1
-          </PaginationLink>
-        </PaginationItem> */}
-
-        {/* Show dots to indicate loading state */}
         <PaginationItem>
           <div className="flex items-center px-2">
-            <div className="h-1 w-1 rounded-full bg-foreground/70 mx-0.5 animate-pulse" />
-            <div className="h-1 w-1 rounded-full bg-foreground/70 mx-0.5 animate-pulse delay-75" />
-            <div className="h-1 w-1 rounded-full bg-foreground/70 mx-0.5 animate-pulse delay-150" />
+            <div className="h-1 w-1 rounded-full bg-muted-foreground/20 mx-0.5 animate-pulse" />
+            <div className="h-1 w-1 rounded-full bg-muted-foreground/20 mx-0.5 animate-pulse delay-75" />
+            <div className="h-1 w-1 rounded-full bg-muted-foreground/20 mx-0.5 animate-pulse delay-150" />
           </div>
         </PaginationItem>
       </>
@@ -68,96 +55,111 @@ export default function DashBoardTableSkeleton({
   };
 
   return (
-    <div className="w-full">
-      <h2 className="text-base md:text-xl ml-4 font-semibold mb-3 text-foreground/75">
-        Recent Test Results
-      </h2>
-      <div className="bg-card rounded-lg p-2">
-        <div className="flex justify-end mr-3 mb-0.5">
-          {/* Filter dropdown - disabled in skeleton */}
-          <Select disabled value={currentFilter}>
-            <SelectTrigger className="w-[180px] max-w-full opacity-70">
-              <SelectValue>
-                <div className="flex items-center gap-2">
-                  {currentFilter === "recent" && <Clock className="h-4 w-4" />}
-                  {currentFilter === "highestScore" && (
-                    <ArrowUp className="h-4 w-4" />
-                  )}
-                  {currentFilter === "lowestScore" && (
-                    <ArrowDown className="h-4 w-4" />
-                  )}
-                  {currentFilter === "recent" && "Most recent"}
-                  {currentFilter === "highestScore" && "Highest score"}
-                  {currentFilter === "lowestScore" && "Lowest score"}
-                </div>
-              </SelectValue>
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                <SelectItem value="placeholder">Placeholder</SelectItem>
-              </SelectGroup>
-            </SelectContent>
-          </Select>
+    <Card className="w-full animate-pulse">
+      <CardHeader>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <CardTitle className="text-2xl">Test Results</CardTitle>
+          </div>
+          <div className="flex items-center gap-2 text-sm">
+            <div className="flex flex-col sm:flex-row-reverse gap-4">
+              <div className="flex items-center gap-2">
+                <Select disabled value={currentFilter}>
+                  <SelectTrigger className="w-[200px] opacity-70">
+                    <SelectValue>
+                      <div className="flex items-center gap-2">
+                        {currentFilter === "recent" && <Clock className="h-4 w-4" />}
+                        {currentFilter === "highestScore" && (
+                          <ArrowUp className="h-4 w-4" />
+                        )}
+                        {currentFilter === "lowestScore" && (
+                          <ArrowDown className="h-4 w-4" />
+                        )}
+                        {currentFilter === "recent" && "Most recent"}
+                        {currentFilter === "highestScore" && "Highest score"}
+                        {currentFilter === "lowestScore" && "Lowest score"}
+                      </div>
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectItem value="placeholder">Placeholder</SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
         </div>
-        <div className="overflow-x-auto mb-4 lg:mb-1">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="whitespace-nowrap truncate max-w-sm">
-                  Name
-                </TableHead>
-                <TableHead className="whitespace-nowrap">Start time</TableHead>
-                <TableHead className="whitespace-nowrap">Status</TableHead>
-                <TableHead className="whitespace-nowrap">Score</TableHead>
-                <TableHead className="w-10">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {skeletonRows.map((_, index) => (
-                <TableRow key={index}>
-                  <TableCell className="whitespace-nowrap overflow-hidden text-ellipsis max-w-[100px]">
-                    <div className="h-5 bg-muted rounded animate-pulse w-24" />
-                  </TableCell>
-                  <TableCell className="whitespace-nowrap">
-                    <div className="h-5 bg-muted rounded animate-pulse w-14" />
-                  </TableCell>
-                  <TableCell>
-                    <div className="h-4 w-4 bg-muted rounded-full animate-pulse" />
-                  </TableCell>
-                  <TableCell className="whitespace-nowrap">
-                    <div className="h-5 bg-muted rounded animate-pulse w-8" />
-                  </TableCell>
-                  <TableCell>
-                    <button className="p-1 rounded-full hover:bg-accent hover:text-accent-foreground focus:outline-none opacity-70">
-                      <EllipsisVertical className="h-4 w-4" />
-                    </button>
-                  </TableCell>
+      </CardHeader>
+
+      <CardContent className="space-y-6">
+        <div className="border rounded-lg overflow-hidden">
+          <div className="overflow-x-auto">
+            <Table className="table-auto md:table-fixed">
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="text-left whitespace-nowrap">
+                    <div className="flex items-center gap-2">
+                      <Calendar className="w-4 h-4" />
+                      Test Series
+                    </div>
+                  </TableHead>
+                  <TableHead className="text-center whitespace-nowrap">Start Time</TableHead>
+                  <TableHead className="text-center">Status</TableHead>
+                  <TableHead className="text-center">Score</TableHead>
+                  <TableHead className="text-center">Actions</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {skeletonRows.map((_, index) => (
+                  <TableRow key={index}>
+                    <TableCell className="text-left">
+                      <div className="h-5 bg-muted rounded w-3/4" />
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <div className="h-5 bg-muted rounded w-1/2 mx-auto" />
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <div className="h-6 bg-muted rounded-full w-24 mx-auto" />
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <div className="h-6 bg-muted rounded-full w-16 mx-auto" />
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <div className="flex justify-center">
+                        <div className="h-8 w-8 bg-muted rounded-full" />
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
         </div>
-        <Pagination>
-          <PaginationContent className="flex-wrap justify-center">
-            <PaginationItem className="hidden md:block">
-              <PaginationPrevious
-                aria-disabled={true}
-                className="pointer-events-none opacity-50"
-              />
-            </PaginationItem>
 
-            {/* Simplified pagination for skeleton state */}
-            {renderSkeletonPageNumbers()}
+        <div className="flex justify-center">
+          <Pagination>
+            <PaginationContent className="flex-wrap justify-center gap-1">
+              <PaginationItem>
+                <PaginationPrevious
+                  aria-disabled={true}
+                  className="pointer-events-none opacity-50"
+                />
+              </PaginationItem>
 
-            <PaginationItem className="hidden md:block">
-              <PaginationNext
-                aria-disabled={true}
-                className="pointer-events-none opacity-50"
-              />
-            </PaginationItem>
-          </PaginationContent>
-        </Pagination>
-      </div>
-    </div>
+              {renderSkeletonPageNumbers()}
+
+              <PaginationItem>
+                <PaginationNext
+                  aria-disabled={true}
+                  className="pointer-events-none opacity-50"
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        </div>
+      </CardContent>
+    </Card>
   );
 }

@@ -78,7 +78,7 @@ export default function DashBoardTable() {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const router = useRouter();
   const searchParams = useSearchParams();
-  const pageSize = 5; // Items per page
+  const pageSize = 3; // Items per page
 
   // Get page from URL or default to 1
   const currentPage = Number(searchParams.get("page")) || 1;
@@ -218,8 +218,7 @@ export default function DashBoardTable() {
   // Get score badge variant based on performance
   const getScoreVariant = (score: number, isCompleted: boolean) => {
     if (!isCompleted) return "outline";
-    if (score >= 80) return "default";
-    if (score >= 60) return "secondary";
+    if (score) return "easy";
     return "destructive";
   };
 
@@ -369,9 +368,7 @@ export default function DashBoardTable() {
                             Pending
                           </Badge>
                         ) : (
-                          <Badge variant={getScoreVariant(Number(test.score), test.isCompleted)}>
-                            {Number(test.score) >= 80 && <Trophy className="w-3 h-3 mr-1" />}
-                            {Number(test.score) >= 60 && Number(test.score) < 80 && <Target className="w-3 h-3 mr-1" />}
+                          <Badge variant="easy">
                             {test.score}
                           </Badge>
                         )}
