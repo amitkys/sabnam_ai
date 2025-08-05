@@ -1,13 +1,11 @@
 "use client"
 
-import { TrendingUp } from "lucide-react"
+import { useState, useMemo } from "react"
 import { Bar, BarChart, CartesianGrid, XAxis } from "recharts"
 
 import {
   Card,
   CardContent,
-  CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
@@ -18,101 +16,146 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart"
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "../ui/select"
-
-export const description = "A bar chart"
-
-const chartData = [
-  { month: "January", desktop: 186 },
-  { month: "February", desktop: 305 },
-  { month: "March", desktop: 237 },
-  { month: "April", desktop: 73 },
-  { month: "May", desktop: 209 },
-  { month: "June", desktop: 214 },
-  { month: "March", desktop: 237 },
-  { month: "March", desktop: 237 },
-  { month: "April", desktop: 73 },
-  { month: "May", desktop: 209 },
-  { month: "June", desktop: 214 },
-  { month: "April", desktop: 73 },
-  { month: "May", desktop: 209 },
-  { month: "June", desktop: 214 },
-  { month: "March", desktop: 237 },
-  { month: "March", desktop: 237 },
-  { month: "March", desktop: 237 },
-  { month: "April", desktop: 73 },
-  { month: "May", desktop: 209 },
-  { month: "June", desktop: 214 },
-  { month: "April", desktop: 73 },
-  { month: "May", desktop: 209 },
-  { month: "June", desktop: 214 },
-  { month: "April", desktop: 73 },
-  { month: "May", desktop: 209 },
-  { month: "June", desktop: 214 },
-  { month: "March", desktop: 237 },
-  { month: "March", desktop: 237 },
-  { month: "April", desktop: 73 },
-  { month: "May", desktop: 209 },
-  { month: "May", desktop: 209 },
-]
+import { Button } from "@/components/ui/button"
+import { getChartData } from "@/utils/testingApi"
+import { Loader } from "../ui/loader"
+import { Spinner } from "../custom/spinner"
 
 const chartConfig = {
-  desktop: {
-    label: "Desktop",
+  totalAttempts: {
+    label: "Attempts",
     color: "hsl(var(--chart-5))",
+  },
+  zeroBase: {
+    label: "No Attempts",
+    color: "hsl(var(--chart-3))",
   },
 } satisfies ChartConfig
 
-export default function DashboardChart() {
+export default function DashboardChart({ userCreationDate }: { userCreationDate: Date }) {
+  const currentYear = new Date().getFullYear();
+  const creationYear = userCreationDate.getFullYear();
+
+  const years = Array.from(
+    { length: currentYear - creationYear + 1 },
+    (_, i) => creationYear + i
+  );
+
+  const [selectedYear, setSelectedYear] = useState<number>(currentYear);
+
+  const { chartData, error, isLoading } = getChartData(selectedYear.toString());
+
+  const { processedChartData, hasAnyAttempts, maxAttempts } = useMemo(() => {
+    if (!chartData) return { processedChartData: [], hasAnyAttempts: false, maxAttempts: 0 };
+
+    const maxAttempts = Math.max(...chartData.map(item => item.totalAttempts));
+    const hasAnyAttempts = maxAttempts > 0;
+
+    const processedData = chartData.map(item => ({
+      ...item,
+      // For zero attempts, show a small fixed bar (5% of max or minimum 1)
+      zeroBase: item.totalAttempts === 0 ? (hasAnyAttempts ? Math.max(maxAttempts * 0.05, 1) : 1) : 0,
+    }));
+
+    return { processedChartData: processedData, hasAnyAttempts, maxAttempts };
+  }, [chartData]);
+
+  if (isLoading) {
+    return (
+      <Card className="h-96 flex items-center justify-center">
+        <div className="flex items-center gap-2">
+          <div>Loading</div>
+          <Loader size="sm" />
+        </div>
+      </Card>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card className="h-96 flex items-center justify-center">
+        <div className="text-red-500">Error: {error.message}</div>
+      </Card>
+    );
+  }
+
+  // Show message when no attempts found in entire year
+  if (!hasAnyAttempts) {
+    return (
+      <Card className="h-96 flex flex-col">
+        <CardHeader className="pb-2">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between">
+            <CardTitle className="mb-2 md:mb-0">Test attempt history</CardTitle>
+            <div className="flex items-center gap-2">
+              <Select
+                value={selectedYear.toString()}
+                onValueChange={(value) => setSelectedYear(parseInt(value, 10))}
+              >
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Select Year" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectLabel>Years</SelectLabel>
+                    {years.map((year) => (
+                      <SelectItem key={year} value={year.toString()}>
+                        {year}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="flex-1 min-h-0 flex flex-col items-center justify-center">
+          <div className="text-center space-y-4">
+            <div className="text-muted-foreground">
+              <h3 className="text-lg font-medium mb-2">No test attempts in {selectedYear}</h3>
+              <p className="text-sm">Start taking tests to see your progress here.</p>
+            </div>
+            <Button
+              onClick={() => window.location.href = '/home'}
+              className="mt-4"
+            >
+              Take Your First Test
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card className="h-96 flex flex-col">
       <CardHeader className="pb-2">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between">
           <CardTitle className="mb-2 md:mb-0">Test attempt history</CardTitle>
           <div className="flex items-center gap-2">
-            <Select>
+            <Select
+              value={selectedYear.toString()}
+              onValueChange={(value) => setSelectedYear(parseInt(value, 10))}
+            >
               <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Years" />
+                <SelectValue placeholder="Select Year" />
               </SelectTrigger>
               <SelectContent>
                 <SelectGroup>
                   <SelectLabel>Years</SelectLabel>
-                  <SelectItem value="2022">2022</SelectItem>
-                  <SelectItem value="2023">2023</SelectItem>
-                  <SelectItem value="2024">2024</SelectItem>
-                  <SelectItem value="2025">2025</SelectItem>
-                  <SelectItem value="2026">2026</SelectItem>
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-            <Select>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Months" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  <SelectLabel>Months</SelectLabel>
-                  <SelectItem value="January">January</SelectItem>
-                  <SelectItem value="February">February</SelectItem>
-                  <SelectItem value="March">March</SelectItem>
-                  <SelectItem value="April">April</SelectItem>
-                  <SelectItem value="May">May</SelectItem>
-                  <SelectItem value="June">June</SelectItem>
-                  <SelectItem value="July">July</SelectItem>
-                  <SelectItem value="August">August</SelectItem>
-                  <SelectItem value="September">September</SelectItem>
-                  <SelectItem value="October">October</SelectItem>
-                  <SelectItem value="November">November</SelectItem>
-                  <SelectItem value="December">December</SelectItem>
+                  {years.map((year) => (
+                    <SelectItem key={year} value={year.toString()}>
+                      {year}
+                    </SelectItem>
+                  ))}
                 </SelectGroup>
               </SelectContent>
             </Select>
           </div>
-
         </div>
       </CardHeader>
       <CardContent className="flex-1 min-h-0">
         <ChartContainer config={chartConfig} className="h-full w-full">
-          <BarChart accessibilityLayer data={chartData} height={120}>
+          <BarChart accessibilityLayer data={processedChartData} height={120}>
             <CartesianGrid vertical={false} />
             <XAxis
               dataKey="month"
@@ -123,9 +166,40 @@ export default function DashboardChart() {
             />
             <ChartTooltip
               cursor={false}
-              content={<ChartTooltipContent hideLabel />}
+              content={({ active, payload, label }) => {
+                if (!active || !payload || payload.length === 0) return null;
+
+                const data = payload[0].payload;
+                const hasAttempts = data.totalAttempts > 0;
+
+                return (
+                  <div className="rounded-lg border bg-background px-2 py-1 shadow-sm">
+                    <p className="font-medium">{label}</p>
+                    {hasAttempts ? (
+                      <p className="text-sm">
+                        {`${chartConfig.totalAttempts.label}: ${data.totalAttempts}`}
+                      </p>
+                    ) : (
+                      <p className="text-sm text-muted-foreground">
+                        {chartConfig.zeroBase.label}
+                      </p>
+                    )}
+                  </div>
+                );
+              }}
             />
-            <Bar dataKey="desktop" fill="hsl(var(--chart-5))" radius={8} />
+            <Bar
+              dataKey="totalAttempts"
+              fill="var(--color-totalAttempts)"
+              radius={8}
+              stackId="a"
+            />
+            <Bar
+              dataKey="zeroBase"
+              fill="var(--color-zeroBase)"
+              radius={8}
+              stackId="a"
+            />
           </BarChart>
         </ChartContainer>
       </CardContent>

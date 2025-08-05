@@ -483,3 +483,17 @@ export async function deleteAttempt(testAttemptId: string) {
     return { success: false, error: "Failed to delete test attempt" };
   }
 }
+
+export async function getUserCreationDate() {
+  const user = await GetServerSessionHere();
+  const creationDate = await prisma.user.findUnique({
+    where: {
+      id: user.user.id,
+    },
+    select: {
+      createdAt: true,
+    },
+  });
+
+  return creationDate?.createdAt;
+}
