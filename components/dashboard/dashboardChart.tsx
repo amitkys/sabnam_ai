@@ -19,16 +19,11 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrig
 import { Button } from "@/components/ui/button"
 import { getChartData } from "@/utils/testingApi"
 import { Loader } from "../ui/loader"
-import { Spinner } from "../custom/spinner"
 
 const chartConfig = {
   totalAttempts: {
     label: "Attempts",
     color: "hsl(var(--chart-5))",
-  },
-  zeroBase: {
-    label: "No Attempts",
-    color: "hsl(var(--chart-3))",
   },
 } satisfies ChartConfig
 
@@ -45,19 +40,16 @@ export default function DashboardChart({ userCreationDate }: { userCreationDate:
 
   const { chartData, error, isLoading } = getChartData(selectedYear.toString());
 
-  const { processedChartData, hasAnyAttempts, maxAttempts } = useMemo(() => {
-    if (!chartData) return { processedChartData: [], hasAnyAttempts: false, maxAttempts: 0 };
+  const { processedChartData, hasAnyAttempts } = useMemo(() => {
+    if (!chartData) return { processedChartData: [], hasAnyAttempts: false };
 
     const maxAttempts = Math.max(...chartData.map(item => item.totalAttempts));
     const hasAnyAttempts = maxAttempts > 0;
 
-    const processedData = chartData.map(item => ({
-      ...item,
-      // For zero attempts, show a small fixed bar (5% of max or minimum 1)
-      zeroBase: item.totalAttempts === 0 ? (hasAnyAttempts ? Math.max(maxAttempts * 0.05, 1) : 1) : 0,
-    }));
+    // No processing needed - just use the data as is
+    const processedData = chartData;
 
-    return { processedChartData: processedData, hasAnyAttempts, maxAttempts };
+    return { processedChartData: processedData, hasAnyAttempts };
   }, [chartData]);
 
   if (isLoading) {
@@ -65,7 +57,7 @@ export default function DashboardChart({ userCreationDate }: { userCreationDate:
       <Card className="h-96 flex items-center justify-center">
         <div className="flex items-center gap-2">
           <Loader size="sm" />
-          <div>Loading..</div>
+          <div>Loading chart..</div>
         </div>
       </Card>
     );
@@ -75,7 +67,7 @@ export default function DashboardChart({ userCreationDate }: { userCreationDate:
     return (
       <Card className="h-96 flex items-center justify-center">
         <div className="text-center space-y-4">
-          <div className="text-red-500 text-sm">
+          <div className="text-red-500 text-sm font-bold">
             Error loading chart
           </div>
           <Button
@@ -95,28 +87,26 @@ export default function DashboardChart({ userCreationDate }: { userCreationDate:
     return (
       <Card className="h-96 flex flex-col">
         <CardHeader className="pb-2">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-            <CardTitle className="mb-2 md:mb-0">Test attempt history</CardTitle>
-            <div className="flex items-center gap-2">
-              <Select
-                value={selectedYear.toString()}
-                onValueChange={(value) => setSelectedYear(parseInt(value, 10))}
-              >
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Select Year" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectLabel>Years</SelectLabel>
-                    {years.map((year) => (
-                      <SelectItem key={year} value={year.toString()}>
-                        {year}
-                      </SelectItem>
-                    ))}
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-            </div>
+          <div className="flex items-start justify-between gap-2 sm:items-center">
+            <CardTitle className="text-lg sm:text-xl flex-shrink-0">Test attempt history</CardTitle>
+            <Select
+              value={selectedYear.toString()}
+              onValueChange={(value) => setSelectedYear(parseInt(value, 10))}
+            >
+              <SelectTrigger className="w-[120px] sm:w-[180px] flex-shrink-0">
+                <SelectValue placeholder="Select Year" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectLabel>Years</SelectLabel>
+                  {years.map((year) => (
+                    <SelectItem key={year} value={year.toString()}>
+                      {year}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
           </div>
         </CardHeader>
         <CardContent className="flex-1 min-h-0 flex flex-col items-center justify-center">
@@ -140,31 +130,29 @@ export default function DashboardChart({ userCreationDate }: { userCreationDate:
   return (
     <Card className="h-96 flex flex-col">
       <CardHeader className="pb-2">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-          <CardTitle className="mb-2 md:mb-0">Test attempt history</CardTitle>
-          <div className="flex items-center gap-2">
-            <Select
-              value={selectedYear.toString()}
-              onValueChange={(value) => setSelectedYear(parseInt(value, 10))}
-            >
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Select Year" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  <SelectLabel>Years</SelectLabel>
-                  {years.map((year) => (
-                    <SelectItem key={year} value={year.toString()}>
-                      {year}
-                    </SelectItem>
-                  ))}
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-          </div>
+        <div className="flex items-start justify-between gap-2 sm:items-center">
+          <CardTitle className="text-lg sm:text-xl flex-shrink-0">Test attempt history</CardTitle>
+          <Select
+            value={selectedYear.toString()}
+            onValueChange={(value) => setSelectedYear(parseInt(value, 10))}
+          >
+            <SelectTrigger className="w-[120px] sm:w-[180px] flex-shrink-0">
+              <SelectValue placeholder="Select Year" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectLabel>Years</SelectLabel>
+                {years.map((year) => (
+                  <SelectItem key={year} value={year.toString()}>
+                    {year}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
         </div>
       </CardHeader>
-      <CardContent className="flex-1 min-h-0">
+      <CardContent className="px-2 md:px-6 flex-1 min-h-0">
         <ChartContainer config={chartConfig} className="h-full w-full">
           <BarChart accessibilityLayer data={processedChartData} height={120}>
             <CartesianGrid vertical={false} />
@@ -192,7 +180,7 @@ export default function DashboardChart({ userCreationDate }: { userCreationDate:
                       </p>
                     ) : (
                       <p className="text-sm text-muted-foreground">
-                        {chartConfig.zeroBase.label}
+                        No Attempts
                       </p>
                     )}
                   </div>
@@ -203,13 +191,6 @@ export default function DashboardChart({ userCreationDate }: { userCreationDate:
               dataKey="totalAttempts"
               fill="var(--color-totalAttempts)"
               radius={8}
-              stackId="a"
-            />
-            <Bar
-              dataKey="zeroBase"
-              fill="var(--color-zeroBase)"
-              radius={8}
-              stackId="a"
             />
           </BarChart>
         </ChartContainer>

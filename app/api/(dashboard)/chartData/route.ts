@@ -19,9 +19,11 @@ export async function GET(request: Request) {
     const year = parseInt(searchParams.get('year') || new Date().getFullYear().toString());
     
     const user = await GetServerSessionHere();
-    if (!user) {
+    if (!user?.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    console.log(user);
 
     // Get the first and last day of the selected year
     const startDate = new Date(year, 0, 1);
@@ -30,7 +32,7 @@ export async function GET(request: Request) {
     // Get test attempts for the user in the selected year, grouped by month
     const attempts = await prisma.testAttempt.findMany({
       where: {
-        userId: user.id,
+        userId: user.user.id,
         startedAt: {
           gte: startDate,
           lte: endDate,

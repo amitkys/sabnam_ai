@@ -247,49 +247,40 @@ export default function DashBoardTable() {
 
   return (
     <Card className="w-full">
-      <CardHeader>
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <CardTitle className="text-2xl">Test Results</CardTitle>
-          </div>
-          {/* test controls */}
-          <div className="flex items-center gap-2 text-sm">
-            <div className="flex flex-col sm:flex-row-reverse gap-4">
-              <div className="flex items-center gap-2">
-                <Select value={filterby} onValueChange={handleFilterChange}>
-                  <SelectTrigger className="w-[200px]">
-                    <SelectValue placeholder="Filter by..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      <SelectItem value="recent">
-                        <div className="flex items-center gap-2">
-                          <Clock className="h-4 w-4" />
-                          Most Recent
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="highestScore">
-                        <div className="flex items-center gap-2">
-                          <ArrowUp className="h-4 w-4" />
-                          Highest Score
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="lowestScore">
-                        <div className="flex items-center gap-2">
-                          <ArrowDown className="h-4 w-4" />
-                          Lowest Score
-                        </div>
-                      </SelectItem>
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-          </div>
+      <CardHeader className="pb-3">
+        <div className="flex items-start justify-between gap-2 sm:items-center">
+          <CardTitle className="text-lg sm:text-xl flex-shrink-0">Test Results</CardTitle>
+          <Select value={filterby} onValueChange={handleFilterChange}>
+            <SelectTrigger className="w-[160px] sm:w-[180px] flex-shrink-0">
+              <SelectValue placeholder="Filter by..." />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectItem value="recent">
+                  <div className="flex items-center gap-2">
+                    <Clock className="h-4 w-4" />
+                    Most Recent
+                  </div>
+                </SelectItem>
+                <SelectItem value="highestScore">
+                  <div className="flex items-center gap-2">
+                    <ArrowUp className="h-4 w-4" />
+                    Highest Score
+                  </div>
+                </SelectItem>
+                <SelectItem value="lowestScore">
+                  <div className="flex items-center gap-2">
+                    <ArrowDown className="h-4 w-4" />
+                    Lowest Score
+                  </div>
+                </SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-6 px-2 md:px-6">
         {/* Table Section */}
         <div className="border rounded-lg overflow-hidden">
           <div className="overflow-x-auto">
