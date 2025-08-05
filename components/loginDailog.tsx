@@ -1,30 +1,26 @@
 "use client";
-import { Button } from "@/components/ui/button";
+import { signIn } from "next-auth/react";
+import { useState, useEffect } from "react";
+import { FaGoogle } from "react-icons/fa";
+import { useSearchParams } from "next/navigation";
+
+import { Loader } from "@/components/ui/loader";
+import { useAuthStore } from "@/lib/store/auth-store";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogClose,
 } from "@/components/ui/dialog";
-import { useAuthStore } from "@/lib/store/auth-store";
-import { signIn } from "next-auth/react";
-import { useState, useEffect } from "react";
-import { Loader } from "@/components/ui/loader";
-import { FaGoogle } from "react-icons/fa";
-import { toast } from "sonner";
-import { useSearchParams } from "next/navigation";
+import { Button } from "@/components/ui/button";
 
 interface LoginDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-export default function LoginDialog({
-  open,
-  onOpenChange,
-}: LoginDialogProps) {
+export default function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
   const [loading, setLoading] = useState(false);
   const { setRedirectUrl } = useAuthStore();
   const searchParams = useSearchParams();
@@ -32,6 +28,7 @@ export default function LoginDialog({
   // Get callback URL from query parameters (set by middleware)
   useEffect(() => {
     const callbackUrl = searchParams.get("callbackUrl");
+
     if (callbackUrl) {
       setRedirectUrl(callbackUrl);
     }
@@ -41,9 +38,11 @@ export default function LoginDialog({
     try {
       setLoading(true);
       // Store the current URL before redirecting to login
-      if (typeof window !== 'undefined') {
+      if (typeof window !== "undefined") {
         const callbackUrl = searchParams.get("callbackUrl");
-        const redirectTo = callbackUrl || window.location.pathname + window.location.search;
+        const redirectTo =
+          callbackUrl || window.location.pathname + window.location.search;
+
         setRedirectUrl(redirectTo);
       }
       await signIn("google");
@@ -55,9 +54,11 @@ export default function LoginDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="">
+      <DialogContent>
         <DialogHeader>
-          <DialogTitle className="text-center sm:text-left">Login to Continue</DialogTitle>
+          <DialogTitle className="text-center sm:text-left">
+            Login to Continue
+          </DialogTitle>
           <DialogDescription className="text-center sm:text-left">
             You will be redirected back here after login.
           </DialogDescription>
@@ -65,8 +66,8 @@ export default function LoginDialog({
         <div className="flex flex-col space-y-4 pt-4">
           <Button
             className="w-full flex items-center justify-center space-x-2"
-            onClick={handleGoogleSignIn}
             disabled={loading}
+            onClick={handleGoogleSignIn}
           >
             {loading ? (
               <span className="flex items-center space-x-2">
@@ -80,7 +81,6 @@ export default function LoginDialog({
               </>
             )}
           </Button>
-          <DialogClose />
         </div>
       </DialogContent>
     </Dialog>
