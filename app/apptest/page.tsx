@@ -1,7 +1,7 @@
 export default function Page() {
   return (
-    <div className="min-h-screen bg-background p-8">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-[calc(100vh_-_56px)] flex items-center justify-center bg-red-500">
+      <div className="">
         Hello World
       </div>
     </div>

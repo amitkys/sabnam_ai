@@ -1,9 +1,15 @@
-"use client";
+import { ContentLayout } from "@/components/admin-panel/content-layout";
+import { Loader } from "@/components/ui/loader";
 
 export default function Loading() {
   return (
-    <div className="bg-card min-h-screen flex items-center justify-center">
-      <p className="tracking-wider">Loading...</p>
-    </div>
-  );
+    <ContentLayout title="Dashboard">
+      <div className="min-h-[calc(100vh_-_80px)] flex items-center justify-center">
+        <div className="flex items-center gap-2">
+          <Loader size="sm" />
+          <span>Loading..</span>
+        </div>
+      </div>
+    </ContentLayout>
+  )
 }

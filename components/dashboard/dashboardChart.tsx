@@ -64,8 +64,8 @@ export default function DashboardChart({ userCreationDate }: { userCreationDate:
     return (
       <Card className="h-96 flex items-center justify-center">
         <div className="flex items-center gap-2">
-          <div>Loading</div>
           <Loader size="sm" />
+          <div>Loading..</div>
         </div>
       </Card>
     );
@@ -74,7 +74,18 @@ export default function DashboardChart({ userCreationDate }: { userCreationDate:
   if (error) {
     return (
       <Card className="h-96 flex items-center justify-center">
-        <div className="text-red-500">Error: {error.message}</div>
+        <div className="text-center space-y-4">
+          <div className="text-red-500 text-sm">
+            Error loading chart
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => window.location.reload()}
+          >
+            Try Again
+          </Button>
+        </div>
       </Card>
     );
   }

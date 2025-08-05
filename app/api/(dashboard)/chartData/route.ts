@@ -61,7 +61,7 @@ export async function GET(request: Request) {
       .sort((a, b) => a.monthIndex - b.monthIndex)
       .map(({ monthIndex, ...rest }) => rest);
 
-    return NextResponse.json(result);
+    return NextResponse.json(result, {status: 200});
   } catch (error) {
     console.error("Error fetching test attempts data:", error);
     return NextResponse.json(
