@@ -4,14 +4,8 @@ import DashboardChart from "@/components/dashboard/dashboardChart";
 import { getUserCreationDate } from "@/lib/actions";
 import { GetServerSessionHere } from "@/auth.config";
 
-export const description = "A bar chart"
-
 export default async function Page() {
   const userCreationDate = await getUserCreationDate();
-  const user = await GetServerSessionHere()
-  if (!user) {
-    window.location.href = "/login";
-  }
   console.log(userCreationDate);
   return (
     <ContentLayout title="Dashboard">
