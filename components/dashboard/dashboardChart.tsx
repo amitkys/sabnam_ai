@@ -1,39 +1,46 @@
-"use client"
+"use client";
 
-import { useState, useMemo } from "react"
-import { Bar, BarChart, CartesianGrid, XAxis } from "recharts"
+import { useState, useMemo } from "react";
+import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
 
 import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
+import { Loader } from "../ui/loader";
+
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   ChartConfig,
   ChartContainer,
   ChartTooltip,
-  ChartTooltipContent,
-} from "@/components/ui/chart"
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "../ui/select"
-import { Button } from "@/components/ui/button"
-import { getChartData } from "@/utils/testingApi"
-import { Loader } from "../ui/loader"
+} from "@/components/ui/chart";
+import { Button } from "@/components/ui/button";
+import { getChartData } from "@/utils/testingApi";
 
 const chartConfig = {
   totalAttempts: {
     label: "Attempts",
     color: "hsl(var(--chart-5))",
   },
-} satisfies ChartConfig
+} satisfies ChartConfig;
 
-export default function DashboardChart({ userCreationDate }: { userCreationDate: Date }) {
+export default function DashboardChart({
+  userCreationDate,
+}: {
+  userCreationDate: Date;
+}) {
   const currentYear = new Date().getFullYear();
   const creationYear = userCreationDate.getFullYear();
 
   const years = Array.from(
     { length: currentYear - creationYear + 1 },
-    (_, i) => creationYear + i
+    (_, i) => creationYear + i,
   );
 
   const [selectedYear, setSelectedYear] = useState<number>(currentYear);
@@ -43,7 +50,9 @@ export default function DashboardChart({ userCreationDate }: { userCreationDate:
   const { processedChartData, hasAnyAttempts } = useMemo(() => {
     if (!chartData) return { processedChartData: [], hasAnyAttempts: false };
 
-    const maxAttempts = Math.max(...chartData.map(item => item.totalAttempts));
+    const maxAttempts = Math.max(
+      ...chartData.map((item) => item.totalAttempts),
+    );
     const hasAnyAttempts = maxAttempts > 0;
 
     // No processing needed - just use the data as is
@@ -71,8 +80,8 @@ export default function DashboardChart({ userCreationDate }: { userCreationDate:
             Error loading chart
           </div>
           <Button
-            variant="outline"
             size="sm"
+            variant="outline"
             onClick={() => window.location.reload()}
           >
             Try Again
@@ -88,7 +97,9 @@ export default function DashboardChart({ userCreationDate }: { userCreationDate:
       <Card className="h-96 flex flex-col">
         <CardHeader className="pb-2">
           <div className="flex items-start justify-between gap-2 sm:items-center">
-            <CardTitle className="text-lg sm:text-xl flex-shrink-0">Test attempt history</CardTitle>
+            <CardTitle className="text-lg sm:text-xl flex-shrink-0">
+              Test attempt history
+            </CardTitle>
             <Select
               value={selectedYear.toString()}
               onValueChange={(value) => setSelectedYear(parseInt(value, 10))}
@@ -112,12 +123,16 @@ export default function DashboardChart({ userCreationDate }: { userCreationDate:
         <CardContent className="flex-1 min-h-0 flex flex-col items-center justify-center">
           <div className="text-center space-y-4">
             <div className="text-muted-foreground">
-              <h3 className="text-lg font-medium mb-2">No test attempts in {selectedYear}</h3>
-              <p className="text-sm">Start taking tests to see your progress here.</p>
+              <h3 className="text-lg font-medium mb-2">
+                No test attempts in {selectedYear}
+              </h3>
+              <p className="text-sm">
+                Start taking tests to see your progress here.
+              </p>
             </div>
             <Button
-              onClick={() => window.location.href = '/home'}
               className="mt-4"
+              onClick={() => (window.location.href = "/home")}
             >
               Take Your First Test
             </Button>
@@ -131,7 +146,9 @@ export default function DashboardChart({ userCreationDate }: { userCreationDate:
     <Card className="h-96 flex flex-col">
       <CardHeader className="pb-2">
         <div className="flex items-start justify-between gap-2 sm:items-center">
-          <CardTitle className="text-lg sm:text-xl flex-shrink-0">Test attempt history</CardTitle>
+          <CardTitle className="text-lg sm:text-xl flex-shrink-0">
+            Test attempt history
+          </CardTitle>
           <Select
             value={selectedYear.toString()}
             onValueChange={(value) => setSelectedYear(parseInt(value, 10))}
@@ -153,18 +170,17 @@ export default function DashboardChart({ userCreationDate }: { userCreationDate:
         </div>
       </CardHeader>
       <CardContent className="px-2 md:px-6 flex-1 min-h-0">
-        <ChartContainer config={chartConfig} className="h-full w-full">
+        <ChartContainer className="h-full w-full" config={chartConfig}>
           <BarChart accessibilityLayer data={processedChartData} height={120}>
             <CartesianGrid vertical={false} />
             <XAxis
+              axisLine={false}
               dataKey="month"
+              tickFormatter={(value) => value.slice(0, 3)}
               tickLine={false}
               tickMargin={10}
-              axisLine={false}
-              tickFormatter={(value) => value.slice(0, 3)}
             />
             <ChartTooltip
-              cursor={false}
               content={({ active, payload, label }) => {
                 if (!active || !payload || payload.length === 0) return null;
 
@@ -186,6 +202,7 @@ export default function DashboardChart({ userCreationDate }: { userCreationDate:
                   </div>
                 );
               }}
+              cursor={false}
             />
             <Bar
               dataKey="totalAttempts"
@@ -196,5 +213,5 @@ export default function DashboardChart({ userCreationDate }: { userCreationDate:
         </ChartContainer>
       </CardContent>
     </Card>
-  )
+  );
 }

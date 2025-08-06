@@ -319,3 +319,21 @@ export interface IMainTestSeriesResponse {
     level: string;
   }[];
 }
+
+export interface ITestAttemptHistory {
+  id: string;
+  score: number | null;
+  startedAt: Date;
+  completedAt: Date | null;
+  testSeries: {
+    title: string;
+    duration: number;
+    level: string;
+  };
+}
+
+export interface ITestAttemptHistoryResponse {
+  success: boolean;
+  testAttemptHistory: ITestAttemptHistory[];
+  count: number;
+}

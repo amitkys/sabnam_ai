@@ -1,25 +1,15 @@
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+"use client";
+
+import { ShowLoading } from "@/components/showLoading";
+import { useTestHistory } from "@/lib/store/test-history-Store";
+
 export default function Page() {
+  const history = useTestHistory((state) => state.history);
+
   return (
-    <Dialog>
-      <DialogTrigger>Open</DialogTrigger>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Are you absolutely sure?</DialogTitle>
-          <DialogDescription>
-            This action cannot be undone. This will permanently delete your
-            account and remove your data from our servers.
-          </DialogDescription>
-        </DialogHeader>
-      </DialogContent>
-    </Dialog>
+    <div>
+      <ShowLoading loadingSize="sm" text="Loading history..." />
+    </div>
   );
 }
 

@@ -4,9 +4,11 @@ import { useRouter } from "@bprogress/next/app";
 import { useState, useCallback } from "react";
 import { toast } from "sonner";
 
-import LoginDialog from "../loginDailog";
+import { TestHistoryDrawer } from "./TestHistoryDrawer";
+import { TestSeriesCardContent } from "./TestSeriesCardContent";
+import { TestSeriesCardActions } from "./TestSeriesCardAction";
 
-import { Loader } from "@/components/ui/loader";
+import LoginDialog from "@/components/loginDailog";
 import { TestSeriesResponse } from "@/lib/type";
 import {
   Card,
@@ -16,9 +18,9 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { getTestAttemptId } from "@/lib/actions";
 import { useAuthStore } from "@/lib/store/auth-store";
+import { useTestHistory } from "@/lib/store/test-history-Store";
 import { getBadgeLabel, getBadgeVariant } from "@/utils/utils";
 
 export const TestSeriesCard = ({
@@ -28,9 +30,10 @@ export const TestSeriesCard = ({
 }) => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-
   const { isAuthenticated } = useAuthStore();
   const [showLoginDialog, setShowLoginDialog] = useState(false);
+  const { isDrawerOpen, setIsDrawerOpen, history, isLoading, error } =
+    useTestHistory();
 
   const handleNavigation = useCallback(async () => {
     if (!isAuthenticated) {
@@ -38,25 +41,30 @@ export const TestSeriesCard = ({
 
       return;
     }
+
     try {
       setLoading(true);
-
       const testAttemptId = await getTestAttemptId(testSeries.id);
 
-      toast.promise(
-        Promise.resolve(), // Empty promise since we already have the result
-        {
-          loading: "A new test on the way...",
-          success: "Test starting...",
-          error: "Failed to create test attempt",
-        },
-      );
+      toast.promise(Promise.resolve(), {
+        loading: "A new test on the way...",
+        success: "Test starting...",
+        error: "Failed to create test attempt",
+      });
+
       router.push(`/test/${testSeries.id}/${testAttemptId}`);
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error: any) {
-      toast.error("Failed to create test attempt");
+      toast.error("Failed to create test attempt", error);
+    } finally {
+      setLoading(false);
     }
-  }, [testSeries.id, router]);
+  }, [testSeries.id, router, isAuthenticated]);
+
+  const formattedTitle = testSeries.title
+    .split(" ")
+    .slice(2)
+    .join(" ")
+    .replace("series", "Test Series");
 
   return (
     <>
@@ -68,48 +76,37 @@ export const TestSeriesCard = ({
           >
             {getBadgeLabel(testSeries.level)}
           </Badge>
-          <CardTitle className="text-lg capitalize">
-            {testSeries.title
-              .split(" ")
-              .slice(2)
-              .join(" ")
-              .replace("series", "Test Series")}
-          </CardTitle>
+          <CardTitle className="text-lg capitalize">{formattedTitle}</CardTitle>
         </CardHeader>
+
         <CardContent>
-          {/* <p className="text-sm text-muted-foreground">
-            Duration: {formatDuration(testSeries.duration)}
-          </p> */}
-          <p className="text-sm text-muted-foreground">
-            Questions: {testSeries.totalQuestions}
-          </p>
-          {testSeries.hasAttempted && (
-            <p className="text-sm text-muted-foreground">
-              Last Score: {testSeries.lastScore}
-            </p>
-          )}
+          <TestSeriesCardContent
+            hasAttempted={testSeries.hasAttempted}
+            lastScore={testSeries.lastScore}
+            testSeriesId={testSeries.id}
+            totalQuestions={testSeries.totalQuestions}
+          />
         </CardContent>
+
         <CardFooter>
-          <Button
-            className="max-w-7xl w-full"
-            disabled={loading}
-            // variant={testSeries.hasAttempted ? "outline" : "default"}
-            onClick={handleNavigation}
-          >
-            {loading ? (
-              <div className="flex items-center justify-center">
-                <Loader size="small" variant="spin" />
-              </div>
-            ) : testSeries.hasAttempted ? (
-              "Retake Test"
-            ) : (
-              "Start Test"
-            )}
-          </Button>
+          <TestSeriesCardActions
+            hasAttempted={testSeries.hasAttempted}
+            loading={loading}
+            onStartTest={handleNavigation}
+          />
         </CardFooter>
       </Card>
 
-      {/* Move LoginDialog outside the Card, at the same level */}
+      <TestHistoryDrawer
+        error={error}
+        history={history}
+        isLoading={isLoading}
+        open={isDrawerOpen}
+        testSeriesId={testSeries.id}
+        testSeriesTitle={testSeries.title}
+        onOpenChange={setIsDrawerOpen}
+      />
+
       <LoginDialog open={showLoginDialog} onOpenChange={setShowLoginDialog} />
     </>
   );

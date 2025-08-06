@@ -1,0 +1,94 @@
+import { useEffect, useState } from "react";
+import useSWR from "swr";
+
+import { ShowLoading } from "@/components/showLoading";
+import { useTestHistory } from "@/lib/store/test-history-Store";
+import { ITestAttemptHistoryResponse } from "@/lib/type";
+import { fetcher } from "@/utils/fetcher";
+
+interface TestSeriesCardContentProps {
+  totalQuestions: number;
+  hasAttempted: boolean;
+  lastScore?: number | null;
+  testSeriesId: string;
+}
+
+export const TestSeriesCardContent = ({
+  totalQuestions,
+  hasAttempted,
+  lastScore,
+  testSeriesId,
+}: TestSeriesCardContentProps) => {
+  const [shouldFetch, setShouldFetch] = useState(false);
+  const { setHistory, setIsDrawerOpen, setLoading, setError } =
+    useTestHistory();
+
+  const {
+    data: testHistory,
+    error,
+    isLoading,
+  } = useSWR<ITestAttemptHistoryResponse>(
+    shouldFetch && testSeriesId ? `/api/testhistory/${testSeriesId}` : null,
+    fetcher,
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+    },
+  );
+
+  useEffect(() => {
+    setLoading(isLoading);
+  }, [isLoading, setLoading]);
+
+  useEffect(() => {
+    if (error) {
+      setError(error.message || "Failed to load test history");
+    } else {
+      setError(null);
+    }
+  }, [error, setError]);
+
+  useEffect(() => {
+    if (testHistory) {
+      setHistory(testHistory);
+      setIsDrawerOpen(true);
+      setShouldFetch(false);
+    }
+  }, [testHistory, setHistory, setIsDrawerOpen]);
+
+  const handleViewHistory = () => {
+    if (!isLoading) {
+      setShouldFetch(true);
+    }
+  };
+
+  return (
+    <>
+      <p className="text-sm text-muted-foreground">
+        Questions: {totalQuestions}
+      </p>
+
+      {hasAttempted ? (
+        <div className="flex items-center gap-6">
+          <p className="text-sm text-muted-foreground">
+            Last Score: {lastScore}
+          </p>
+
+          <button
+            className="text-sm text-muted-foreground hover:text-primary transition-colors underline disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
+            disabled={isLoading}
+            onClick={handleViewHistory}
+          >
+            {isLoading ? (
+              <ShowLoading loadingSize="sm" text="Loading..." />
+            ) : (
+              "View History"
+            )}
+          </button>
+        </div>
+      ) : (
+        <div className="h-5" />
+      )}
+    </>
+  );
+};
