@@ -32,7 +32,7 @@ Solve & Compare my answer with the actual correct answer. If no answer is given 
     const encodedPrompt = encodeURIComponent(promptText);
 
     // Create the ChatGPT URL with the prompt parameter
-    const chatgptUrl = `https://chatgpt.com/?prompt=${encodedPrompt}`;
+    const chatgptUrl = `https://chatgpt.com/?prompt=${encodedPrompt}&intent=web`;
 
     window.open(chatgptUrl, "_blank");
   };
