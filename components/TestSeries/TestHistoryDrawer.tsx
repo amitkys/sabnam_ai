@@ -110,19 +110,44 @@ export const TestHistoryDrawer = ({
         .reverse()
       : [];
 
-  // Calculate stats
-  const scores =
+  // Calculate stats with improved logic
+  const chronologicalHistory =
     history?.testAttemptHistory
-      ?.map((h) => h.score || 0)
-      .filter((score) => score > 0) || [];
+      ?.slice() // Create copy to avoid mutating original
+      .sort(
+        (a, b) =>
+          new Date(a.startedAt).getTime() - new Date(b.startedAt).getTime(),
+      ) || [];
+
+  const scores = chronologicalHistory
+    .map((h) => h.score || 0)
+    .filter((score) => score > 0);
+
   const avgScore =
     scores.length > 0 ? scores.reduce((a, b) => a + b, 0) / scores.length : 0;
   const bestScore = scores.length > 0 ? Math.max(...scores) : 0;
-  const improvementPercent =
-    scores.length > 1
-      ? (((scores[scores.length - 1] - scores[0]) / scores[0]) * 100).toFixed(1)
-      : "0";
 
+  // Method 1: First vs Last (Overall improvement) - COMMENTED
+  // const overallImprovement = scores.length > 1
+  //   ? (((scores[scores.length - 1] - scores[0]) / scores[0]) * 100)
+  //   : 0;
+
+  // Method 2: Previous vs Current (Recent trend) - ACTIVE
+  const recentTrend =
+    scores.length > 1
+      ? ((scores[scores.length - 1] - scores[scores.length - 2]) /
+        scores[scores.length - 2]) *
+      100
+      : 0;
+
+  // Method 3: Average of first half vs second half (More robust) - COMMENTED
+  // const midPoint = Math.floor(scores.length / 2);
+  // const firstHalfAvg = scores.slice(0, midPoint).reduce((a, b) => a + b, 0) / midPoint;
+  // const secondHalfAvg = scores.slice(midPoint).reduce((a, b) => a + b, 0) / (scores.length - midPoint);
+  // const progressiveImprovement = ((secondHalfAvg - firstHalfAvg) / firstHalfAvg) * 100;
+
+  // Use recent trend (previous vs current)
+  const improvementPercent = recentTrend.toFixed(1);
   const isImproving = Number(improvementPercent) > 0;
 
   const handleBarClick = (data: any) => {
@@ -140,6 +165,8 @@ export const TestHistoryDrawer = ({
         loading: "Redirecting to test...",
         success: "Opening test...",
       });
+      reset();
+      onOpenChange(false);
       router.push(`/test/${testSeriesId}/${selectedAttempt.id}`);
     }
   };
@@ -151,35 +178,11 @@ export const TestHistoryDrawer = ({
         loading: "Redirecting to analysis...",
         success: "Opening analysis...",
       });
+      reset();
+      onOpenChange(false);
       router.push(`/analysis/${selectedAttempt.id}`);
     }
   };
-  // const handleDelete = async () => {
-  //   if (selectedAttempt && !loadingAction) {
-  //     setLoadingAction("delete");
-
-  //     // ✅ Clear immediately to prevent double-clicks
-  //     const attemptToDelete = selectedAttempt;
-
-  //     setSelectedAttempt(null);
-
-  //     try {
-  //       await toast.promise(deleteAttempt(attemptToDelete.id), {
-  //         loading: "Deleting test...",
-  //         success: "Test deleted successfully",
-  //         error: "Failed to delete test. Please try again.",
-  //       });
-
-  //       // ✅ Mutate AFTER the promise completes, not inside callback
-  //       mutate(`/api/testhistory/${testSeriesId}`);
-  //     } catch (error) {
-  //       console.error("Delete operation failed:", error);
-  //       mutate(`/api/testhistory/${testSeriesId}`);
-  //     } finally {
-  //       setLoadingAction(null);
-  //     }
-  //   }
-  // };
 
   const handleDelete = async () => {
     if (selectedAttempt && !loadingAction) {
@@ -210,6 +213,8 @@ export const TestHistoryDrawer = ({
       } finally {
         setLoadingAction(null);
         setSelectedAttempt(null);
+        reset();
+        onOpenChange(false);
       }
     }
   };
@@ -358,7 +363,7 @@ export const TestHistoryDrawer = ({
 
                     {/* Action buttons */}
                     <div className="grid grid-cols-3 gap-2">
-                      <Card className="border-0 bg-muted/50">
+                      <Card className="border-0 bg-muted/50 hover:bg-muted/70">
                         <CardContent className="p-3">
                           <Button
                             className="w-full h-auto p-0 bg-transparent hover:bg-transparent text-foreground disabled:opacity-50"
@@ -386,7 +391,7 @@ export const TestHistoryDrawer = ({
                         </CardContent>
                       </Card>
 
-                      <Card className="border-0 bg-muted/50">
+                      <Card className="border-0 bg-muted/50 hover:bg-muted/70">
                         <CardContent className="p-3">
                           <Button
                             className="w-full h-auto p-0 bg-transparent hover:bg-transparent text-foreground disabled:opacity-50"
@@ -414,10 +419,10 @@ export const TestHistoryDrawer = ({
                         </CardContent>
                       </Card>
 
-                      <Card className="border-0 bg-muted/50">
+                      <Card className="border-0 bg-muted/50 hover:bg-muted/70">
                         <CardContent className="p-3">
                           <Button
-                            className="w-full h-auto p-0 bg-transparent hover:bg-red-50 text-foreground hover:text-red-600 disabled:opacity-50 disabled:hover:bg-transparent disabled:hover:text-foreground"
+                            className="w-full h-auto p-0 bg-transparent hover:bg-transparent text-foreground disabled:opacity-50"
                             disabled={isAnyActionLoading}
                             onClick={handleDelete}
                           >
@@ -495,7 +500,7 @@ export const TestHistoryDrawer = ({
                           {improvementPercent}%
                         </div>
                         <div className="text-xs text-muted-foreground">
-                          Change
+                          Trend
                         </div>
                       </CardContent>
                     </Card>
