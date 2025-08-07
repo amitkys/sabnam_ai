@@ -3,6 +3,14 @@
 import { useState } from "react";
 import Link from "next/link";
 import { GoHome } from "react-icons/go";
+import { Share2 } from "lucide-react";
+
+import { TestSeriesDetails } from "./types";
+import { PerformanceStats } from "./PerformanceStats";
+import { PerformanceSummary } from "./PerformanceSummary";
+import { PerformanceChart } from "./PerformanceChart";
+import { QuestionAnalysis } from "./QuestionAnalysis";
+
 import {
   FirstTimeTooltip,
   FirstTimeTooltipProvider,
@@ -17,13 +25,16 @@ import {
   BreadcrumbPage,
 } from "@/components/ui/breadcrumb";
 import { ChartConfig } from "@/components/ui/chart";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import ExplainDrawer from "@/components/explain-drawer";
-
-import { TestSeriesDetails } from "./types";
-import { PerformanceStats } from "./PerformanceStats";
-import { PerformanceSummary } from "./PerformanceSummary";
-import { PerformanceChart } from "./PerformanceChart";
-import { QuestionAnalysis } from "./QuestionAnalysis";
 
 export default function MockTestAnalysis({
   testSeriesDetails,
@@ -56,26 +67,46 @@ export default function MockTestAnalysis({
   );
 }
 
-function Content({ testSeriesDetails }: { testSeriesDetails: TestSeriesDetails }) {
+function Content({
+  testSeriesDetails,
+}: {
+  testSeriesDetails: TestSeriesDetails;
+}) {
   const [isExplainDrawerOpen, setIsExplainDrawerOpen] = useState(false);
+  const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
+  const [isCopied, setIsCopied] = useState(false);
   const [currentQuestion, setCurrentQuestion] = useState<
     TestSeriesDetails["questions"][number] | null
   >(null);
   const [currentUserAnswer, setCurrentUserAnswer] = useState(null);
 
-  const latestAttempt = testSeriesDetails.userAttempts[testSeriesDetails.userAttempts.length - 1];
+  const latestAttempt =
+    testSeriesDetails.userAttempts[testSeriesDetails.userAttempts.length - 1];
   const totalQuestions = testSeriesDetails.questions.length;
   const answeredQuestions = latestAttempt?.answers.length || 0;
-  const correctAnswers = latestAttempt?.answers.filter((a) => a.isCorrect).length || 0;
+  const correctAnswers =
+    latestAttempt?.answers.filter((a) => a.isCorrect).length || 0;
   const incorrectAnswers = answeredQuestions - correctAnswers;
   const unansweredQuestions = totalQuestions - answeredQuestions;
   const percentageCorrect = (correctAnswers / totalQuestions) * 100;
-  const accuracy = answeredQuestions > 0 ? (correctAnswers / answeredQuestions) * 100 : 0;
+  const accuracy =
+    answeredQuestions > 0 ? (correctAnswers / answeredQuestions) * 100 : 0;
+
+  // Generate share URL
+  const shareUrl = `sabnam.amitkys.in/analysis/${latestAttempt?.attemptId}`;
 
   const chartData = [
     { name: "Correct", value: correctAnswers, fill: "var(--color-correct)" },
-    { name: "Incorrect", value: incorrectAnswers, fill: "var(--color-incorrect)" },
-    { name: "Unanswered", value: unansweredQuestions, fill: "var(--color-unanswered)" },
+    {
+      name: "Incorrect",
+      value: incorrectAnswers,
+      fill: "var(--color-incorrect)",
+    },
+    {
+      name: "Unanswered",
+      value: unansweredQuestions,
+      fill: "var(--color-unanswered)",
+    },
   ];
 
   const chartConfig = {
@@ -91,49 +122,110 @@ function Content({ testSeriesDetails }: { testSeriesDetails: TestSeriesDetails }
     setIsExplainDrawerOpen(true);
   };
 
-  const timeTaken = latestAttempt?.startedAt && latestAttempt?.completedAt
-    ? Math.round((new Date(latestAttempt.completedAt).getTime() - new Date(latestAttempt.startedAt).getTime()) / (1000 * 60))
-    : null;
+  const handleCopyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setIsCopied(true);
+      // Reset the copied state after 2 seconds
+      setTimeout(() => setIsCopied(false), 2000);
+    } catch (err) {
+      console.error("Failed to copy: ", err);
+      // Fallback for older browsers
+      const textArea = document.createElement("textarea");
+
+      textArea.value = shareUrl;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textArea);
+      setIsCopied(true);
+      setTimeout(() => setIsCopied(false), 2000);
+    }
+  };
+
+  const timeTaken =
+    latestAttempt?.startedAt && latestAttempt?.completedAt
+      ? Math.round(
+        (new Date(latestAttempt.completedAt).getTime() -
+          new Date(latestAttempt.startedAt).getTime()) /
+        (1000 * 60),
+      )
+      : null;
 
   return (
     <div className="container mx-auto px-4 py-6 space-y-8 max-w-7xl">
       <div className="space-y-2">
-        <h1 className="text-2xl lg:text-3xl font-bold tracking-tight">
-          {testSeriesDetails.title
-            .split(" ")
-            .slice(2)
-            .join(" ")
-            .replace("series", "Test Series")}
-        </h1>
-        <p className="text-muted-foreground">
-          Detailed analysis of your test performance
-        </p>
+        <div className="flex items-center gap-4">
+        <h1 className="text-2xl lg:text-3xl font-bold tracking-tight truncate flex-1 min-w-0">
+            {testSeriesDetails.title
+              .split(" ")
+              .slice(2)
+              .join(" ")
+              .replace("series", "Test Series")}
+          </h1> 
+          <Button
+            className="flex items-center gap-2 font-semibold text-secondary-foreground"
+            size="sm"
+            variant={"secondary"}
+            onClick={() => setIsShareDialogOpen(true)}
+          >
+            <Share2 className="h-4 w-4" />
+            Share
+          </Button>
+        </div>
       </div>
 
       <PerformanceStats
-        correctAnswers={correctAnswers}
-        totalMarks={testSeriesDetails.totalMarks}
         accuracy={accuracy}
         answeredQuestions={answeredQuestions}
-        totalQuestions={totalQuestions}
+        correctAnswers={correctAnswers}
         timeTaken={timeTaken}
+        totalMarks={testSeriesDetails.totalMarks}
+        totalQuestions={totalQuestions}
       />
 
       <div className="grid gap-6 lg:grid-cols-3">
         <PerformanceSummary
-          percentageCorrect={percentageCorrect}
           chartData={chartData}
-          totalQuestions={totalQuestions}
           latestAttempt={latestAttempt}
+          percentageCorrect={percentageCorrect}
+          totalQuestions={totalQuestions}
         />
-        <PerformanceChart chartData={chartData} chartConfig={chartConfig} />
+        <PerformanceChart chartConfig={chartConfig} chartData={chartData} />
       </div>
 
       <QuestionAnalysis
-        testSeriesDetails={testSeriesDetails}
         latestAttempt={latestAttempt}
+        testSeriesDetails={testSeriesDetails}
         onExplainClick={handleExplainClick}
       />
+
+      {/* Share Dialog */}
+      <Dialog open={isShareDialogOpen} onOpenChange={setIsShareDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Share Test Analysis</DialogTitle>
+            <DialogDescription>
+              Copy the link below and share it with others.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex items-center space-x-2">
+            <Input
+              readOnly
+              className="flex-[0.7]"
+              value={shareUrl}
+              onClick={(e) => e.currentTarget.select()}
+            />
+            <Button
+              className="flex-[0.3] min-w-[80px]"
+              size="sm"
+              onClick={handleCopyLink}
+            >
+              {isCopied ? "Copied!" : "Copy"}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <ExplainDrawer
         correctAnswer={currentQuestion?.correctAnswer || ""}

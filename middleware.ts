@@ -3,26 +3,51 @@ import type { NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
 import { NextResponse } from "next/server";
 
-// Define paths that don't require authentication
+// Define paths that don't require authentication (including dynamic paths)
 const publicPaths = [
-  "/login", 
-  "/home", 
+  "/login",
+  "/home",
+  "/analysis/*", // Dynamic path with wildcard
   "/apptest",
-  "/exams", 
+  "/exams",
   "/board",
   "/past10year",
   "/api/board",
   "/api/exams",
   "/api/past10thyear",
+  "/user/*/profile", // Example: another dynamic path
 ];
+
+function matchesPath(pathname: string, pattern: string): boolean {
+  // Convert pattern with wildcards to regex
+  const regexPattern = pattern
+    .replace(/\*/g, "[^/]+") // Replace * with one or more non-slash characters
+    .replace(/\//g, "\\/"); // Escape forward slashes
+
+  const regex = new RegExp(`^${regexPattern}$`);
+
+  return regex.test(pathname);
+}
+
+function isPublicPath(pathname: string): boolean {
+  // Check for root path
+  if (pathname === "/") return true;
+
+  // Check against all public paths (including dynamic ones)
+  return publicPaths.some((path) => {
+    if (path.includes("*")) {
+      return matchesPath(pathname, path);
+    }
+
+    return pathname.startsWith(path);
+  });
+}
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const token = await getToken({ req: request });
 
-  // Handle root path separately with exact match
-  const isRootPath = pathname === "/";
-  const isPublicPath = isRootPath || publicPaths.some((path) => pathname.startsWith(path));
+  const isPublic = isPublicPath(pathname);
 
   // If user is logged in and trying to access login page, redirect to home
   if (token && pathname === "/login") {
@@ -30,24 +55,15 @@ export async function middleware(request: NextRequest) {
   }
 
   // If user is not logged in and trying to access any non-public route, redirect to login
-  if (!token && !isPublicPath) {
+  if (!token && !isPublic) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
   return NextResponse.next();
 }
 
-// middleware would run on everything expect routes that given in matcher
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - public folder contents
-     * - api/auth routes
-     */
-    '/((?!_next/static|_next/image|favicon.ico|api/auth|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|css|js|json)$).*)',
+    "/((?!_next/static|_next/image|favicon.ico|api/auth|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|css|js|json)$).*)",
   ],
 };

@@ -75,7 +75,7 @@ export const TestSeriesCardContent = ({
           </p>
 
           <button
-            className="text-sm text-muted-foreground hover:text-primary transition-colors underline disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
+            className={`text-sm text-muted-foreground hover:text-primary transition-colors ${!isLoading ? "underline" : ""} disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1`}
             disabled={isLoading}
             onClick={handleViewHistory}
           >
