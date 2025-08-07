@@ -254,10 +254,14 @@ export const boardExam: EducationalData = {
                   id: "square-and-square-root",
                   name: "Square and Square Root",
                 },
+                {
+                  id: "cube-and-cube-root",
+                  name: "Cube and Cube Root",
+                },
               ],
             },
           ],
-        }
+        },
       ],
     },
     {

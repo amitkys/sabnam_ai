@@ -6,7 +6,8 @@ import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "@bprogress/next/app";
 import { toast } from "sonner";
-import Image from "next/image";
+
+import { Loader } from "../ui/loader";
 
 import { useQuizStore } from "@/lib/store/useQuizStore";
 import { useFullscreen } from "@/hooks/use-fullscreen";
@@ -17,7 +18,6 @@ import { QuizHeader } from "@/components/quiz/QuizHeader";
 import { QuestionCard } from "@/components/quiz/QuestionsCard";
 import { QuestionNavigation } from "@/components/quiz/QuestionNavigation";
 import { QuizActions } from "@/components/quiz/QuizActions";
-import { Loader } from "../ui/loader";
 
 type ActionButtonType = "save" | "later" | "skip" | null;
 
@@ -171,7 +171,6 @@ export default function QuizInterface({
     setIsSubmitting(true);
     if (!testData?.testAttempt?.testSeries || !session?.user?.id) return;
 
-
     try {
       await exitFullscreen();
       if (attemptId) {
@@ -183,7 +182,7 @@ export default function QuizInterface({
             if (!result.success) {
               throw new Error("Failed to submit test");
             } else {
-              router.push(`/analysis/${attemptId}`);
+              window.location.href = `/analysis/${attemptId}`;
             }
           },
           {
@@ -199,12 +198,14 @@ export default function QuizInterface({
   };
 
   if (isSubmitting) {
-    return <div className="min-h-screen flex items-center justify-center">
-      <div className="flex flex-col items-center justify-center">
-        <Loader variant="spin" size="medium" />
-        {/* <p className="text-lg font-medium text-foreground/75">Submitting test...</p> */}
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="flex flex-col items-center justify-center">
+          <Loader size="medium" variant="spin" />
+          {/* <p className="text-lg font-medium text-foreground/75">Submitting test...</p> */}
+        </div>
       </div>
-    </div>
+    );
   }
 
   // Start screen check
@@ -257,14 +258,14 @@ export default function QuizInterface({
           </div>
           <QuizActions
             activeButton={activeButton}
+            hasNextQuestion={currentQuestion < questions.length - 1}
+            hasPreviousQuestion={currentQuestion > 0}
             isSaving={isSaving}
             onLater={() => handleQuestionAction("later")}
+            onNextQuestion={() => handleQuestionNavigation(currentQuestion + 1)}
+            onPrevQuestion={() => handleQuestionNavigation(currentQuestion - 1)}
             onSave={() => handleQuestionAction("solved")}
             onSkip={() => handleQuestionAction("skipped")}
-            onPrevQuestion={() => handleQuestionNavigation(currentQuestion - 1)}
-            onNextQuestion={() => handleQuestionNavigation(currentQuestion + 1)}
-            hasPreviousQuestion={currentQuestion > 0}
-            hasNextQuestion={currentQuestion < questions.length - 1}
           />
         </div>
       </div>
