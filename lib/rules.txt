@@ -85,3 +85,29 @@
   ]
 }
 ```
+
+notice, after the first request, new and further question should like this json
+{
+  "text": "<here will we question just like you give in first request>",
+  "answer": "<anser>",
+  "options": [
+    { "text": "<option1>" },
+    { "text": "<option2>" },
+    { "text": "<option3>" },
+    { "text": "<option3>" }
+  ]
+},
+{
+  "text": "<here will we question just like you give in first request>",
+  "answer": "<anser>",
+  "options": [
+    { "text": "<option1>" },
+    { "text": "<option2>" },
+    { "text": "<option3>" },
+    { "text": "<option3>" }
+  ]
+}
+
+prompt: from given image extract question in json format, this is board level question so, try to maintain board standard language. here is json guidline:
+
+

@@ -1,13 +1,13 @@
 "use server";
+import { revalidatePath } from "next/cache";
+
 import { Data, TestAttemptSubmission } from "@/lib/type";
 import prisma from "@/lib/db";
 import { GetServerSessionHere } from "@/auth.config";
-import { revalidatePath } from "next/cache";
 export async function CreateTest(data: Data) {
   const session = await GetServerSessionHere();
 
   try {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const testSeries = await prisma.testSeries.create({
       data: {
         title: data.testseries.title,
@@ -28,7 +28,7 @@ export async function CreateTest(data: Data) {
       },
     });
 
-    console.log("data inserted");
+    console.log("test series created", testSeries.id);
   } catch (error: any) {
     console.error("Error creating test:", error);
     throw error;
@@ -473,9 +473,10 @@ export async function deleteAttempt(testAttemptId: string) {
       },
     });
 
-    console.log("deleted test attempt", result)
+    console.log("deleted test attempt", result);
 
-    revalidatePath("/api/dashboardTable")
+    revalidatePath("/api/dashboardTable");
+
     return { success: true };
   } catch (error) {
     console.error("Error deleting test attempt:", error);
