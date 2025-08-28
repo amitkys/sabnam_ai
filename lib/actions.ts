@@ -114,8 +114,9 @@ export async function getAnalysisForTestAttempt(testAttemptId: string) {
     if (!testAttempt) {
       throw new Error("Test attempt not found");
     }
-    const selectedLanguage =
-      testAttempt.selectedLanguage.slice(0, 2).toLowerCase() || "en";
+    const selectedLanguage = (testAttempt.selectedLanguage ?? "en")
+      .slice(0, 2)
+      .toLowerCase();
 
     const getLocalizedText = (text: any): string => {
       if (!text) return "";
@@ -254,7 +255,6 @@ export async function getTestAttemptId(id: string) {
         userId: session.user.id,
         testSeriesId: id,
         startedAt: new Date(),
-        selectedLanguage: "en",
       },
       select: {
         id: true,

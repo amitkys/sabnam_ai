@@ -32,19 +32,21 @@ export async function GET(req: NextRequest) {
         },
       },
       include: {
-        testAttempts: userId ? {
-          where: {
-            userId: userId,
-          },
-          orderBy: {
-            startedAt: "desc",
-          },
-          take: 1,
-          select: {
-            score: true,
-            completedAt: true,
-          },
-        } : undefined,
+        testAttempts: userId
+          ? {
+              where: {
+                userId: userId,
+              },
+              orderBy: {
+                startedAt: "desc",
+              },
+              take: 1,
+              select: {
+                score: true,
+                completedAt: true,
+              },
+            }
+          : undefined,
         _count: {
           select: {
             questions: true,
@@ -59,9 +61,10 @@ export async function GET(req: NextRequest) {
         return {
           id: series.id,
           title: series.title,
+          exactName: series.exactName,
           duration: series.duration,
           totalQuestions: series._count.questions,
-          level: series.level, 
+          level: series.level,
         };
       }
 
@@ -74,6 +77,7 @@ export async function GET(req: NextRequest) {
       return {
         id: series.id,
         title: series.title,
+        exactName: series.exactName,
         duration: series.duration,
         hasAttempted,
         lastScore,

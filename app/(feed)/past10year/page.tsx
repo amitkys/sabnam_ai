@@ -32,6 +32,7 @@ export interface TestSeriesResponse {
   data: {
     id: string;
     title: string;
+    exactName: string;
     duration: number;
     hasAttempted: boolean;
     lastScore: number | null;

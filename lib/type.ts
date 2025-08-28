@@ -88,6 +88,7 @@ export interface TestSeriesResponse {
   data: Array<{
     id: string;
     title: string;
+    exactName: string;
     duration: number;
     hasAttempted: boolean;
     lastScore: number | null;
@@ -157,6 +158,7 @@ export interface IMainTestSeriesResponse {
   data: {
     id: string;
     title: string;
+    exactName: string;
     duration: number;
     hasAttempted: boolean;
     lastScore: number | null;

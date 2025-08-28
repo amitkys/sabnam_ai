@@ -23,6 +23,7 @@ interface QuizState {
   testTitle: MultiLangText | null;
   exactName: string | null;
   selectedLanguage: string | null; // Track current language
+  preferredLanguage: string | null; // Track preferred language
   setTestTitle: (title: MultiLangText) => void;
   setCurrentQuestion: (index: number) => void;
   setSelectedLanguage: (lang: string) => void;
@@ -63,7 +64,7 @@ export const useQuizStore = create<QuizState>()(
       testTitle: null,
       exactName: null,
       selectedLanguage: null,
-
+      preferredLanguage: null,
       setTestTitle: (title) => set({ testTitle: title }),
       setSelectedLanguage: (lang) => set({ selectedLanguage: lang }),
 
@@ -133,6 +134,7 @@ export const useQuizStore = create<QuizState>()(
           testData: data,
           exactName: exactName,
           selectedLanguage: selectedLanguage,
+          preferredLanguage: data.testSeries.preferredLanguage,
           questionStatus: questionStatusMap,
           selectedAnswers: answersMap,
           currentQuestion: Math.max(0, lastAnsweredIndex),
@@ -196,7 +198,7 @@ export const useQuizStore = create<QuizState>()(
         set({
           testData: null,
           testTitle: null,
-          selectedLanguage: "en",
+          selectedLanguage: null,
           currentQuestion: 0,
           questionStatus: {},
           selectedAnswers: {},

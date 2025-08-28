@@ -60,12 +60,6 @@ export const TestSeriesCard = ({
     }
   }, [testSeries.id, router, isAuthenticated]);
 
-  const formattedTitle = testSeries.title
-    .split(" ")
-    .slice(2)
-    .join(" ")
-    .replace("series", "Test Series");
-
   return (
     <>
       <Card className="w-full mx-auto">
@@ -76,7 +70,9 @@ export const TestSeriesCard = ({
           >
             {getBadgeLabel(testSeries.level)}
           </Badge>
-          <CardTitle className="text-lg capitalize">{formattedTitle}</CardTitle>
+          <CardTitle className="text-lg capitalize">
+            {testSeries.exactName}
+          </CardTitle>
         </CardHeader>
 
         <CardContent>
@@ -103,7 +99,7 @@ export const TestSeriesCard = ({
         isLoading={isLoading}
         open={isDrawerOpen}
         testSeriesId={testSeries.id}
-        testSeriesTitle={testSeries.title}
+        testSeriesTitle={testSeries.exactName}
         onOpenChange={setIsDrawerOpen}
       />
 

@@ -55,8 +55,6 @@ export default function QuizInterface({
     exactName,
   } = useQuizStore();
 
-  console.log("msg from main ui, title is", exactName);
-
   // Set test data
   useEffect(() => {
     if (TestSeriesData) {

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -28,84 +28,76 @@ export const StartScreen = ({
   attemptId,
   availableLanguage,
 }: StartScreenProps) => {
-  const { selectedLanguage, setSelectedLanguage } = useQuizStore();
+  const { selectedLanguage, setSelectedLanguage, preferredLanguage } =
+    useQuizStore();
 
-  // Keep local language state controlled
-  const [language, setLanguage] = useState<string | undefined>(
-    selectedLanguage ?? undefined,
-  );
-
+  const [language, setLanguage] = useState<string | undefined>();
   const [isSavingToDb, setIsSavingToDb] = useState(false);
   const [isLanguageSaved, setIsLanguageSaved] = useState(false);
 
-  // Sync local state if store updates later (e.g. when backend data comes in)
-  useEffect(() => {
-    if (selectedLanguage) {
-      setLanguage(selectedLanguage);
-      // If language is already set from store, consider it as saved
-      setIsLanguageSaved(true);
-    }
-  }, [selectedLanguage]);
-
-  // Check if language is already saved on component mount
-  useEffect(() => {
-    if (selectedLanguage && attemptId) {
-      setIsLanguageSaved(true);
-    }
-  }, [selectedLanguage, attemptId]);
-
-  const handleLanguageChange = async (value: string) => {
-    setLanguage(value);
-    setIsSavingToDb(true);
-    setIsLanguageSaved(false); // Reset while saving
-
-    try {
-      if (!attemptId) {
-        alert("Attempt ID is not defined. Cannot save language.");
-
-        return;
-      }
-
-      // Update store so other components see it too
-      setSelectedLanguage(value);
-
-      // Save to DB
-      await updateSelectedLanguage(attemptId, value);
-      setIsLanguageSaved(true);
-    } catch (error) {
-      console.error("Failed to save language:", error);
-      // Don't set isLanguageSaved to true if there was an error
-    } finally {
-      setIsSavingToDb(false);
-    }
-  };
-
-  const handleStart = async () => {
-    // If no language is selected yet, try to save the current one
-    if (!isLanguageSaved && language && attemptId) {
+  const handleLanguageChange = useCallback(
+    async (value: string): Promise<boolean> => {
+      setLanguage(value);
       setIsSavingToDb(true);
+      setIsLanguageSaved(false); // Reset while saving
+
       try {
-        setSelectedLanguage(language);
-        await updateSelectedLanguage(attemptId, language);
+        if (!attemptId) {
+          console.warn("Attempt ID is not defined. Cannot save language.");
+
+          return false;
+        }
+
+        // Update store so other components see it too
+        setSelectedLanguage(value);
+
+        // Save to DB
+        await updateSelectedLanguage(attemptId, value);
         setIsLanguageSaved(true);
+
+        return true;
       } catch (error) {
         console.error("Failed to save language:", error);
-        setIsSavingToDb(false);
 
-        return;
+        return false;
+      } finally {
+        setIsSavingToDb(false);
       }
-      setIsSavingToDb(false);
+    },
+    [attemptId, setSelectedLanguage],
+  );
+
+  useEffect(() => {
+    // Determine the language to set based on a clear priority:
+    // 1. A language that was already selected in the current session.
+    // 2. The preferred language for the test, if it's provided.
+    // 3. If there's only one available language, default to that.
+    // 4. Otherwise, leave it undefined to prompt the user to choose.
+    const languageToSet =
+      selectedLanguage ||
+      preferredLanguage ||
+      (availableLanguage?.length === 1 ? availableLanguage[0] : undefined);
+
+    setLanguage(languageToSet);
+
+    if (selectedLanguage) {
+      // If a language was already selected in the store, it's considered "saved"
+      // for the purpose of enabling the start button immediately.
+      setIsLanguageSaved(true);
+    }
+  }, [selectedLanguage, preferredLanguage, availableLanguage]);
+
+  const handleStart = async () => {
+    let languageIsSetAndSaved = isLanguageSaved;
+
+    if (!languageIsSetAndSaved && language) {
+      languageIsSetAndSaved = await handleLanguageChange(language);
     }
 
-    // Only proceed if language is saved or no attemptId (for testing)
-    if (isLanguageSaved || !attemptId) {
+    if (languageIsSetAndSaved || !attemptId) {
       onStart();
     }
   };
-
-  // Check if we can start (language is selected and saved, or only one language available)
-  const canStart =
-    isLanguageSaved || (availableLanguage?.length === 1 && language);
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
@@ -122,7 +114,7 @@ export const StartScreen = ({
             </h3>
             <Select
               disabled={isSavingToDb}
-              value={language ?? undefined}
+              value={language}
               onValueChange={handleLanguageChange}
             >
               <SelectTrigger className="w-full">
