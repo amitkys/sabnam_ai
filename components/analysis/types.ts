@@ -1,5 +1,5 @@
 export interface TestSeriesDetails {
-  title: string;
+  exactName: string;
   questions: {
     id: string;
     text: string;

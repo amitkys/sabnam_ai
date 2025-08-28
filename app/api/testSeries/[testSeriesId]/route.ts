@@ -1,12 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import prisma from "@/lib/db";
+import { GetServerSessionHere } from "@/auth.config";
 
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ testSeriesId: string }> },
 ) {
   try {
+    const session = await GetServerSessionHere();
+    const email = session?.user?.email;
+
+    console.log("user email is", email);
+
+    if (email != "amitkys59@gmail.com") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const { testSeriesId } = await params;
 
     console.log("Starting deletion process for test series:", testSeriesId);
@@ -30,53 +39,13 @@ export async function DELETE(
     // eslint-disable-next-line no-console
     console.log("Test series found, proceeding with deletion");
 
-    // Execute all deletions in a single transaction
-    const [
-      deletedAnswers,
-      deletedTestAttempts,
-      deletedOptions,
-      deletedQuestions,
-      deletedTestSeries,
-    ] = await prisma.$transaction([
-      // 1. Delete all Answers related to this test series
-      prisma.answer.deleteMany({
-        where: {
-          testAttempt: {
-            testSeriesId: testSeriesId,
-          },
-        },
-      }),
-
-      // 2. Delete all TestAttempts for this test series
-      prisma.testAttempt.deleteMany({
-        where: {
-          testSeriesId: testSeriesId,
-        },
-      }),
-
-      // 3. Delete all Options for questions in this test series
-      prisma.option.deleteMany({
-        where: {
-          question: {
-            testSeriesId: testSeriesId,
-          },
-        },
-      }),
-
-      // 4. Delete all Questions in this test series
-      prisma.question.deleteMany({
-        where: {
-          testSeriesId: testSeriesId,
-        },
-      }),
-
-      // 5. Finally, delete the TestSeries itself
-      prisma.testSeries.delete({
-        where: {
-          id: testSeriesId,
-        },
-      }),
-    ]);
+    // With `onDelete: Cascade` in the schema, Prisma will automatically delete
+    // all related Questions, TestAttempts, and Answers.
+    const deletedTestSeries = await prisma.testSeries.delete({
+      where: {
+        id: testSeriesId,
+      },
+    });
 
     // eslint-disable-next-line no-console
     console.log(
@@ -88,13 +57,6 @@ export async function DELETE(
       {
         message: "Test series and all related data deleted successfully",
         deletedId: deletedTestSeries.id,
-        summary: {
-          answers: deletedAnswers.count,
-          testAttempts: deletedTestAttempts.count,
-          options: deletedOptions.count,
-          questions: deletedQuestions.count,
-          testSeries: 1,
-        },
       },
       { status: 200 },
     );

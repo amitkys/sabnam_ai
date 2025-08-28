@@ -1,31 +1,64 @@
 # AI Question Generation Guidelines
 
-## 1. JSON Structure
+## 1. JSON Data Structure
+
+The root object contains a `testseries` object and a `questions` array.
+
+### `testseries` Object
+Contains metadata about the test series, based on context like `helper.json`.
+
 ```json
 {
   "testseries": {
-    "title": "Test Series Title",
-    "duration": 90
-  },
-  "questions": [
-    {
-      "text": "##### $E = mc^2$ inline math\n\n```python\n# Code example\nprint(\"Hello\")\n```\n\n| Header 1 | Header 2 |\n|----------|----------|\n| Cell 1   | Cell 2   |",
-      "answer": "Correct answer",
-      "options": [
-        { "text": "Option 1" },
-        { "text": "Option 2" },
-        { "text": "Correct answer" },
-        { "text": "Option 4" }
-      ]
-    }
+    "title": "BSEB 10th Mathematics",
+    "exactName": "board/10th",
+    "duration": 90,
+    "level": "m",
+    "availableLanguage": ["English", "Hindi"],
+    "preferredLanguage": "Hindi",
+    "isPublic": false
+    "questions": [
+    // ... question objects go here
   ]
+  }
+}
+```
+
+### `questions` Object
+Each object in the `questions` array represents a single question.
+
+```json
+{
+  "text": {
+    "en": "##### What is the value of $E=mc^2$?",
+    "hi": "##### $E=mc^2$ का मान क्या है?"
+  },
+  "answerIndex": 2,
+  "options": [
+    { "en": "Option A", "hi": "विकल्प A" },
+    { "en": "Option B", "hi": "विकल्प B" },
+    { "en": "Correct Answer", "hi": "सही उत्तर" },
+    { "en": "Option D", "hi": "विकल्प D" }
+  ],
+  "marks": 1,
+  "tags": ["physics", "relativity"]
 }
 ```
 
 ## 2. Formatting Rules
 
 ### Question Structure
-- Every question must start with `#####`
+- AnswerIndex should be 0 based
+- Every question must start with `#####` 
+- Question text might have tables, images, code blocks, blockquotes, etc.
+this is how you have add images: 
+##### What is the value of $E=mc^2$? \n ![Alt text](image address) \n
+this is how you have add tables: 
+##### What is the value of $E=mc^2$? \n | Column 1 | Column 2 | \n | --- | --- | \n | Row 1 | Row 2 | \n
+this is how you have add blockquotes: 
+##### What is the value of $E=mc^2$? \n > This is a blockquote \n
+this is how you have add code blocks: 
+##### What is the value of $E=mc^2$? \n ```python \n def hello(): \n     print("Hello") \n ``` \n
 - Question title should be same as provided in picture, do not modify
 - Use `\n` for line breaks in these cases:
   - Before and after code blocks
@@ -35,6 +68,11 @@
   - Between distinct sections of a question
 
 ### Math Expressions
+I use this library to show complex math expression: import Markdown from "react-markdown";
+import remarkMath from "remark-math";
+import rehypeKatex from "rehype-katex";
+import remarkGfm from 'remark-gfm';
+
 - Always use `$` for both inline and display math
 - Example: `$E = mc^2$` or `$$\nE = mc^2\n$$`
 - Uses \\dfrac{...}{...} for clean, readable fractions
@@ -62,52 +100,3 @@
 ### Validation
 - JSON must be valid
 - Math expressions must be properly escaped
-
-## 4. Example
-
-```json
-{
-  "testseries": {
-    "title": "Mathematics Test Series",
-    "duration": 60
-  },
-  "questions": [
-    {
-      "text": "##### Find the roots of the equation $x^2 - 5x + 6 = 0$\n\n```python\n# Python code to find roots\nimport math\n\ndef find_roots(a, b, c):\n    d = b**2 - 4*a*c\n    root1 = (-b + math.sqrt(d)) / (2*a)\n    root2 = (-b - math.sqrt(d)) / (2*a)\n    return root1, root2\n```",
-      "answer": "2 and 3",
-      "options": [
-        { "text": "1 and 6" },
-        { "text": "2 and 3" },
-        { "text": "-2 and -3" },
-        { "text": "-1 and -6" }
-      ]
-    }
-  ]
-}
-```
-
-notice, after the first request, new and further question should like this json
-{
-  "text": "<here will we question just like you give in first request>",
-  "answer": "<anser>",
-  "options": [
-    { "text": "<option1>" },
-    { "text": "<option2>" },
-    { "text": "<option3>" },
-    { "text": "<option3>" }
-  ]
-},
-{
-  "text": "<here will we question just like you give in first request>",
-  "answer": "<anser>",
-  "options": [
-    { "text": "<option1>" },
-    { "text": "<option2>" },
-    { "text": "<option3>" },
-    { "text": "<option3>" }
-  ]
-}
-
-prompt: from given image extract question in json format, this is board level question so, try to maintain board standard language. here is json guidline:
-
-

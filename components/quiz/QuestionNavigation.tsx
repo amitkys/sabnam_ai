@@ -1,3 +1,5 @@
+import type { MultiLangText } from "@/lib/type";
+
 import { ChevronDown, ChevronUp } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -23,15 +25,12 @@ const getStatusColor = (status: QuestionStatusType | undefined) => {
 interface QuestionNavigationProps {
   questions: {
     id: string;
-    text: string;
-    answer: string;
-    options: {
-      id: string;
-      text: string;
-    }[];
+    text: MultiLangText;
+    options: MultiLangText[];
   }[];
   currentQuestion: number;
   questionStatus: Record<string, QuestionStatusType>;
+  selectedLanguage: string | null;
   showNumbers: boolean;
   toggleShowNumbers: () => void;
   onQuestionSelect: (index: number) => void;
@@ -41,6 +40,7 @@ export const QuestionNavigation = ({
   questions,
   currentQuestion,
   questionStatus,
+  selectedLanguage,
   showNumbers,
   toggleShowNumbers,
   onQuestionSelect,
@@ -125,13 +125,13 @@ export const QuestionNavigation = ({
           )}
         >
           {questions.map((question, idx) => {
-            // Use question.id instead of idx to get the status
+            // Use question.id to get the status
             const status = questionStatus[question.id];
             const isCurrent = idx === currentQuestion;
 
             return (
               <Button
-                key={idx}
+                key={question.id}
                 className={cn(
                   "w-8 h-8 lg:w-9 lg:h-9 rounded-full",
                   "border border-border",

@@ -61,21 +61,12 @@ export async function DELETE() {
         where: { questionId: { in: orphanedQuestionIds } },
       });
 
-      await prisma.option.deleteMany({
-        where: { questionId: { in: orphanedQuestionIds } },
-      });
 
       await prisma.question.deleteMany({
         where: { id: { in: orphanedQuestionIds } },
       });
     }
 
-    // Step 3: Identify and clean orphaned Options (where question no longer exists)
-    // eslint-disable-next-line no-console
-    console.log("Cleaning orphaned options...");
-    const allOptions = await prisma.option.findMany({
-      select: { id: true, questionId: true },
-    });
 
     const questionIds = new Set(
       (await prisma.question.findMany({ select: { id: true } })).map(
@@ -83,25 +74,7 @@ export async function DELETE() {
       ),
     );
 
-    const orphanedOptionIds = allOptions
-      .filter((option) => !questionIds.has(option.questionId))
-      .map((option) => option.id);
 
-    if (orphanedOptionIds.length > 0) {
-      // eslint-disable-next-line no-console
-      console.log(
-        `Found ${orphanedOptionIds.length} orphaned options to delete`,
-      );
-
-      // Delete answers using these options first
-      await prisma.answer.deleteMany({
-        where: { optionId: { in: orphanedOptionIds } },
-      });
-
-      await prisma.option.deleteMany({
-        where: { id: { in: orphanedOptionIds } },
-      });
-    }
 
     // Step 4: Clean remaining orphaned Answers
     // eslint-disable-next-line no-console
@@ -111,7 +84,6 @@ export async function DELETE() {
         id: true,
         testAttemptId: true,
         questionId: true,
-        optionId: true,
       },
     });
 
@@ -121,10 +93,6 @@ export async function DELETE() {
       ),
     );
 
-    const optionIds = new Set(
-      (await prisma.option.findMany({ select: { id: true } })).map((o) => o.id),
-    );
-
     const orphanedAnswerIds = allAnswers
       .filter((answer) => {
         // Check if related testAttempt exists
@@ -132,9 +100,6 @@ export async function DELETE() {
 
         // Check if related question exists
         if (!questionIds.has(answer.questionId)) return true;
-
-        // Check if optionId is set and if related option exists
-        if (answer.optionId && !optionIds.has(answer.optionId)) return true;
 
         return false;
       })
@@ -171,7 +136,6 @@ export async function DELETE() {
         stats: {
           testAttemptsDeleted: orphanedTestAttemptIds.length,
           questionsDeleted: orphanedQuestionIds.length,
-          optionsDeleted: orphanedOptionIds.length,
           answersDeleted: answersDeleted,
         },
       },

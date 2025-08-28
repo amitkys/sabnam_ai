@@ -1,28 +1,22 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef } from "react";
+import { toast } from "sonner";
 
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Spotlight } from "@/components/ui/spotlight-new";
 import { AuroraText } from "@/components/magicui/aurora-text";
 import {
   Accordion,
-  AccordionContent, AccordionItem, AccordionTrigger,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Data } from "@/lib/type";
 import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
 import AnimatedGradientTextDemo from "@/components/custom/animated-topage";
 import { CreateTest } from "@/lib/actions";
-
+import { ITestSeriesInput } from "@/lib/type";
 
 export default function DifficultySelector() {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -36,35 +30,30 @@ export default function DifficultySelector() {
     "7th ncert math",
   ];
 
-  // const handleSelectChange = (value: string) => {
-  //   setDifficulty(value);
-  // };
-
   const handleSubmit = () => {
     toast.info("This feature is under development.");
   };
   const dbFunctionCall = async () => {
     if (!textareaRef.current?.value) {
       toast.error("Please enter valid JSON data.");
+
       return;
     }
 
     try {
-      const data: Data = JSON.parse(textareaRef.current.value);
+      const data: ITestSeriesInput = JSON.parse(textareaRef.current.value);
 
       toast.promise(
         // Your existing CreateTest function wrapped in a promise
         () => CreateTest(data),
         {
-          loading: 'Creating test...',
-          success: () => 'Test has been created successfully.',
-          error: 'Failed to create test'
-        }
+          loading: "Creating test...",
+          success: () => "Test has been created successfully.",
+          error: "Failed to create test",
+        },
       );
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-      toast.error('Please enter valid JSON data.');
+      toast.error("Please enter valid JSON data.");
       throw new Error(error);
     }
   };

@@ -1,13 +1,15 @@
 "use client";
 import { usePathname } from "next/navigation";
 import useSWR from "swr";
+import { useEffect } from "react";
 
 import TestSererisSkeleton from "../loading";
 
-import { FetchedTestSeriesData } from "@/lib/type";
-import QuizInterface from "@/components/quiz/QuizInterface";
+import { TestAttemptQuestionFetched } from "@/lib/type";
+import { QuizInterface } from "@/components/quiz";
+import { updateSelectedLanguage } from "@/lib/actions";
 
-const fetcher = async (url: string): Promise<FetchedTestSeriesData> => {
+const fetcher = async (url: string): Promise<TestAttemptQuestionFetched> => {
   const res = await fetch(url);
 
   if (!res.ok) {
@@ -24,23 +26,54 @@ export default function Page() {
   const pathname = usePathname();
 
   const parts = pathname.split("/");
-
   const testSeriesId = parts[2];
   const testAttemptId = parts[3];
 
-  if (!testSeriesId || !testAttemptId) {
-    alert("URL is missing");
-
-    return;
-  }
   const {
     data: testSeriesData,
     error,
     isLoading,
-  } = useSWR<FetchedTestSeriesData>(
-    `/api/testSeries/${testSeriesId}/${testAttemptId}`,
+  } = useSWR<TestAttemptQuestionFetched>(
+    testSeriesId && testAttemptId
+      ? `/api/testSeries/${testSeriesId}/${testAttemptId}`
+      : null,
     fetcher,
   );
+
+  useEffect(() => {
+    const updateLanguage = async () => {
+      if (!testAttemptId) return;
+
+      const savedLanguage = testSeriesData?.selectedLanguage;
+      const preferred = testSeriesData?.testSeries?.preferredLanguage;
+
+      // Only update if no language is saved yet
+      if (!savedLanguage && preferred) {
+        try {
+          await updateSelectedLanguage(testAttemptId, preferred);
+        } catch (error) {
+          console.error("Failed to update language:", error);
+        }
+      }
+    };
+
+    updateLanguage();
+  }, [
+    testAttemptId,
+    testSeriesData?.selectedLanguage,
+    testSeriesData?.testSeries?.preferredLanguage,
+  ]);
+
+  // Early returns after all hooks
+  if (!testSeriesId || !testAttemptId) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-red-500">
+          <p>Invalid URL: Missing test series ID or attempt ID</p>
+        </div>
+      </div>
+    );
+  }
 
   if (error) {
     return (
@@ -51,21 +84,9 @@ export default function Page() {
       </div>
     );
   }
+
   if (isLoading) {
-    return (
-      <TestSererisSkeleton />
-      // <div className="min-h-screen flex items-center flex-col justify-center space-x-2">
-      //   <Image
-      //     alt="Loading illustration"
-      //     height={400}
-      //     src={"/dog.svg"}
-      //     width={400}
-      //   />
-      //   <p className="text-lg font-medium text-foreground/75">
-      //     Loading your test series, please wait...
-      //   </p>
-      // </div>
-    );
+    return <TestSererisSkeleton />;
   }
 
   if (!testSeriesData) {

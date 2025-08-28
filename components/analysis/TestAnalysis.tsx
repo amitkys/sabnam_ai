@@ -156,13 +156,9 @@ function Content({
     <div className="container mx-auto px-4 py-6 space-y-8 max-w-7xl">
       <div className="space-y-2">
         <div className="flex items-center gap-4">
-        <h1 className="text-2xl lg:text-3xl font-bold tracking-tight truncate flex-1 min-w-0">
-            {testSeriesDetails.title
-              .split(" ")
-              .slice(2)
-              .join(" ")
-              .replace("series", "Test Series")}
-          </h1> 
+          <h1 className="text-2xl lg:text-3xl font-bold tracking-tight truncate flex-1 min-w-0">
+            {testSeriesDetails.exactName}
+          </h1>
           <Button
             className="flex items-center gap-2 font-semibold text-secondary-foreground"
             size="sm"

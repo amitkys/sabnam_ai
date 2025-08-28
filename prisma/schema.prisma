@@ -8,87 +8,74 @@ datasource db {
 }
 
 model User {
-  id            String          @id @default(cuid()) @map("_id")
-  name          String
-  email         String          @unique
-  avatar        String?
-  testSeries    TestSeries[]
-  testAttempts  TestAttempt[]
-  createdAt     DateTime        @default(now())
-  FavouriteExam FavouriteExam[]
+  id           String        @id @default(cuid()) @map("_id")
+  name         String
+  email        String        @unique
+  avatar       String?
+  testSeries   TestSeries[]
+  testAttempts TestAttempt[]
+  createdAt    DateTime      @default(now())
 }
 
 model TestSeries {
-  id           String        @id @default(cuid()) @map("_id")
-  title        String
-  questions    Question[]
-  language     String        @default("en")
-  testAttempts TestAttempt[]
-  createdAt    DateTime      @default(now())
-  duration     Int
-  level        String        @default("n") //n for not specified, e for easy, m for medium, h for hard
-  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId       String
+  id                String        @id @default(cuid()) @map("_id")
+  title             String
+  exactName         String
+  questions         Question[]
+  testAttempts      TestAttempt[]
+  availableLanguage String[]      @default([])
+  preferredLanguage String // preferred language should come from db, suppose it's bseb, should be hindi, cbse, should be english
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  duration          Int
+  level             String        @default("n") //n for not specified, e for easy, m for medium, h for hard
+  isPublic          Boolean       @default(false) // whether this test is public or private
+  user              User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId            String
 }
 
 model Question {
   id           String     @id @default(cuid()) @map("_id")
-  text         String
-  answer       String
+  text         Json
+  answerIndex  Int
+  options      Json
+  tags         String[]   @default([])
+  marks        Int        @default(1)
   testSeriesId String
   testSeries   TestSeries @relation(fields: [testSeriesId], references: [id], onDelete: Cascade)
-  answers      Answer[]
+  answers      Answer[] // user answer wheather it's wrong or right
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
-  options      Option[]
-}
 
-model Option {
-  id         String   @id @default(cuid()) @map("_id")
-  text       String
-  questionId String
-  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
-  answers    Answer[]
-  createdAt  DateTime @default(now())
+  @@index([testSeriesId])
 }
 
 model TestAttempt {
-  id           String    @id @default(cuid()) @map("_id")
-  userId       String
-  testSeriesId String
-  startedAt    DateTime  @default(now())
-  completedAt  DateTime?
-  score        Int?      @default(0)
-
-  user       User       @relation(fields: [userId], references: [id])
-  testSeries TestSeries @relation(fields: [testSeriesId], references: [id])
-  answers    Answer[]
+  id               String     @id @default(cuid()) @map("_id")
+  userId           String
+  testSeriesId     String
+  selectedLanguage String
+  startedAt        DateTime   @default(now())
+  completedAt      DateTime?
+  score            Int?       @default(0)
+  totalMarks       Int? // Total possible marks
+  timeSpent        Int? // Time spent in minutes
+  user             User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  testSeries       TestSeries @relation(fields: [testSeriesId], references: [id], onDelete: Cascade)
+  answers          Answer[]
 
   @@index([userId, testSeriesId])
 }
 
 model Answer {
-  id            String  @id @default(cuid()) @map("_id")
-  testAttemptId String
-  questionId    String
-  markAs        String?
-  optionId      String?
-  isCorrect     Boolean
-
-  testAttempt TestAttempt @relation(fields: [testAttemptId], references: [id])
-  question    Question    @relation(fields: [questionId], references: [id])
-  option      Option?     @relation(fields: [optionId], references: [id])
+  id                  String      @id @default(cuid()) @map("_id")
+  testAttemptId       String
+  questionId          String
+  selectedOptionIndex Int? // Index of selected option in the options JSON array
+  markAs              String?
+  isCorrect           Boolean? // Added to store if the selected option was correct
+  testAttempt         TestAttempt @relation(fields: [testAttemptId], references: [id], onDelete: Cascade)
+  question            Question    @relation(fields: [questionId], references: [id], onDelete: Cascade)
 
   @@index([testAttemptId, questionId])
-}
-
-model FavouriteExam {
-  id          String  @id @default(cuid()) @map("_id")
-  userId      String
-  examId      String
-  isFavourite Boolean @default(false)
-
-  user User @relation(fields: [userId], references: [id])
-
-  @@index([userId, examId])
 }

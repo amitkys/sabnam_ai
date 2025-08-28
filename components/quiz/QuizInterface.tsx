@@ -1,6 +1,6 @@
 "use client";
 
-import type { FetchedTestSeriesData } from "@/lib/type";
+import type { TestAttemptQuestionFetched } from "@/lib/type";
 
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
@@ -25,12 +25,12 @@ export default function QuizInterface({
   TestSeriesData,
   attemptId,
 }: {
-  TestSeriesData: FetchedTestSeriesData;
+  TestSeriesData: TestAttemptQuestionFetched;
   attemptId: string;
 }) {
   const router = useRouter();
   const { data: session, status } = useSession();
-  const { enterFullscreen, exitFullscreen } = useFullscreen();
+  const { enterFullscreen, exitFullscreen, isFullscreen } = useFullscreen();
   const [isSaving, setIsSaving] = useState(false);
   const [activeButton, setActiveButton] = useState<ActionButtonType>(null);
 
@@ -47,9 +47,15 @@ export default function QuizInterface({
     toggleShowNumbers,
     hasStarted,
     startTest,
+    startTime,
     isSubmitting,
     setIsSubmitting,
+    selectedLanguage,
+    testTitle,
+    exactName,
   } = useQuizStore();
+
+  console.log("msg from main ui, title is", exactName);
 
   // Set test data
   useEffect(() => {
@@ -61,18 +67,22 @@ export default function QuizInterface({
   // Handle test start
   const handleStart = async () => {
     try {
-      await enterFullscreen();
-      startTest();
+      if (!isFullscreen) {
+        await enterFullscreen();
+      }
+      startTest(attemptId); // Pass attemptId to track current attempt
     } catch (error) {
       console.error("Failed to enter fullscreen:", error);
-      startTest();
+      startTest(attemptId); // Pass attemptId even if fullscreen fails
     }
   };
 
   // Handle exiting the test
   const handleExit = async () => {
     setIsSubmitting(true);
-    await exitFullscreen();
+    if (isFullscreen) {
+      await exitFullscreen();
+    }
     window.location.href = "/home";
   };
 
@@ -86,10 +96,7 @@ export default function QuizInterface({
   const handleQuestionAction = async (
     action: "solved" | "later" | "skipped",
   ) => {
-    if (
-      !testData?.testAttempt?.testSeries.questions[currentQuestion] ||
-      !testData.testAttempt.id
-    )
+    if (!testData?.testSeries?.questions[currentQuestion] || !testData.id)
       return;
 
     // Set which button type was clicked
@@ -102,8 +109,7 @@ export default function QuizInterface({
     setActiveButton(buttonType);
     setIsSaving(true);
 
-    const currentQuestionId =
-      testData.testAttempt.testSeries.questions[currentQuestion].id;
+    const currentQuestionId = testData.testSeries.questions[currentQuestion].id;
     const selectedAnswer = selectedAnswers[currentQuestionId];
 
     // For "solved" action, verify that an answer was selected
@@ -121,13 +127,10 @@ export default function QuizInterface({
     try {
       // Save to database via server action
       const result = await SaveQuestionResponse({
-        testAttemptId: testData.testAttempt.id,
+        testAttemptId: testData.id,
         questionId: currentQuestionId,
-        optionId: selectedAnswer?.optionId || null,
+        selectedOptionIndex: selectedAnswer?.selectedOptionIndex ?? null,
         markAs: action,
-        isCorrect: selectedAnswer
-          ? selectedAnswer.selectedAnswer === selectedAnswer.answer
-          : false,
       });
 
       if (!result.success) {
@@ -138,10 +141,7 @@ export default function QuizInterface({
       toast.error("Failed to save response");
     } finally {
       // Move to next question if available
-      if (
-        currentQuestion <
-        testData.testAttempt.testSeries.questions.length - 1
-      ) {
+      if (currentQuestion < testData.testSeries.questions.length - 1) {
         setCurrentQuestion(currentQuestion + 1);
       }
 
@@ -152,32 +152,38 @@ export default function QuizInterface({
   };
 
   // Handle answer selection
-  const handleAnswerSelect = (optionId: string, optionText: string) => {
-    if (!testData?.testAttempt?.testSeries.questions) return;
+  const handleAnswerSelect = (optionIndex: number) => {
+    if (!testData?.testSeries?.questions) return;
 
-    const currentQuestionData =
-      testData.testAttempt.testSeries.questions[currentQuestion];
+    const currentQuestionData = testData.testSeries.questions[currentQuestion];
 
-    setAnswer(
-      currentQuestionData.id,
-      optionId,
-      optionText,
-      currentQuestionData.answer,
-    );
+    if (currentQuestionData && currentQuestionData.options[optionIndex]) {
+      setAnswer(
+        currentQuestionData.id,
+        optionIndex,
+        currentQuestionData.options[optionIndex],
+      );
+    }
   };
 
   // Handle test submission
   const handleSubmit = async () => {
     setIsSubmitting(true);
-    if (!testData?.testAttempt?.testSeries || !session?.user?.id) return;
+    if (!testData?.testSeries || !session?.user?.id) return;
 
     try {
-      await exitFullscreen();
+      if (isFullscreen) {
+        await exitFullscreen();
+      }
       if (attemptId) {
         // used toast promise to show loading, success and error messages
         await toast.promise(
           async () => {
-            const result = await SubmitTest({ testAttemptId: attemptId });
+            const result = await SubmitTest({
+              testAttemptId: attemptId,
+              totalMarks: testData.testSeries.questions.length,
+              createdAt: startTime,
+            });
 
             if (!result.success) {
               throw new Error("Failed to submit test");
@@ -208,30 +214,33 @@ export default function QuizInterface({
     );
   }
 
-  // Start screen check
+  // Start screen check - use multilingual title
   if (!hasStarted) {
     return (
       <StartScreen
-        testName={TestSeriesData.testAttempt?.testSeries.title || "Test"}
+        attemptId={testData?.id}
+        availableLanguage={testData?.testSeries.availableLanguage}
         onStart={handleStart}
       />
     );
   }
 
-  if (!testData?.testAttempt?.testSeries) return null;
+  if (!testData?.testSeries) return null;
 
-  const questions = testData.testAttempt.testSeries.questions;
+  const questions = testData.testSeries.questions;
   const currentQuestionData = questions[currentQuestion];
-  const selectedAnswer = currentQuestionData
-    ? selectedAnswers[currentQuestionData.id]?.selectedAnswer || ""
-    : "";
+
+  // Get the selected answer data for the current question
+  const selectedAnswerData = currentQuestionData
+    ? selectedAnswers[currentQuestionData.id]
+    : null;
 
   return (
     <div className="min-h-screen bg-background text-foreground mb-48 sm:mb-0 transition-colors no-scrollbar">
       <div className="flex-grow max-w-7xl mx-auto w-full">
         <div className="border border-border rounded-lg p-4 space-y-4 h-full flex flex-col">
           <QuizHeader
-            duration={testData.testAttempt.testSeries.duration}
+            duration={testData.testSeries.duration}
             onExit={handleExit}
             onSubmit={handleSubmit}
           />
@@ -241,7 +250,8 @@ export default function QuizInterface({
                 <QuestionCard
                   currentNumber={currentQuestion + 1}
                   question={currentQuestionData}
-                  selectedAnswer={selectedAnswer}
+                  selectedLanguage={selectedLanguage}
+                  selectedOptionIndex={selectedAnswerData?.selectedOptionIndex}
                   totalQuestions={questions.length}
                   onAnswerSelect={handleAnswerSelect}
                 />
@@ -251,6 +261,7 @@ export default function QuizInterface({
               currentQuestion={currentQuestion}
               questionStatus={questionStatus}
               questions={questions}
+              selectedLanguage={selectedLanguage}
               showNumbers={showNumbers}
               toggleShowNumbers={toggleShowNumbers}
               onQuestionSelect={handleQuestionNavigation}

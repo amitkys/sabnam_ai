@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { authOptions } from "@/auth.config";
 import prisma from "@/lib/db";
-import { FetchedTestSeriesData } from "@/lib/type";
+import { TestAttemptQuestionFetched } from "@/lib/type";
 
 export async function GET(
   request: NextRequest,
@@ -29,28 +29,30 @@ export async function GET(
     }
 
     // Fetch TestAttempt with nested TestSeries data in a single query
-    const testAttempt = await prisma.testAttempt.findUnique({
+    const testAttempt = (await prisma.testAttempt.findUnique({
       where: { id: attemptId },
-      include: {
+      select: {
+        id: true,
+        userId: true,
+        selectedLanguage: true,
+        startedAt: true,
         testSeries: {
           select: {
             id: true,
             title: true,
+            exactName: true,
+            preferredLanguage: true,
             duration: true,
             createdAt: true,
             level: true,
+            availableLanguage: true,
             questions: {
               orderBy: { id: "asc" },
               select: {
                 id: true,
+                tags: true,
                 text: true,
-                answer: true,
-                options: {
-                  select: {
-                    id: true,
-                    text: true,
-                  },
-                },
+                options: true,
               },
             },
           },
@@ -60,15 +62,14 @@ export async function GET(
             id: true,
             questionId: true,
             markAs: true,
-            optionId: true,
-            isCorrect: true,
+            selectedOptionIndex: true,
           },
         },
       },
-    });
+    })) as TestAttemptQuestionFetched;
 
     // Verify the testSeriesId matches
-    if (testAttempt?.testSeriesId !== testSeriesId) {
+    if (testAttempt?.testSeries.id !== testSeriesId) {
       return NextResponse.json(
         {
           message: "Test attempt does not belong to the specified test series",
@@ -85,12 +86,7 @@ export async function GET(
       );
     }
 
-    // Prepare response
-    const response: FetchedTestSeriesData = {
-      testAttempt,
-    };
-
-    return NextResponse.json(response, { status: 200 });
+    return NextResponse.json(testAttempt, { status: 200 });
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error("Error fetching test data:", error);

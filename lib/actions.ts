@@ -1,36 +1,44 @@
 "use server";
 import { revalidatePath } from "next/cache";
 
-import { Data, TestAttemptSubmission } from "@/lib/type";
+import { ITestSeriesInput } from "@/lib/type";
 import prisma from "@/lib/db";
 import { GetServerSessionHere } from "@/auth.config";
-export async function CreateTest(data: Data) {
+
+export async function CreateTest(data: ITestSeriesInput) {
   const session = await GetServerSessionHere();
 
+  if (session.user.email != "amitkys59@gmail.com") {
+    throw new Error("Unauthorized");
+  }
   try {
     const testSeries = await prisma.testSeries.create({
       data: {
         title: data.testseries.title,
+        exactName: data.testseries.exactName,
         duration: data.testseries.duration,
         level: data.testseries.level,
-        userId: session.user.id, // Associate test series with user
+        availableLanguage: data.testseries.availableLanguage,
+        preferredLanguage: data.testseries.preferredLanguage,
+        isPublic: data.testseries.isPublic,
+        userId: session.user.id,
         questions: {
-          create: data.questions.map((question) => ({
-            text: question.text,
-            answer: question.answer,
-            options: {
-              create: question.options.map((option) => ({
-                text: option.text,
-              })),
-            },
+          create: data.testseries.questions.map((question) => ({
+            text: question.text, // JSON
+            answerIndex: question.answerIndex,
+            options: question.options, // JSON array
+            marks: question.marks ?? 1,
+            tags: question.tags ?? [],
           })),
         },
       },
     });
 
-    console.log("test series created", testSeries.id);
+    console.log("Test series created:", testSeries.id);
+
+    return testSeries;
   } catch (error: any) {
-    console.error("Error creating test:", error);
+    console.error("Error creating test:");
     throw error;
   }
 }
@@ -83,120 +91,116 @@ export async function CreateTest(data: Data) {
 //   }
 // }
 
-export async function CreateTestAttempt(data: TestAttemptSubmission) {
-  console.log(data);
-
-  try {
-    // Calculate the score based on correct answers
-    const score = data.answers.reduce(
-      (acc, answer) => (answer.isCorrect ? acc + 1 : acc),
-      0,
-    );
-
-    const testAttempt = await prisma.testAttempt.create({
-      data: {
-        userId: data.userId,
-        testSeriesId: data.testSeriesId,
-        startedAt: new Date(data.startedAt),
-        completedAt: new Date(data.completedAt),
-        score: score, // Set the calculated score here
-        answers: {
-          create: data.answers.map((answer) => ({
-            questionId: answer.questionId,
-            optionId: answer.optionId,
-            isCorrect: answer.isCorrect,
-          })),
-        },
-      },
-      include: {
-        answers: true,
-      },
-    });
-
-    return testAttempt.id;
-  } catch (error: any) {
-    console.error("Error creating test attempt:", error);
-    throw error;
-  } finally {
-    await prisma.$disconnect();
-  }
-}
-
 export async function getAnalysisForTestAttempt(testAttemptId: string) {
-  // await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulate database delay to mimic real-world conditions
   try {
-    // Fetch the TestAttempt using the provided testAttemptId. This query includes:
-    // - The TestSeries this attempt belongs to, which in turn includes all questions and their options.
-    // - All answers given by the user for this attempt, including details of which question and option they relate to.
     const testAttempt = await prisma.testAttempt.findUnique({
       where: { id: testAttemptId },
       include: {
         testSeries: {
           include: {
             questions: {
-              orderBy: { id: "asc" },
-              include: {
-                options: true,
-              },
+              orderBy: { createdAt: "asc" }, // Use createdAt since id ordering might not be reliable
             },
           },
         },
         answers: {
           include: {
             question: true,
-            option: true,
           },
         },
       },
     });
 
     if (!testAttempt) {
-      throw new Error("Test attempt not found"); // If no attempt matches the ID, throw an error.
+      throw new Error("Test attempt not found");
     }
+    const selectedLanguage =
+      testAttempt.selectedLanguage.slice(0, 2).toLowerCase() || "en";
 
-    // Structure the data to match the desired output format:
+    const getLocalizedText = (text: any): string => {
+      if (!text) return "";
+      if (typeof text === "string") return text;
+
+      return text[selectedLanguage] || text["en"] || "";
+    };
+
+    // Structure the data to match the expected format
     const result = {
-      // Title of the TestSeries associated with this attempt
-      title: testAttempt.testSeries.title,
+      // Title from the TestSeries (assuming it's a string or needs conversion)
+      exactName: testAttempt.testSeries.exactName,
 
-      // Array of questions from the TestSeries. Each question includes:
-      questions: testAttempt.testSeries.questions.map((question) => ({
-        id: question.id,
-        text: question.text,
-        options: question.options.map((option) => ({
-          id: option.id,
-          text: option.text,
-        })),
-        correctAnswer: question.answer, // The correct answer for each question
-      })),
+      // Map questions from the TestSeries
+      questions: testAttempt.testSeries.questions.map((question) => {
+        const options = Array.isArray(question.options)
+          ? question.options
+          : typeof question.options === "object" && question.options !== null
+            ? Object.values(question.options as any)
+            : [];
 
-      // Details of the user's attempt, encapsulated in an array (even though it's just one attempt here):
+        const correctAnswerText = options[question.answerIndex]
+          ? getLocalizedText(options[question.answerIndex])
+          : "Correct answer not available";
+
+        return {
+          id: question.id,
+          text: getLocalizedText(question.text),
+          options: options.map((option, optIndex) => ({
+            id: `${question.id}-opt-${optIndex}`, // Generate a stable ID
+            text: getLocalizedText(option),
+          })),
+          correctAnswer: correctAnswerText,
+          marks: question.marks,
+          tags: question.tags,
+        };
+      }),
+
+      // User attempts array (contains just this one attempt)
       userAttempts: [
         {
-          attemptId: testAttempt.id, // The ID of this test attempt
-          startedAt: testAttempt.startedAt, // When the attempt began
-          completedAt: testAttempt.completedAt, // When the attempt was completed (if applicable)
-          score: testAttempt.score, // The score the user achieved in this attempt
+          attemptId: testAttempt.id,
+          startedAt: testAttempt.startedAt,
+          completedAt: testAttempt.completedAt,
+          score: testAttempt.score || 0,
 
-          // Map through all answers given in this attempt, providing:
-          answers: testAttempt.answers.map((answer) => ({
-            questionId: answer.questionId, // The question this answer pertains to
-            userAnswer: answer.option?.text, // The text of the option chosen by the user
-            isCorrect: answer.isCorrect, // Boolean indicating if the answer was correct
-          })),
+          // Map through answers for this attempt
+          answers: testAttempt.answers.map((answer) => {
+            const question = testAttempt.testSeries.questions.find(
+              (q) => q.id === answer.questionId,
+            );
+
+            let userAnswerText: string | undefined = undefined;
+
+            if (question && answer.selectedOptionIndex !== null) {
+              const options = Array.isArray(question.options)
+                ? question.options
+                : Object.values(question.options as any);
+
+              if (options[answer.selectedOptionIndex]) {
+                userAnswerText = getLocalizedText(
+                  options[answer.selectedOptionIndex],
+                );
+              }
+            }
+
+            return {
+              questionId: answer.questionId,
+              userAnswer: userAnswerText,
+              isCorrect: answer.isCorrect ?? false,
+            };
+          }),
         },
       ],
 
-      // Total marks possible for this test series, calculated by the number of questions
-      totalMarks: testAttempt.testSeries.questions.length,
+      totalMarks:
+        testAttempt.totalMarks || testAttempt.testSeries.questions.length,
     };
 
-    return result; // Return the structured data as per the function's promise
+    return result;
   } catch (error) {
-    console.error("Error fetching test attempt details:", error); // Log any errors encountered during the operation
-    throw error; // Re-throw the error to be handled by the caller of this function
+    console.error("Error fetching test attempt details:", error);
+    throw error;
   } finally {
-    await prisma.$disconnect(); // Ensure to close the database connection to prevent resource leaks
+    await prisma.$disconnect();
   }
 }
 
@@ -250,6 +254,7 @@ export async function getTestAttemptId(id: string) {
         userId: session.user.id,
         testSeriesId: id,
         startedAt: new Date(),
+        selectedLanguage: "en",
       },
       select: {
         id: true,
@@ -269,22 +274,32 @@ export default async function loggerSession() {
   console.log(session.user.id);
 }
 
-type SaveQuestionResponseParams = {
+interface SaveQuestionResponseParams {
   testAttemptId: string;
   questionId: string;
-  optionId?: string | null;
-  markAs: "solved" | "later" | "skipped";
-  isCorrect?: boolean;
-};
+  selectedOptionIndex: number | null; // Changed from optionId to selectedOptionIndex
+  markAs: string;
+}
 
 export async function SaveQuestionResponse({
   testAttemptId,
   questionId,
-  optionId,
+  selectedOptionIndex, // Changed from optionId to selectedOptionIndex
   markAs,
-  isCorrect,
 }: SaveQuestionResponseParams) {
   try {
+    console.log("selected options index", selectedOptionIndex);
+    // Fetch the question to determine correctness
+    const question = await prisma.question.findUnique({
+      where: { id: questionId },
+      select: { answerIndex: true },
+    });
+
+    if (!question) {
+      throw new Error("Question not found.");
+    }
+
+    let isCorrect: boolean | null = null;
     // Check if an answer for this question already exists
     const existingAnswer = await prisma.answer.findFirst({
       where: {
@@ -292,6 +307,10 @@ export async function SaveQuestionResponse({
         questionId,
       },
     });
+
+    if (selectedOptionIndex !== null) {
+      isCorrect = selectedOptionIndex === question.answerIndex;
+    }
 
     if (existingAnswer) {
       // Update existing answer
@@ -301,9 +320,8 @@ export async function SaveQuestionResponse({
         },
         data: {
           markAs,
-          optionId: optionId || null,
-          isCorrect:
-            isCorrect !== undefined ? isCorrect : existingAnswer.isCorrect,
+          selectedOptionIndex: selectedOptionIndex,
+          isCorrect: isCorrect, // Store correctness
         },
       });
     } else {
@@ -313,35 +331,11 @@ export async function SaveQuestionResponse({
           testAttemptId,
           questionId,
           markAs,
-          optionId: optionId || null,
-          isCorrect: isCorrect !== undefined ? isCorrect : false,
+          selectedOptionIndex: selectedOptionIndex,
+          isCorrect: isCorrect, // Store correctness,
         },
       });
     }
-
-    // Update the score in TestAttempt
-    // First get all answers for this test attempt
-    const allAnswers = await prisma.answer.findMany({
-      where: {
-        testAttemptId: testAttemptId,
-      },
-    });
-
-    // Calculate the new score based on correct answers
-    const updatedScore = allAnswers.reduce(
-      (acc, answer) => (answer.isCorrect ? acc + 1 : acc),
-      0,
-    );
-
-    // Update the TestAttempt score
-    await prisma.testAttempt.update({
-      where: {
-        id: testAttemptId,
-      },
-      data: {
-        score: updatedScore,
-      },
-    });
 
     // Return success indicator
     return { success: true };
@@ -438,22 +432,57 @@ export async function SaveQuestionResponse({
 //   }
 // }
 
-export async function SubmitTest({ testAttemptId }: { testAttemptId: string }) {
+export async function SubmitTest({
+  testAttemptId,
+  createdAt,
+  totalMarks,
+}: {
+  testAttemptId: string;
+  createdAt: string | Date;
+  totalMarks: number;
+}) {
+  // normalize both dates
+  const startTime = new Date(createdAt);
+  const endTime = new Date();
+
+  // calculate difference in minutes
+  const diffMs = endTime.getTime() - startTime.getTime();
+  const timeSpentMinutes = Math.floor(diffMs / 1000 / 60);
+
   try {
-    // Update the TestAttempt score
+    // Fetch all answers for this test attempt to calculate the score
+    const answers = await prisma.answer.findMany({
+      where: {
+        testAttemptId: testAttemptId,
+      },
+      select: {
+        isCorrect: true,
+      },
+    });
+
+    // Calculate the score based on the 'isCorrect' field
+    const calculatedScore = answers.filter((answer) => answer.isCorrect).length;
+
+    // Update the TestAttempt
     await prisma.testAttempt.update({
       where: {
         id: testAttemptId,
       },
       data: {
-        completedAt: new Date(),
+        completedAt: endTime,
+        timeSpent: timeSpentMinutes, // store in minutes
+        totalMarks: totalMarks,
+        score: calculatedScore, // Update the score here
       },
     });
 
-    // Return success indicator
-    return { success: true };
+    return {
+      success: true,
+      timeSpent: timeSpentMinutes,
+      score: calculatedScore,
+    };
   } catch (error) {
-    console.error("Error saving question response:", error);
+    console.error("Error submitting test:", error);
 
     return { success: false, error: "Failed to save response" };
   }
@@ -497,4 +526,17 @@ export async function getUserCreationDate() {
   });
 
   return creationDate?.createdAt;
+}
+
+export async function updateSelectedLanguage(attemptId: string, lang: string) {
+  await prisma.testAttempt.update({
+    where: {
+      id: attemptId,
+    },
+    data: {
+      selectedLanguage: lang,
+    },
+  });
+
+  return true;
 }
