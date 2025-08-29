@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Loader } from "@/components/ui/loader";
+import { ArrowRight, Repeat } from "lucide-react";
 
 interface TestSeriesCardActionsProps {
   loading: boolean;
@@ -14,7 +15,7 @@ export const TestSeriesCardActions = ({
 }: TestSeriesCardActionsProps) => {
   return (
     <Button
-      className="max-w-7xl w-full"
+      className="max-w-7xl w-full flex items-center gap-2"
       disabled={loading}
       onClick={onStartTest}
     >
@@ -23,9 +24,15 @@ export const TestSeriesCardActions = ({
           <Loader size="small" variant="spin" />
         </div>
       ) : hasAttempted ? (
-        "Retake Test"
+        <>
+          <Repeat size={14} />
+          Retake Test
+        </>
       ) : (
-        "Start Test"
+        <>
+          Start Test
+          <ArrowRight size={14} />
+        </>
       )}
     </Button>
   );

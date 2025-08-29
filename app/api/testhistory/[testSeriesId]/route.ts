@@ -53,7 +53,7 @@ export async function GET(
         orderBy: {
           startedAt: "desc",
         },
-        take: 10,
+        take: 5,
       });
 
     const response: ITestAttemptHistoryResponse = {

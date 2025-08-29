@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import useSWR from "swr";
+import { HelpCircle, CheckCircle, History } from "lucide-react";
 
 import { ShowLoading } from "@/components/showLoading";
 import { useTestHistory } from "@/lib/store/test-history-Store";
@@ -64,14 +65,16 @@ export const TestSeriesCardContent = ({
 
   return (
     <>
-      <p className="text-sm text-muted-foreground">
-        Questions: {totalQuestions}
+      <p className="text-sm text-muted-foreground flex items-center gap-1">
+        <HelpCircle size={14} />
+        Questions: <span className="ml-2 font-bold">{totalQuestions}</span>
       </p>
 
       {hasAttempted ? (
         <div className="flex items-center gap-6">
-          <p className="text-sm text-muted-foreground">
-            Last Score: {lastScore}
+          <p className="text-sm text-muted-foreground flex items-center gap-1">
+            <CheckCircle size={14} />
+            Last Score: <span className="ml-1 font-bold">{lastScore}</span>
           </p>
 
           <button
@@ -82,7 +85,10 @@ export const TestSeriesCardContent = ({
             {isLoading ? (
               <ShowLoading loadingSize="sm" text="Loading..." />
             ) : (
-              "View History"
+              <>
+                <History size={14} />
+                View History
+              </>
             )}
           </button>
         </div>

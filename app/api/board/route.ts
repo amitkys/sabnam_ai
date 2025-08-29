@@ -65,6 +65,7 @@ export async function GET(req: NextRequest) {
           duration: series.duration,
           totalQuestions: series._count.questions,
           level: series.level,
+          availableLanguage: series.availableLanguage,
         };
       }
 
@@ -84,6 +85,7 @@ export async function GET(req: NextRequest) {
         isCompleted,
         totalQuestions: series._count.questions,
         level: series.level,
+        availableLanguage: series.availableLanguage,
       };
     });
 

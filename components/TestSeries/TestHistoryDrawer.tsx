@@ -36,6 +36,7 @@ import {
 } from "@/components/ui/chart";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { deleteAttempt } from "@/lib/actions";
 import { ITestAttemptHistoryResponse, ITestAttemptHistory } from "@/lib/type";
 import { useTestHistory } from "@/lib/store/test-history-Store";
@@ -275,10 +276,6 @@ export const TestHistoryDrawer = ({
         <VisuallyHidden>
           <DrawerHeader className="pb-4">
             <DrawerTitle>Test Performance History</DrawerTitle>
-            <DrawerDescription>
-              Your score progression for{" "}
-              {testSeriesTitle.replace("series", "Test Series")}
-            </DrawerDescription>
           </DrawerHeader>
         </VisuallyHidden>
         <div className="mx-auto w-full max-w-md">
@@ -293,6 +290,11 @@ export const TestHistoryDrawer = ({
             ) : (
               <>
                 {/* Chart */}
+                {/* <div className="text-center mb-2">
+                  <p className="text-xs text-muted-foreground">
+                    (Last 5 attempts)
+                  </p>
+                </div> */}
                 <div className="h-48 mb-8 md:mb-16">
                   <ChartContainer config={chartConfig}>
                     <BarChart
@@ -319,9 +321,7 @@ export const TestHistoryDrawer = ({
                                 <p className="text-xs font-medium">
                                   {props.payload?.fullDate}
                                 </p>
-                                <p className="text-xs text-primary font-semibold">
-                                  Score: {value}
-                                </p>
+                                Score: {value}
                                 <p className="text-xs text-muted-foreground">
                                   Click to view options
                                 </p>
@@ -332,6 +332,10 @@ export const TestHistoryDrawer = ({
                         cursor={false}
                       />
                       <Bar
+                        background={{
+                          fill: "hsl(var(--muted))",
+                          radius: 4,
+                        }}
                         className="cursor-pointer hover:opacity-80 transition-opacity"
                         dataKey="score"
                         fill="var(--color-score)"
@@ -347,9 +351,9 @@ export const TestHistoryDrawer = ({
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-xs text-muted-foreground">
+                        <Badge className="mb-2" variant="easy">
                           Score: {selectedAttempt.score || 0}
-                        </p>
+                        </Badge>
                       </div>
                       <Button
                         disabled={isAnyActionLoading}

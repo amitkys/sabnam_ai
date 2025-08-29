@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/breadcrumb";
 import { Spinner } from "@/components/custom/spinner";
 import { Loader } from "@/components/ui/loader";
+import { IMainTestSeriesResponse } from "@/lib/type";
 // Type definition for the TestSeriesResponse
 export interface TestSeriesResponse {
   data: {
@@ -90,7 +91,7 @@ function ContentPage() {
     data: testSeriesData,
     error,
     isLoading,
-  } = useSWR<TestSeriesResponse>(
+  } = useSWR<IMainTestSeriesResponse>(
     shouldFetch && selectedYear
       ? `/api/past10thyear?topic=${topic}&subject=${subject}&class=${clas}&year=${selectedYear}`
       : null,

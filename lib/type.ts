@@ -95,6 +95,7 @@ export interface TestSeriesResponse {
     isCompleted: boolean;
     totalQuestions: number;
     level: string;
+    availableLanguage: string[];
   }>;
 }
 
@@ -165,6 +166,7 @@ export interface IMainTestSeriesResponse {
     isCompleted: boolean;
     totalQuestions: number;
     level: string;
+    availableLanguage: string[];
   }[];
 }
 

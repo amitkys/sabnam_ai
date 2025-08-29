@@ -205,6 +205,10 @@ export default function DashboardChart({
               cursor={false}
             />
             <Bar
+              background={{
+                fill: "hsl(var(--muted))",
+                radius: 8,
+              }}
               dataKey="totalAttempts"
               fill="var(--color-totalAttempts)"
               radius={8}

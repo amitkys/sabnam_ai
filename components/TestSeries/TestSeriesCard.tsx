@@ -18,10 +18,17 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { getTestAttemptId } from "@/lib/actions";
 import { useAuthStore } from "@/lib/store/auth-store";
 import { useTestHistory } from "@/lib/store/test-history-Store";
 import { getBadgeLabel, getBadgeVariant } from "@/utils/utils";
+import { Languages } from "lucide-react";
 
 export const TestSeriesCard = ({
   testSeries,
@@ -63,18 +70,29 @@ export const TestSeriesCard = ({
   return (
     <>
       <Card className="w-full mx-auto">
-        <CardHeader className="relative">
-          <Badge
-            className="absolute top-2 right-2"
-            variant={getBadgeVariant(testSeries.level)}
-          >
-            {getBadgeLabel(testSeries.level)}
-          </Badge>
-          <CardTitle className="text-lg capitalize">
-            {testSeries.exactName}
-          </CardTitle>
-        </CardHeader>
-
+        <TooltipProvider>
+          <CardHeader className="relative">
+            <div className="flex items-center justify-between">
+              <Tooltip>
+                <TooltipTrigger>
+                  <Badge variant="outline" className="flex items-center gap-1">
+                    <Languages size={14} />
+                    {testSeries.availableLanguage.join(", ")}
+                  </Badge>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Language support for this test</p>
+                </TooltipContent>
+              </Tooltip>
+              <Badge variant={getBadgeVariant(testSeries.level)}>
+                {getBadgeLabel(testSeries.level)}
+              </Badge>
+            </div>
+            <CardTitle className="text-lg capitalize pt-2">
+              {testSeries.exactName}
+            </CardTitle>
+          </CardHeader>
+        </TooltipProvider>
         <CardContent>
           <TestSeriesCardContent
             hasAttempted={testSeries.hasAttempted}
