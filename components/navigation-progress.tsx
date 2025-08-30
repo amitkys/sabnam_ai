@@ -13,7 +13,9 @@ const ProgressBarProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   // Use muted colors for a more subtle appearance
-  const progressColor = mounted ? "hsl(var(--primary) / 0.7)" : "hsl(var(--primary) / 0.7)";
+  const progressColor = mounted
+    ? "hsl(var(--primary) / 0.7)"
+    : "hsl(var(--primary) / 0.7)";
 
   return (
     <ProgressProvider
@@ -22,10 +24,10 @@ const ProgressBarProvider = ({ children }: { children: React.ReactNode }) => {
       options={{
         showSpinner: false,
         trickle: true,
-        trickleSpeed: 150,
-        minimum: 0.08,
+        trickleSpeed: 500,
+        minimum: 0.4,
         easing: "cubic-bezier(0.4, 0, 0.2, 1)",
-        speed: 400,
+        speed: 600,
       }}
       shallowRouting={false} // Disable shallow routing for progress bar
     >

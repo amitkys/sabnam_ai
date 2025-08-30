@@ -25,6 +25,7 @@ interface MenuProps {
 export function Menu({ isOpen }: MenuProps) {
   const pathname = usePathname();
   const menuList = getMenuList(pathname);
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
   return (
     <ScrollArea className="[&>div>div[style]]:!block">
@@ -81,7 +82,7 @@ export function Menu({ isOpen }: MenuProps) {
                                     "max-w-[200px] truncate",
                                     isOpen === false
                                       ? "-translate-x-96 opacity-0"
-                                      : "translate-x-0 opacity-100",
+                                      : "translate-x-0 opacity-100"
                                   )}
                                 >
                                   {label}
@@ -111,7 +112,7 @@ export function Menu({ isOpen }: MenuProps) {
                         submenus={submenus}
                       />
                     </div>
-                  ),
+                  )
               )}
             </li>
           ))}
@@ -119,7 +120,7 @@ export function Menu({ isOpen }: MenuProps) {
             <TooltipProvider disableHoverableContent>
               <Tooltip delayDuration={100}>
                 <TooltipTrigger asChild>
-                  {useAuthStore((state) => state.isAuthenticated) ? (
+                  {isAuthenticated ? (
                     <Button
                       className="w-full justify-center h-10 mt-5"
                       variant="outline"
@@ -131,7 +132,7 @@ export function Menu({ isOpen }: MenuProps) {
                       <p
                         className={cn(
                           "whitespace-nowrap",
-                          isOpen === false ? "opacity-0 hidden" : "opacity-100",
+                          isOpen === false ? "opacity-0 hidden" : "opacity-100"
                         )}
                       >
                         Logout
@@ -150,7 +151,7 @@ export function Menu({ isOpen }: MenuProps) {
                         <p
                           className={cn(
                             "whitespace-nowrap",
-                            isOpen === false ? "opacity-0 hidden" : "opacity-100",
+                            isOpen === false ? "opacity-0 hidden" : "opacity-100"
                           )}
                         >
                           Login
@@ -161,7 +162,7 @@ export function Menu({ isOpen }: MenuProps) {
                 </TooltipTrigger>
                 {isOpen === false && (
                   <TooltipContent side="right">
-                    {useAuthStore((state) => state.isAuthenticated) ? "Logout" : "Login"}
+                    {isAuthenticated ? "Logout" : "Login"}
                   </TooltipContent>
                 )}
               </Tooltip>
