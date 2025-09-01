@@ -105,7 +105,10 @@ export default function RequestExamPage() {
                     className="text-muted-foreground hover:text-foreground flex items-center gap-1 group"
                     href="/exams"
                   >
-                    <ArrowLeft className="h-4 md:h-5 transform transition-transform duration-200 group-hover:-translate-x-1" />
+                    <ArrowLeft
+                      className="h-4 md:h-5 transform transition-transform duration-200 group-hover:-translate-x-1"
+                      strokeWidth={3}
+                    />
                   </Link>
                 </div>
 

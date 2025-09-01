@@ -8,7 +8,6 @@ import { ArrowLeft } from "lucide-react";
 import { Button } from "./ui/button";
 
 import { useExamStore } from "@/lib/store/examStore";
-import { ExamBreadcrumb } from "@/components/exam/exam-breadcrumb";
 import { ExamList } from "@/components/exam/exam-list";
 import { SubjectList } from "@/components/exam/exam-subject-list";
 import { ChapterList } from "@/components/exam/exam-chapter-list";
@@ -117,7 +116,10 @@ export default function ExamContent({
 
         <Button asChild className="mt-6 group transition-all">
           <Link className="flex items-center gap-2" href="/home">
-            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+            <ArrowLeft
+              className="w-4 h-4 group-hover:-translate-x-1 transition-transform"
+              strokeWidth={3}
+            />
             Back to Homepage
           </Link>
         </Button>

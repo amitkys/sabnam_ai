@@ -36,7 +36,10 @@ export function ChapterList() {
             className="text-muted-foreground hover:text-foreground flex items-center gap-1 group"
             href={`/board?type=${boardType}&standard=${standard}`}
           >
-            <ArrowLeft className="h-4 md:h-5 group-hover:-translate-x-1 transition-transform" />
+            <ArrowLeft
+              className="h-4 md:h-5 group-hover:-translate-x-1 transition-transform"
+              strokeWidth={3}
+            />
           </Link>
 
           {/* Middle - Title only */}

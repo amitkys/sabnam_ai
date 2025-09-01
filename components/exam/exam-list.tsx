@@ -2,8 +2,8 @@ import type { Exam } from "@/lib/type/exam";
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useRouter } from '@bprogress/next/app';
-import { FileText, Search, Plus, ArrowLeft } from "lucide-react";
+import { useRouter } from "@bprogress/next/app";
+import { FileText, ArrowLeft } from "lucide-react";
 import { DialogTitle } from "@radix-ui/react-dialog";
 
 import { SelectSeparator } from "../ui/select";
@@ -16,7 +16,6 @@ import {
   CardContent,
 } from "@/components/ui/card";
 import { useExamStore } from "@/lib/store/examStore";
-import { Button } from "@/components/ui/button";
 import {
   CommandDialog,
   CommandEmpty,
@@ -67,7 +66,10 @@ export function ExamList() {
               className="text-muted-foreground hover:text-foreground flex items-center gap-1 group"
               href="/home"
             >
-              <ArrowLeft className="h-4 md:h-5 group-hover:-translate-x-1 transition-transform" />
+              <ArrowLeft
+                className="h-4 md:h-5 group-hover:-translate-x-1 transition-transform"
+                strokeWidth={3}
+              />
             </Link>
             {/* Middle - Title only */}
             <CardTitle className="uppercase text-center flex-1">

@@ -136,7 +136,10 @@ export default function EducationContent({
 
         <Button asChild className="mt-6 group transition-all">
           <Link className="flex items-center gap-2" href="/home">
-            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+            <ArrowLeft
+              className="w-4 h-4 group-hover:-translate-x-1 transition-transform"
+              strokeWidth={3}
+            />
             Back to Homepage
           </Link>
         </Button>
