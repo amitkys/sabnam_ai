@@ -99,7 +99,7 @@ export async function getAnalysisForTestAttempt(testAttemptId: string) {
         testSeries: {
           include: {
             questions: {
-              orderBy: { createdAt: "asc" }, // Use createdAt since id ordering might not be reliable
+              orderBy: { id: "asc" },
             },
           },
         },

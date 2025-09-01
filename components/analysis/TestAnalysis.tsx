@@ -35,6 +35,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import ExplainDrawer from "@/components/explain-drawer";
+import { ScrollToTopButton } from "@/components/custom/scroll-to-top-button";
 
 export default function MockTestAnalysis({
   testSeriesDetails,
@@ -154,6 +155,7 @@ function Content({
 
   return (
     <div className="container mx-auto px-4 py-6 space-y-8 max-w-7xl">
+      <ScrollToTopButton />
       <div className="space-y-2">
         <div className="flex items-center gap-4">
           <h1 className="text-2xl lg:text-3xl font-bold tracking-tight truncate flex-1 min-w-0">
