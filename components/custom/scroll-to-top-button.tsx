@@ -21,7 +21,7 @@ export function ScrollToTopButton() {
 
   useEffect(() => {
     const toggleVisibility = () => {
-      const shouldBeVisible = window.pageYOffset > 300;
+      const shouldBeVisible = window.pageYOffset > 1500;
 
       if (shouldBeVisible && !isVisible) {
         // Becoming visible
@@ -65,7 +65,7 @@ export function ScrollToTopButton() {
     if (isExpanded) {
       timeoutId = setTimeout(() => {
         setIsExpanded(false);
-      }, 3000); // 2 seconds
+      }, 4000);
     }
 
     return () => {
