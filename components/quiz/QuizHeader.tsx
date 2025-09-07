@@ -116,38 +116,18 @@ export const QuizHeader = ({ duration, onExit, onSubmit }: QuizHeaderProps) => {
           <AlertDialogContent className="max-w-md">
             <AlertDialogHeader>
               <AlertDialogTitle className="flex items-center gap-3">
-                {getCompletionIcon()}
-                Submit Test
+                Solved Questions:
               </AlertDialogTitle>
               <AlertDialogDescription asChild>
                 <div className="space-y-4">
-                  <div className="space-y-3">
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between text-sm">
-                        <span>Test Progress</span>
-                        <span className="font-bold">
-                          {completionPercentage}%
-                        </span>
-                      </div>
-                      <div className="w-full bg-muted rounded-full h-2">
-                        <div
-                          className={`h-2 rounded-full transition-all duration-500 ${getProgressColorClass()}`}
-                          style={{ width: `${completionPercentage}%` }}
-                        />
-                      </div>
-                      <div className="flex items-center justify-between text-sm text-muted-foreground">
-                        <span>Questions Answered</span>
-                        <span className="font-semibold">
-                          {solvedQuestions} / {totalQuestions}
-                        </span>
-                      </div>
-                    </div>
+                  <div className="text-4xl font-extrabold text-center">
+                    {solvedQuestions} / {totalQuestions}
                   </div>
                 </div>
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel className="flex items-center gap-2">
+              <AlertDialogCancel className="">
                 <ArrowLeft size={16} />
                 Continue test
               </AlertDialogCancel>

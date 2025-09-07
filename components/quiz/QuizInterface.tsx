@@ -23,6 +23,7 @@ import { QuizActions } from "@/components/quiz/QuizActions";
 import { Alert, AlertTitle } from "@/components/ui/alert";
 import { useOnlineStatus } from "@/hooks/use-online-status";
 import { OfflineDisplay } from "@/components/quiz/OfflineDisplay";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 type ActionButtonType = "save" | "later" | "skip" | null;
 
@@ -40,6 +41,7 @@ export default function QuizInterface({
   const [activeButton, setActiveButton] = useState<ActionButtonType>(null);
   const [showFullscreenAlert, setShowFullscreenAlert] = useState(true);
   const isOnline = useOnlineStatus();
+  const isMobile = useIsMobile();
 
   const {
     testData,
@@ -93,6 +95,9 @@ export default function QuizInterface({
   // Handle question navigation
   const handleQuestionNavigation = (idx: number) => {
     setCurrentQuestion(idx);
+    if (isMobile && showNumbers) {
+      toggleShowNumbers();
+    }
   };
 
   // Handle question actions (save, later, skip)

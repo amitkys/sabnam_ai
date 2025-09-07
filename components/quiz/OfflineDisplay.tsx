@@ -1,8 +1,8 @@
 "use client";
 
-import { WifiOff, RefreshCw } from "lucide-react";
+import { RefreshCw, WifiOff } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
+import { Button } from "../ui/button";
 
 export const OfflineDisplay = () => {
   return (
@@ -13,7 +13,7 @@ export const OfflineDisplay = () => {
         <p className="text-muted-foreground mb-6">
           Please check your internet connection.
         </p>
-        <Button onClick={() => window.location.reload()}>
+        <Button variant={"secondary"} onClick={() => window.location.reload()}>
           <RefreshCw className="mr-1 h-4 w-4" />
           Reload
         </Button>
