@@ -78,7 +78,6 @@ export default function QuizInterface({
 
   // Handle exiting the test
   const handleExit = async () => {
-    setIsSubmitting(true);
     if (isFullscreen) {
       await exitFullscreen();
     }
