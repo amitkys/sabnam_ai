@@ -6,9 +6,10 @@ import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "@bprogress/next/app";
 import { toast } from "sonner";
-import { CheckCircle2 } from "lucide-react";
+import { CheckCircle2, Maximize, X } from "lucide-react";
 
 import { Loader } from "../ui/loader";
+import { Button } from "../ui/button";
 
 import { useQuizStore } from "@/lib/store/useQuizStore";
 import { useFullscreen } from "@/hooks/use-fullscreen";
@@ -19,6 +20,9 @@ import { QuizHeader } from "@/components/quiz/QuizHeader";
 import { QuestionCard } from "@/components/quiz/QuestionsCard";
 import { QuestionNavigation } from "@/components/quiz/QuestionNavigation";
 import { QuizActions } from "@/components/quiz/QuizActions";
+import { Alert, AlertTitle } from "@/components/ui/alert";
+import { useOnlineStatus } from "@/hooks/use-online-status";
+import { OfflineDisplay } from "@/components/quiz/OfflineDisplay";
 
 type ActionButtonType = "save" | "later" | "skip" | null;
 
@@ -34,6 +38,8 @@ export default function QuizInterface({
   const { enterFullscreen, exitFullscreen, isFullscreen } = useFullscreen();
   const [isSaving, setIsSaving] = useState(false);
   const [activeButton, setActiveButton] = useState<ActionButtonType>(null);
+  const [showFullscreenAlert, setShowFullscreenAlert] = useState(true);
+  const isOnline = useOnlineStatus();
 
   const {
     testData,
@@ -242,6 +248,40 @@ export default function QuizInterface({
     <div className="min-h-screen bg-background text-foreground mb-48 sm:mb-0 transition-colors no-scrollbar">
       <div className="flex-grow max-w-7xl mx-auto w-full">
         <div className="border border-border rounded-lg p-4 space-y-4 h-full flex flex-col">
+          {!isFullscreen && showFullscreenAlert && (
+            <Alert
+              className="flex flex-col sm:flex-row sm:items-center gap-3"
+              variant="info"
+            >
+              {/* Left side: title + description */}
+              <div className="flex-1 min-w-0">
+                <AlertTitle>Better Experience Recommended!</AlertTitle>
+                {/* <AlertDescription>
+                  Switch to fullscreen mode for a better viewing experience
+                </AlertDescription> */}
+              </div>
+
+              {/* Right side: actions */}
+              <div className="flex gap-2 sm:flex-shrink-0">
+                <Button
+                  className="flex-1 sm:flex-none"
+                  size="sm"
+                  onClick={enterFullscreen}
+                >
+                  <Maximize className="h-4 w-4 mr-1" />
+                  Enter Fullscreen
+                </Button>
+                <Button
+                  className="flex-1 sm:flex-none"
+                  size="sm"
+                  variant="destructive"
+                  onClick={() => setShowFullscreenAlert(false)}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            </Alert>
+          )}
           <QuizHeader
             duration={testData.testSeries.duration}
             onExit={handleExit}
@@ -275,6 +315,7 @@ export default function QuizInterface({
             hasNextQuestion={currentQuestion < questions.length - 1}
             hasPreviousQuestion={currentQuestion > 0}
             isSaving={isSaving}
+            isOnline={isOnline}
             onLater={() => handleQuestionAction("later")}
             onNextQuestion={() => handleQuestionNavigation(currentQuestion + 1)}
             onPrevQuestion={() => handleQuestionNavigation(currentQuestion - 1)}
@@ -283,6 +324,7 @@ export default function QuizInterface({
           />
         </div>
       </div>
+      {!isOnline && <OfflineDisplay />}
     </div>
   );
 }

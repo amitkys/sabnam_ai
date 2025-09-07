@@ -61,7 +61,7 @@ export const QuestionNavigation = ({
           className="w-full flex items-center justify-between lg:hidden mb-2 p-2 border border-border rounded"
           onClick={toggleShowNumbers}
         >
-          <span>Question Numbers</span>
+          <span className="text-dual-muted">Question Numbers</span>
           {showNumbers ? (
             <ChevronUp className="h-4 w-4" />
           ) : (
@@ -95,7 +95,7 @@ export const QuestionNavigation = ({
         {/* Question Numbers Grid */}
         <div
           className={cn(
-            "grid grid-cols-5 lg:grid-cols-5 gap-4 lg:gap-2 overflow-y-auto max-h-[calc(100vh-300px)] pr-2 p-1",
+            "grid grid-cols-5 lg:grid-cols-5 gap-4 lg:gap-2 p-1 overflow-y-auto no-scrollbar max-h-[40vh]",
             !showNumbers && "lg:grid hidden",
           )}
         >

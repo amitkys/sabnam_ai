@@ -16,6 +16,7 @@ interface QuizActionsProps {
   onNextQuestion: () => void;
   isAnswerSelected?: boolean;
   isSaving: boolean;
+  isOnline: boolean;
   activeButton: "save" | "later" | "skip" | null;
   hasPreviousQuestion: boolean;
   hasNextQuestion: boolean;
@@ -29,10 +30,12 @@ export const QuizActions = ({
   onNextQuestion,
   isAnswerSelected = false,
   isSaving = false,
+  isOnline = true,
   activeButton = null,
   hasPreviousQuestion,
   hasNextQuestion,
 }: QuizActionsProps) => {
+  const isDisabled = !isOnline || isSaving;
   return (
     <div className="fixed bottom-0 left-0 right-0 bg-background border-t border-border p-4 z-10">
       <div className="max-w-7xl mx-auto">
@@ -45,7 +48,7 @@ export const QuizActions = ({
                   variant="outline"
                   size="icon"
                   onClick={onPrevQuestion}
-                  disabled={!hasPreviousQuestion || isSaving}
+                  disabled={!hasPreviousQuestion || isDisabled}
                   aria-label="Previous Question"
                   className="h-10 w-10"
                 >
@@ -65,7 +68,7 @@ export const QuizActions = ({
                   variant="outline"
                   size="icon"
                   onClick={onNextQuestion}
-                  disabled={!hasNextQuestion || isSaving}
+                  disabled={!hasNextQuestion || isDisabled}
                   aria-label="Next Question"
                   className="h-10 w-10"
                 >
@@ -86,7 +89,7 @@ export const QuizActions = ({
             {/* Skip */}
             <Button
               className="flex-1 h-10"
-              disabled={isSaving}
+              disabled={isDisabled}
               variant="outline"
               onClick={onSkip}
             >
@@ -103,7 +106,7 @@ export const QuizActions = ({
             {/* Preview Later */}
             <Button
               className="flex-1 h-10"
-              disabled={isSaving}
+              disabled={isDisabled}
               variant="outline"
               onClick={onLater}
             >
@@ -123,7 +126,7 @@ export const QuizActions = ({
             {/* Save & Next - Primary action */}
             <Button
               className="flex-1 h-10"
-              disabled={isSaving}
+              disabled={isDisabled}
               variant="default"
               onClick={onSave}
             >
@@ -145,7 +148,7 @@ export const QuizActions = ({
                     variant="outline"
                     size="icon"
                     onClick={onPrevQuestion}
-                    disabled={!hasPreviousQuestion || isSaving}
+                    disabled={!hasPreviousQuestion || isDisabled}
                     aria-label="Previous Question"
                     className="hidden sm:flex h-10 w-10"
                   >
@@ -165,7 +168,7 @@ export const QuizActions = ({
                     variant="outline"
                     size="icon"
                     onClick={onNextQuestion}
-                    disabled={!hasNextQuestion || isSaving}
+                    disabled={!hasNextQuestion || isDisabled}
                     aria-label="Next Question"
                     className="hidden sm:flex h-10 w-10"
                   >

@@ -11,8 +11,8 @@ import {
   Trash2,
   X,
   AlertCircle,
+  RotateCcw,
 } from "lucide-react";
-import { Play } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -24,7 +24,6 @@ import { Loader } from "@/components/ui/loader";
 import {
   Drawer,
   DrawerContent,
-  DrawerDescription,
   DrawerHeader,
   DrawerTitle,
 } from "@/components/ui/drawer";
@@ -382,7 +381,7 @@ export const TestHistoryDrawer = ({
                                     size="small"
                                   />
                                 ) : (
-                                  <Play className="h-4 w-4 text-muted-foreground" />
+                                  <RotateCcw className="h-4 w-4 text-muted-foreground" />
                                 )}
                               </div>
                               <div className="text-xs text-muted-foreground">
