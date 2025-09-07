@@ -1,6 +1,14 @@
 import type { MultiLangText } from "@/lib/type";
 
-import { ChevronDown, ChevronUp } from "lucide-react";
+import {
+  CheckCircle2,
+  ChevronDown,
+  ChevronUp,
+  Clock3,
+  XCircle,
+} from "lucide-react";
+
+import { Card } from "../ui/card";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -18,7 +26,7 @@ const getStatusColor = (status: QuestionStatusType | undefined) => {
     case "skipped":
       return "bg-red-100 text-red-700 dark:bg-red-600/30 dark:text-red-300";
     default:
-      return "bg-background text-foreground";
+      return "text-dual-muted";
   }
 };
 
@@ -62,60 +70,27 @@ export const QuestionNavigation = ({
         </button>
 
         {/* Legend */}
-        <div
+        <Card
           className={cn(
-            "space-y-1 mb-10 p-3 rounded-lg bg-muted",
+            "space-y-2 mb-10 p-4 rounded-xl border text-dual-muted",
             !showNumbers && "lg:block hidden",
           )}
         >
-          <div className="flex items-center space-x-2">
-            <svg
-              className="w-4 h-4 text-green-600"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-            >
-              <path
-                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                fillRule="evenodd"
-              />
-            </svg>
-            <span className="text-green-600 dark:text-green-400 text-sm font-medium">
-              Solved questions
-            </span>
+          <div className="flex items-center gap-2 ">
+            <CheckCircle2 className="w-4 h-4 text-green-600 dark:text-green-400" />
+            <span className="text-sm font-medium ">Solved questions</span>
           </div>
 
-          <div className="flex items-center space-x-2">
-            <svg
-              className="w-4 h-4 text-blue-600"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-            >
-              <path
-                d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
-                fillRule="evenodd"
-              />
-            </svg>
-            <span className="text-blue-600 dark:text-blue-400 text-sm font-medium">
-              Questions for later
-            </span>
+          <div className="flex items-center gap-2">
+            <Clock3 className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+            <span className="text-sm font-medium ">Questions for later</span>
           </div>
 
-          <div className="flex items-center space-x-2">
-            <svg
-              className="w-4 h-4 text-red-600"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-            >
-              <path
-                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                fillRule="evenodd"
-              />
-            </svg>
-            <span className="text-red-600 dark:text-red-400 text-sm font-medium">
-              Skipped questions
-            </span>
+          <div className="flex items-center gap-2">
+            <XCircle className="w-4 h-4 text-red-600 dark:text-red-400" />
+            <span className="text-sm font-medium ">Skipped questions</span>
           </div>
-        </div>
+        </Card>
 
         {/* Question Numbers Grid */}
         <div
@@ -133,9 +108,9 @@ export const QuestionNavigation = ({
               <Button
                 key={question.id}
                 className={cn(
-                  "w-8 h-8 lg:w-9 lg:h-9 rounded-full",
+                  "w-9 h-9 font-bold",
                   "border border-border",
-                  "hover:bg-accent hover:text-accent-foreground",
+                  "text-red-500 hover:text-accent-foreground",
                   "focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
                   getStatusColor(status),
                   isCurrent && "ring-2 ring-white", // Always apply ring for current question

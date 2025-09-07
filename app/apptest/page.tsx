@@ -1,63 +1,24 @@
 "use client";
+import { CheckCircle2 } from "lucide-react";
 
-import { ShowLoading } from "@/components/showLoading";
-import { useTestHistory } from "@/lib/store/test-history-Store";
+import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
+import { Loader } from "@/components/ui/loader";
 
-export default function Page() {
-  const history = useTestHistory((state) => state.history);
-
+export default function TestSubmitted() {
   return (
-    <div>
-      <ShowLoading loadingSize="sm" text="Loading history..." />
+    <div className="min-h-screen flex items-center justify-center px-4">
+      <Card className="w-full max-w-md rounded-2xl shadow-lg text-muted-foreground">
+        <CardHeader className="flex flex-col items-center text-center space-y-4">
+          <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
+            <CheckCircle2 className="w-10 h-10 text-primary" />
+          </div>
+          <CardTitle className="text-2xl">Test Submitted!</CardTitle>
+        </CardHeader>
+        <CardContent className="flex flex-col items-center space-y-3">
+          <Loader size="medium" variant="spin" />
+          <p className="text-sm ">Calculating your result, please wait...</p>
+        </CardContent>
+      </Card>
     </div>
   );
 }
-
-/*
-// demo use of markdown
-
-import { MarkdownRenderer } from "@/components/newMarkdownRender";
-
-const markdownContent = `
-# Question Title
-
-###### Subtitle
-
-Here is a table:
-
-| Amit kumar | Badal raj | Deepak kumar | Deepak kumar |
-|---|---|---|---|
-| 1 | 2 | 3 | 4 |
-
-\`\`\`rust
-fn main() {
-// error: semicolon is missing
-  println!("hello woddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddrld");
-  for i in 1..4 {
-    println!("{}", i);
-  }
-}
-\`\`\`
-
-Here is an image:
-
-![Alt text](https://picsum.photos/600/300)
-
-And an equation: $E=mc^2$
-
-Block equation:
-
-$$\\int_0^\\infty e^{-x^2} dx = \\frac{\\sqrt{\\pi}}{2}$$
-`;
-
-export default function Page() {
-  return (
-    <div className="min-h-screen bg-background p-8">
-      <div className="max-w-4xl mx-auto">
-        <MarkdownRenderer content={markdownContent} />
-      </div>
-    </div>
-  );
-};
-
-*/

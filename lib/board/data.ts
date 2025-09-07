@@ -176,21 +176,31 @@ export const boardExam: EducationalData = {
               ],
             },
 
+            // {
+            //   id: "english",
+            //   name: "English",
+            //   chapters: [
+            //     {
+            //       id: "prose",
+            //       name: "Prose",
+            //     },
+            //     {
+            //       id: "poetry",
+            //       name: "Poetry",
+            //     },
+            //     {
+            //       id: "grammar",
+            //       name: "Grammar",
+            //     },
+            //   ],
+            // },
             {
-              id: "english",
-              name: "English",
+              id: "hindi",
+              name: "Hindi",
               chapters: [
                 {
-                  id: "prose",
-                  name: "Prose",
-                },
-                {
-                  id: "poetry",
-                  name: "Poetry",
-                },
-                {
-                  id: "grammar",
-                  name: "Grammar",
+                  id: "shram-vibhajan-aur-jati-pratha",
+                  name: "श्रम विभाजन और जाति प्रथा",
                 },
               ],
             },

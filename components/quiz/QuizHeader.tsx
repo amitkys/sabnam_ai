@@ -91,7 +91,9 @@ export const QuizHeader = ({ duration, onExit, onSubmit }: QuizHeaderProps) => {
     <div className="flex justify-between items-center gap-4">
       {/* <Timer initialTime={duration} /> */}
       <div className="flex-1 min-w-0 ml-2 mt-2">
-        <p className="text-base font-bold truncate">{exactName}</p>
+        <p className="text-base font-bold truncate text-dual-muted">
+          {exactName}
+        </p>
       </div>
       <div className="flex space-x-2 flex-shrink-0">
         <ModeToggle />

@@ -345,3 +345,7 @@
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
 }   
+
+.text-dual-muted {
+  @apply text-foreground dark:text-muted-foreground;
+}

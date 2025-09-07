@@ -54,7 +54,9 @@ export const QuestionCard = ({
           <span className="bg-muted/60 px-2 py-1 rounded">
             Qn. {currentNumber}/{totalQuestions}
           </span>
-          <Badge variant="outline">{question.tags?.join(", ")}</Badge>
+          {question.tags?.length ? (
+            <Badge variant="outline">{question.tags.join(", ")}</Badge>
+          ) : null}
         </div>
         <div className="flex-1 min-w-0">
           {/* Use the reusable markdown renderer for question text */}

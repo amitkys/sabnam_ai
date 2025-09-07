@@ -6,12 +6,13 @@ import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "@bprogress/next/app";
 import { toast } from "sonner";
+import { CheckCircle2 } from "lucide-react";
 
 import { Loader } from "../ui/loader";
 
 import { useQuizStore } from "@/lib/store/useQuizStore";
 import { useFullscreen } from "@/hooks/use-fullscreen";
-import { Card } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { SaveQuestionResponse, SubmitTest } from "@/lib/actions";
 import { StartScreen } from "@/components/quiz/startScreen";
 import { QuizHeader } from "@/components/quiz/QuizHeader";
@@ -86,7 +87,6 @@ export default function QuizInterface({
 
   // Handle question navigation
   const handleQuestionNavigation = (idx: number) => {
-    toggleShowNumbers();
     setCurrentQuestion(idx);
   };
 
@@ -190,8 +190,6 @@ export default function QuizInterface({
             }
           },
           {
-            loading: "Submitting test...",
-            success: "Test submitted successfully",
             error: "Failed to submit test",
           },
         );
@@ -203,11 +201,19 @@ export default function QuizInterface({
 
   if (isSubmitting) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="flex flex-col items-center justify-center">
-          <Loader size="medium" variant="spin" />
-          {/* <p className="text-lg font-medium text-foreground/75">Submitting test...</p> */}
-        </div>
+      <div className="min-h-screen flex items-center justify-center px-4">
+        <Card className="w-full max-w-md rounded-2xl shadow-lg text-dual-muted">
+          <CardHeader className="flex flex-col items-center text-center space-y-4">
+            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
+              <CheckCircle2 className="w-10 h-10 text-primary" />
+            </div>
+            <CardTitle className="text-2xl">Test Submitted!</CardTitle>
+          </CardHeader>
+          <CardContent className="flex flex-col items-center space-y-3">
+            <Loader size="medium" variant="spin" />
+            <p className="text-sm ">Calculating your result, please wait...</p>
+          </CardContent>
+        </Card>
       </div>
     );
   }
