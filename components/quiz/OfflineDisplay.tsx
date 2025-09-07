@@ -14,8 +14,8 @@ export const OfflineDisplay = () => {
           Please check your internet connection.
         </p>
         <Button onClick={() => window.location.reload()}>
-          <RefreshCw className="mr-2 h-4 w-4" />
-          Retry
+          <RefreshCw className="mr-1 h-4 w-4" />
+          Reload
         </Button>
       </div>
     </div>

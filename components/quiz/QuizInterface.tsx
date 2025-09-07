@@ -314,8 +314,8 @@ export default function QuizInterface({
             activeButton={activeButton}
             hasNextQuestion={currentQuestion < questions.length - 1}
             hasPreviousQuestion={currentQuestion > 0}
-            isSaving={isSaving}
             isOnline={isOnline}
+            isSaving={isSaving}
             onLater={() => handleQuestionAction("later")}
             onNextQuestion={() => handleQuestionNavigation(currentQuestion + 1)}
             onPrevQuestion={() => handleQuestionNavigation(currentQuestion - 1)}

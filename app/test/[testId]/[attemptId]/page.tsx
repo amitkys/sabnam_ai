@@ -7,6 +7,7 @@ import TestSererisSkeleton from "../loading";
 
 import { TestAttemptQuestionFetched } from "@/lib/type";
 import { QuizInterface } from "@/components/quiz";
+import { ErrorDisplay } from "@/components/error/ErrorDisplay";
 import { updateSelectedLanguage } from "@/lib/actions";
 
 const fetcher = async (url: string): Promise<TestAttemptQuestionFetched> => {
@@ -14,7 +15,7 @@ const fetcher = async (url: string): Promise<TestAttemptQuestionFetched> => {
 
   if (!res.ok) {
     const errorResponse = await res.json();
-    const error = new Error(errorResponse.message || "Unknown error");
+    const error = new Error(errorResponse.message || "Something went wrong");
 
     throw error;
   }
@@ -33,6 +34,7 @@ export default function Page() {
     data: testSeriesData,
     error,
     isLoading,
+    mutate,
   } = useSWR<TestAttemptQuestionFetched>(
     testSeriesId && testAttemptId
       ? `/api/testSeries/${testSeriesId}/${testAttemptId}`
@@ -67,22 +69,12 @@ export default function Page() {
   // Early returns after all hooks
   if (!testSeriesId || !testAttemptId) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-red-500">
-          <p>Invalid URL: Missing test series ID or attempt ID</p>
-        </div>
-      </div>
+      <ErrorDisplay message="Invalid test series ID or test attempt ID." />
     );
   }
 
   if (error) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-red-500">
-          <p>{error.message}</p>
-        </div>
-      </div>
-    );
+    return <ErrorDisplay message={error.message} retry={mutate} />;
   }
 
   if (isLoading) {
@@ -91,9 +83,10 @@ export default function Page() {
 
   if (!testSeriesData) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p>Failed to load test series data.</p>
-      </div>
+      <ErrorDisplay
+        message={"Failed to load test series data."}
+        retry={mutate}
+      />
     );
   }
 
