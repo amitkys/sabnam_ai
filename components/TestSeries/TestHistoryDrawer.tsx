@@ -161,10 +161,7 @@ export const TestHistoryDrawer = ({
   const handleResume = () => {
     if (selectedAttempt && !loadingAction) {
       setLoadingAction("resume");
-      toast.promise(Promise.resolve(), {
-        loading: "Redirecting to test...",
-        success: "Opening test...",
-      });
+      toast.info("Redirecting to test...");
       reset();
       onOpenChange(false);
       router.push(`/test/${testSeriesId}/${selectedAttempt.id}`);

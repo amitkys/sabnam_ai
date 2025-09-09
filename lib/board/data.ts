@@ -202,6 +202,10 @@ export const boardExam: EducationalData = {
                   id: "shram-vibhajan-aur-jati-pratha",
                   name: "श्रम विभाजन और जाति प्रथा",
                 },
+                {
+                  id: "vish-ke-daant",
+                  name: "विष के दाँत",
+                },
               ],
             },
           ],

@@ -13,7 +13,6 @@ export default function ToasterWrapper() {
 
   return (
     <Toaster
-      richColors
       position="top-center"
       theme={theme === "light" ? "dark" : "light"}
       toastOptions={{

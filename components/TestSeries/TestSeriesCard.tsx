@@ -3,6 +3,7 @@
 import { useRouter } from "@bprogress/next/app";
 import { useState, useCallback } from "react";
 import { toast } from "sonner";
+import { Languages } from "lucide-react";
 
 import { TestHistoryDrawer } from "./TestHistoryDrawer";
 import { TestSeriesCardContent } from "./TestSeriesCardContent";
@@ -28,7 +29,6 @@ import { getTestAttemptId } from "@/lib/actions";
 import { useAuthStore } from "@/lib/store/auth-store";
 import { useTestHistory } from "@/lib/store/test-history-Store";
 import { getBadgeLabel, getBadgeVariant } from "@/utils/utils";
-import { Languages } from "lucide-react";
 
 export const TestSeriesCard = ({
   testSeries,
@@ -53,11 +53,9 @@ export const TestSeriesCard = ({
       setLoading(true);
       const testAttemptId = await getTestAttemptId(testSeries.id);
 
-      toast.promise(Promise.resolve(), {
-        loading: "A new test on the way...",
-        success: "Test starting...",
-        error: "Failed to create test attempt",
-      });
+      if (testAttemptId) {
+        toast.info("Please wait, starting soon...");
+      }
 
       router.push(`/test/${testSeries.id}/${testAttemptId}`);
     } catch (error: any) {
@@ -75,7 +73,7 @@ export const TestSeriesCard = ({
             <div className="flex items-center justify-between">
               <Tooltip>
                 <TooltipTrigger>
-                  <Badge variant="outline" className="flex items-center gap-1">
+                  <Badge className="flex items-center gap-1" variant="outline">
                     <Languages size={14} />
                     {testSeries.availableLanguage.join(", ")}
                   </Badge>
