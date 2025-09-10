@@ -86,8 +86,8 @@ export const boardExam: EducationalData = {
               name: "Physics",
               chapters: [
                 {
-                  id: "reflection-of-light",
-                  name: "1. Reflection of Light",
+                  id: "light-reflection-and-refraction",
+                  name: "1. Light: Reflection & Refraction",
                 },
                 {
                   id: "refraction-of-light",

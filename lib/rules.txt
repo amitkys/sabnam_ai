@@ -100,3 +100,282 @@ import remarkGfm from 'remark-gfm';
 ### Validation
 - JSON must be valid
 - Math expressions must be properly escaped
+
+
+SPECIAL:
+
+FOR QUESTION:
+# AI Question Generation Guidelines 
+
+
+this is sample 
+
+
+
+ ```json 
+
+
+ { 
+
+
+   "text": { 
+
+
+     "en": "##### What is the value of $E=mc^2$?", 
+
+
+     "hi": "##### $E=mc^2$ का मान क्या है?" 
+
+
+   }, 
+
+
+   "answerIndex": 2, 
+
+
+   "options": [ 
+
+
+     { "en": "Option A", "hi": "विकल्प A" }, 
+
+
+     { "en": "Option B", "hi": "विकल्प B" }, 
+
+
+     { "en": "Correct Answer", "hi": "सही उत्तर" }, 
+
+
+     { "en": "Option D", "hi": "विकल्प D" } 
+
+
+   ], 
+
+
+   "marks": 1, 
+
+
+   "tags": ["physics", "relativity"] 
+
+
+ } 
+
+
+ ``` 
+ 
+ also this wrong syntax:
+{
+  "text": {
+    "en": "##### If the curved surface area of a cone is $880\ \text{cm}^2$ and its radius is $14\ \text{cm}$, then its slant height is",
+    "hi": "##### यदि किसी शंकु के वक्रपृष्ठ का क्षेत्रफल $880\ \text{सेमी}^2$ है और त्रिज्या $14\ \text{सेमी}$ है तो इसकी तिर्यक ऊँचाई है"
+  },
+  "answerIndex": 1,
+  "options": [
+    {
+      "en": "10 cm",
+      "hi": "10 सेमी"
+    },
+    {
+      "en": "20 cm",
+      "hi": "20 सेमी"
+    },
+    {
+      "en": "40 cm",
+      "hi": "40 सेमी"
+    },
+    {
+      "en": "30 cm",
+      "hi": "30 सेमी"
+    }
+  ],
+  "marks": 1,
+  "tags": []
+}
+
+THIS IS RIGHT!
+{
+  "text": {
+    "en": "##### If the curved surface area of a cone is $880 \\, \\text{cm}^2$ and its radius is $14 \\, \\text{cm}$, then its slant height is",
+    "hi": "##### यदि किसी शंकु के वक्रपृष्ठ का क्षेत्रफल $880 \\, \\text{सेमी}^2$ है और त्रिज्या $14 \\, \\text{सेमी}$ है तो इसकी तिर्यक ऊँचाई है"
+  },
+  "answerIndex": 1,
+  "options": [
+    {
+      "en": "10 cm",
+      "hi": "10 सेमी"
+    },
+    {
+      "en": "20 cm",
+      "hi": "20 सेमी"
+    },
+    {
+      "en": "40 cm",
+      "hi": "40 सेमी"
+    },
+    {
+      "en": "30 cm",
+      "hi": "30 सेमी"
+    }
+  ],
+  "marks": 1,
+  "tags": []
+}
+
+
+
+
+ ## 2. Formatting Rules 
+
+
+
+ ### Question Structure 
+
+
+ - AnswerIndex should be 0 based 
+
+
+ - Every question must start with `#####`  
+
+
+ - Question text might have tables, images, code blocks, blockquotes, etc. 
+
+
+ this is how you have add images:  
+
+
+ ##### What is the value of $E=mc^2$? \n ![Alt text](image address) \n 
+
+
+ this is how you have add tables:  
+
+
+ ##### What is the value of $E=mc^2$? \n | Column 1 | Column 2 | \n | --- | --- | \n | Row 1 | Row 2 | \n 
+
+
+ this is how you have add blockquotes:  
+
+
+ ##### What is the value of $E=mc^2$? \n > This is a blockquote \n 
+
+
+ this is how you have add code blocks:  
+
+
+ ##### What is the value of $E=mc^2$? \n ```python \n def hello(): \n     print("Hello") \n ``` \n 
+
+
+ - Question title should be same as provided in picture, do not modify 
+
+
+ - Use `\n` for line breaks in these cases: 
+
+
+   - Before and after code blocks 
+
+
+   - Before and after tables 
+
+
+   - Before and after images 
+
+
+   - Before and after blockquotes 
+
+
+   - Between distinct sections of a question 
+
+
+
+ ### Math Expressions 
+
+
+ I use this library to show complex math expression: import Markdown from "react-markdown"; 
+
+
+ import remarkMath from "remark-math"; 
+
+
+ import rehypeKatex from "rehype-katex"; 
+
+
+ import remarkGfm from 'remark-gfm'; 
+
+
+
+ - Always use `$` for both inline and display math 
+
+
+ - Example: `$E = mc^2$` or `$$\nE = mc^2\n$$` 
+
+
+ - Uses \\dfrac{...}{...} for clean, readable fractions 
+
+
+ - Maintains mathematical clarity and professionalism 
+
+
+
+ ### Code Blocks 
+
+
+ - Use triple backticks with language specification 
+
+
+ - Add `\n` before and after the code block 
+
+
+
+ ### Tables 
+
+
+ - Use markdown table syntax 
+
+
+ - Add `\n` before and after the table 
+
+
+
+ ## 3. Requirements 
+
+
+
+ ### Questions 
+
+
+ - Must start with `#####` prefix 
+
+
+ - Must use `$` for all math expressions, even single ones 
+
+
+ - Must use `\n` for proper spacing around blocks 
+
+
+
+ ### Options 
+
+
+ - One option must exactly match the "answer" field 
+
+
+ - Support same markdown as question text 
+
+
+
+ ### Validation 
+
+
+ - JSON must be valid j
+
+
+ - Math expressions must be properly escaped 
+
+
+
+ this is Json guideline. I'll provide image, you have to extract question in hindi, english language 
+
+keep tags always empty array
+
+
+FOR VERIFICATION:
+I will give you question in Json format, you have to check answer is correct or not, use emoji for clear and quick readability 
+note: answerIndex is 0 based
