@@ -12,6 +12,7 @@ interface TestSeriesCardContentProps {
   hasAttempted: boolean;
   lastScore?: number | null;
   testSeriesId: string;
+  onOpenDrawer: (isOpen: boolean) => void;
 }
 
 export const TestSeriesCardContent = ({
@@ -19,10 +20,10 @@ export const TestSeriesCardContent = ({
   hasAttempted,
   lastScore,
   testSeriesId,
+  onOpenDrawer,
 }: TestSeriesCardContentProps) => {
   const [shouldFetch, setShouldFetch] = useState(false);
-  const { setHistory, setIsDrawerOpen, setLoading, setError } =
-    useTestHistory();
+  const { setHistory, setLoading, setError } = useTestHistory();
 
   const {
     data: testHistory,
@@ -52,10 +53,10 @@ export const TestSeriesCardContent = ({
   useEffect(() => {
     if (testHistory) {
       setHistory(testHistory);
-      setIsDrawerOpen(true);
+      onOpenDrawer(true);
       setShouldFetch(false);
     }
-  }, [testHistory, setHistory, setIsDrawerOpen]);
+  }, [testHistory, setHistory, onOpenDrawer]);
 
   const handleViewHistory = () => {
     if (!isLoading) {

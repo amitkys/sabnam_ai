@@ -159,6 +159,7 @@ export const TestHistoryDrawer = ({
   };
 
   const handleResume = () => {
+    console.log("handleResume called", testSeriesId);
     if (selectedAttempt && !loadingAction) {
       setLoadingAction("resume");
       toast.info("Redirecting to test...");

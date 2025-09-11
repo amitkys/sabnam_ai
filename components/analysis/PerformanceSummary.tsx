@@ -2,10 +2,12 @@
 
 import { format } from "date-fns";
 import { Calendar, CheckCircle2, BarChart3 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+
+import { TestSeriesDetails } from "./types";
+
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
-import { TestSeriesDetails } from "./types";
 
 interface PerformanceSummaryProps {
   percentageCorrect: number;
@@ -27,9 +29,6 @@ export function PerformanceSummary({
           <BarChart3 className="h-5 w-5" />
           Performance Summary
         </CardTitle>
-        <CardDescription>
-          Overview of your test performance
-        </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-3">
@@ -39,7 +38,7 @@ export function PerformanceSummary({
               {percentageCorrect.toFixed(1)}%
             </span>
           </div>
-          <Progress value={percentageCorrect} className="h-2" />
+          <Progress className="h-2" value={percentageCorrect} />
         </div>
 
         <Separator />
@@ -48,7 +47,10 @@ export function PerformanceSummary({
           {chartData.map((item, index) => (
             <div key={index} className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <span className="h-4 w-4 rounded-full" style={{ backgroundColor: item.fill }} />
+                <span
+                  className="h-4 w-4 rounded-full"
+                  style={{ backgroundColor: item.fill }}
+                />
                 <span className="text-sm font-medium">{item.name}</span>
               </div>
               <div className="text-right">

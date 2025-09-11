@@ -8,7 +8,9 @@ import {
   LogOut,
   Maximize,
   Minimize,
+  Languages,
 } from "lucide-react";
+import { useCallback, useState } from "react";
 
 import { ModeToggle } from "../mode-toggle";
 
@@ -30,6 +32,10 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuPortal,
 } from "@/components/ui/dropdown-menu";
 import { useQuizStore } from "@/lib/store/useQuizStore";
 import {
@@ -39,6 +45,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useFullscreen } from "@/hooks/use-fullscreen";
+import { updateSelectedLanguage } from "@/lib/actions";
 
 interface QuizHeaderProps {
   duration: number;
@@ -47,9 +54,44 @@ interface QuizHeaderProps {
 }
 
 export const QuizHeader = ({ duration, onExit, onSubmit }: QuizHeaderProps) => {
-  const { isSubmitting, exactName, testData, questionStatus } = useQuizStore();
+  const {
+    isSubmitting,
+    exactName,
+    testData,
+    questionStatus,
+    selectedLanguage,
+    setSelectedLanguage,
+  } = useQuizStore();
   const { enterFullscreen, exitFullscreen, isFullscreen } = useFullscreen();
+  const [isSavingToDb, setIsSavingToDb] = useState(false);
+  const handleLanguageChange = useCallback(
+    async (value: string): Promise<boolean> => {
+      setIsSavingToDb(true);
 
+      try {
+        if (!testData?.id) {
+          console.warn("Attempt ID is not defined. Cannot save language.");
+
+          return false;
+        }
+
+        // Update store so other components see it too
+        setSelectedLanguage(value);
+
+        // Save to DB
+        await updateSelectedLanguage(testData.id, value);
+
+        return true;
+      } catch (error) {
+        console.error("Failed to save language:", error);
+
+        return false;
+      } finally {
+        setIsSavingToDb(false);
+      }
+    },
+    [testData?.id, setSelectedLanguage],
+  );
   const toggleFullscreen = async () => {
     if (isFullscreen) {
       await exitFullscreen();
@@ -196,6 +238,30 @@ export const QuizHeader = ({ duration, onExit, onSubmit }: QuizHeaderProps) => {
                   </span>
                 )}
               </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger>
+                  <span className="flex items-center gap-2">
+                    <Languages size={16} />
+                    <span>Language</span>
+                  </span>
+                </DropdownMenuSubTrigger>
+                <DropdownMenuPortal>
+                  <DropdownMenuSubContent>
+                    {testData?.testSeries?.availableLanguage?.map((lang) => (
+                      <DropdownMenuItem
+                        key={lang}
+                        disabled={selectedLanguage === lang}
+                        onClick={() => handleLanguageChange(lang)}
+                      >
+                        <span>
+                          {lang.charAt(0).toUpperCase() + lang.slice(1)}
+                        </span>
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuSubContent>
+                </DropdownMenuPortal>
+              </DropdownMenuSub>
             </DropdownMenuContent>
           </DropdownMenu>
           <AlertDialogContent>

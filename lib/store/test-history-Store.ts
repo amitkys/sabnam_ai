@@ -5,10 +5,8 @@ import { ITestAttemptHistoryResponse } from "@/lib/type";
 
 interface ITestHistoryStore {
   history: ITestAttemptHistoryResponse | null;
-  isDrawerOpen: boolean;
   isLoading: boolean;
   error: string | null;
-  setIsDrawerOpen: (value: boolean) => void;
   setHistory: (data: ITestAttemptHistoryResponse) => void;
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
@@ -21,10 +19,8 @@ export const useTestHistory = create<ITestHistoryStore>()(
   persist(
     (set, get) => ({
       history: null,
-      isDrawerOpen: false,
       isLoading: false,
       error: null,
-      setIsDrawerOpen: (value) => set({ isDrawerOpen: value }),
       setHistory: (data) => set({ history: data, error: null }),
       setLoading: (loading) => set({ isLoading: loading }),
       setError: (error) => set({ error }),
@@ -46,7 +42,6 @@ export const useTestHistory = create<ITestHistoryStore>()(
       reset: () =>
         set({
           history: null,
-          isDrawerOpen: false,
           isLoading: false,
           error: null,
         }),

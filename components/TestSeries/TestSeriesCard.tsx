@@ -39,8 +39,8 @@ export const TestSeriesCard = ({
   const [loading, setLoading] = useState(false);
   const { isAuthenticated } = useAuthStore();
   const [showLoginDialog, setShowLoginDialog] = useState(false);
-  const { isDrawerOpen, setIsDrawerOpen, history, isLoading, error } =
-    useTestHistory();
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const { history, isLoading, error } = useTestHistory();
 
   const handleNavigation = useCallback(async () => {
     if (!isAuthenticated) {
@@ -97,6 +97,7 @@ export const TestSeriesCard = ({
             lastScore={testSeries.lastScore}
             testSeriesId={testSeries.id}
             totalQuestions={testSeries.totalQuestions}
+            onOpenDrawer={setIsDrawerOpen}
           />
         </CardContent>
 
