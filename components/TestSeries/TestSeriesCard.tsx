@@ -28,7 +28,7 @@ import {
 import { getTestAttemptId } from "@/lib/actions";
 import { useAuthStore } from "@/lib/store/auth-store";
 import { useTestHistory } from "@/lib/store/test-history-Store";
-import { getBadgeLabel, getBadgeVariant } from "@/utils/utils";
+import { getBadgeLabel } from "@/utils/utils";
 
 export const TestSeriesCard = ({
   testSeries,
@@ -82,7 +82,7 @@ export const TestSeriesCard = ({
                   <p>Language support for this test</p>
                 </TooltipContent>
               </Tooltip>
-              <Badge variant={getBadgeVariant(testSeries.level)}>
+              <Badge variant={"secondary"}>
                 {getBadgeLabel(testSeries.level)}
               </Badge>
             </div>

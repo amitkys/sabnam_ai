@@ -151,7 +151,7 @@ export default function Loading() {
                     {[...Array(4)].map((_, j) => (
                       <div key={j} className="flex items-start gap-3 p-3 rounded-lg border">
                         <Skeleton className="h-4 w-4 rounded-full mt-1" />
-                        <div className="flex-grow space-y-2">
+                        <div className="grow space-y-2">
                           <Skeleton className="h-4 w-full" />
                         </div>
                       </div>

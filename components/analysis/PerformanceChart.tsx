@@ -49,7 +49,7 @@ export function PerformanceChart({
                 strokeWidth={5}
               />
               <ChartLegend
-                className="-translate-y-2 flex-wrap gap-2 [&>*]:basis-1/4 [&>*]:justify-center"
+                className="-translate-y-2 flex-wrap gap-2 *:basis-1/4 *:justify-center"
                 content={<ChartLegendContent nameKey="name" />}
               />
             </PieChart>

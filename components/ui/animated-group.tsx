@@ -7,7 +7,7 @@ export type PresetType =
   | "fade"
   | "slide"
   | "scale"
-  | "blur"
+  | "blur-sm"
   | "blur-slide"
   | "zoom"
   | "flip"
@@ -50,7 +50,7 @@ const presetVariants: Record<PresetType, Variants> = {
     hidden: { scale: 0.8 },
     visible: { scale: 1 },
   },
-  blur: {
+  "blur-sm": {
     hidden: { filter: "blur(4px)" },
     visible: { filter: "blur(0px)" },
   },

@@ -26,7 +26,7 @@ import { getChartData } from "@/utils/testingApi";
 const chartConfig = {
   totalAttempts: {
     label: "Attempts",
-    color: "hsl(var(--chart-5))",
+    color: "hsl(var(--chart-1))",
   },
 } satisfies ChartConfig;
 
@@ -97,14 +97,14 @@ export default function DashboardChart({
       <Card className="h-96 flex flex-col">
         <CardHeader className="pb-2">
           <div className="flex items-start justify-between gap-2 sm:items-center">
-            <CardTitle className="text-lg sm:text-xl flex-shrink-0">
+            <CardTitle className="text-lg sm:text-xl shrink-0">
               Test attempt history
             </CardTitle>
             <Select
               value={selectedYear.toString()}
               onValueChange={(value) => setSelectedYear(parseInt(value, 10))}
             >
-              <SelectTrigger className="w-[120px] sm:w-[180px] flex-shrink-0">
+              <SelectTrigger className="w-[120px] sm:w-[180px] shrink-0">
                 <SelectValue placeholder="Select Year" />
               </SelectTrigger>
               <SelectContent>
@@ -146,14 +146,14 @@ export default function DashboardChart({
     <Card className="h-96 flex flex-col">
       <CardHeader className="pb-2">
         <div className="flex items-start justify-between gap-2 sm:items-center">
-          <CardTitle className="text-lg sm:text-xl flex-shrink-0">
+          <CardTitle className="text-lg sm:text-xl shrink-0">
             Test attempt history
           </CardTitle>
           <Select
             value={selectedYear.toString()}
             onValueChange={(value) => setSelectedYear(parseInt(value, 10))}
           >
-            <SelectTrigger className="w-[120px] sm:w-[180px] flex-shrink-0">
+            <SelectTrigger className="w-[120px] sm:w-[180px] shrink-0">
               <SelectValue placeholder="Select Year" />
             </SelectTrigger>
             <SelectContent>
@@ -188,7 +188,7 @@ export default function DashboardChart({
                 const hasAttempts = data.totalAttempts > 0;
 
                 return (
-                  <div className="rounded-lg border bg-background px-2 py-1 shadow-sm">
+                  <div className="rounded-lg border bg-background px-2 py-1 shadow-xs">
                     <p className="font-medium">{label}</p>
                     {hasAttempts ? (
                       <p className="text-sm">
@@ -210,7 +210,7 @@ export default function DashboardChart({
                 radius: 8,
               }}
               dataKey="totalAttempts"
-              fill="var(--color-totalAttempts)"
+              fill="var(--chart-1)"
               radius={8}
             />
           </BarChart>

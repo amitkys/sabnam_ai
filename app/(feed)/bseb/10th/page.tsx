@@ -86,9 +86,7 @@ const Content = () => {
             <Button
               key={index}
               className="w-full text-base lg:text-lg py-6"
-              variant={
-                selectedSubject === subject.title ? "default" : "outline"
-              }
+              variant={"default"}
               onClick={() => handleSubjectSelect(subject.title)}
             >
               {subject.title}

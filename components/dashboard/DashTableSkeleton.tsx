@@ -35,10 +35,10 @@ export default function DashBoardTableSkeleton({
     <Card className="w-full animate-pulse">
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between gap-2 sm:items-center">
-          <CardTitle className="text-lg sm:text-xl flex-shrink-0">
+          <CardTitle className="text-lg sm:text-xl shrink-0">
             <div className="h-7 bg-muted rounded w-32" />
           </CardTitle>
-          <div className="w-[160px] sm:w-[180px] flex-shrink-0 h-10 bg-muted rounded" />
+          <div className="w-[160px] sm:w-[180px] shrink-0 h-10 bg-muted rounded" />
         </div>
       </CardHeader>
 

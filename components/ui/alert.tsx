@@ -28,7 +28,7 @@ const alertVariants = cva(
       },
       shadow: {
         none: "",
-        sm: "shadow-sm",
+        sm: "shadow-xs",
         md: "shadow-md",
         lg: "shadow-lg",
       },
@@ -72,7 +72,7 @@ const Alert = React.forwardRef<
       {dismissible && onDismiss && (
         <button
           aria-label="Dismiss alert"
-          className="absolute right-2 top-2 rounded-md p-1 text-foreground/50 hover:text-foreground hover:bg-foreground/5 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 transition-colors"
+          className="absolute right-2 top-2 rounded-md p-1 text-foreground/50 hover:text-foreground hover:bg-foreground/5 focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2 transition-colors"
           onClick={onDismiss}
         >
           <svg

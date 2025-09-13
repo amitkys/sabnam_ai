@@ -335,7 +335,7 @@ export const TestHistoryDrawer = ({
                         }}
                         className="cursor-pointer hover:opacity-80 transition-opacity"
                         dataKey="score"
-                        fill="var(--color-score)"
+                        fill="var(--chart-1)"
                         maxBarSize={50}
                         radius={[4, 4, 0, 0]}
                       />
@@ -348,7 +348,7 @@ export const TestHistoryDrawer = ({
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
                       <div>
-                        <Badge className="mb-2" variant="easy">
+                        <Badge className="mb-2" variant="secondary">
                           Score: {selectedAttempt.score || 0}
                         </Badge>
                       </div>

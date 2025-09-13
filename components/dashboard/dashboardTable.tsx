@@ -201,7 +201,7 @@ export default function DashBoardTable() {
       <Card className="w-full">
         <CardHeader className="pb-2">
           <div className="flex items-start justify-between gap-2 sm:items-center">
-            <CardTitle className="text-lg sm:text-xl flex-shrink-0">
+            <CardTitle className="text-lg sm:text-xl shrink-0">
               Test Results
             </CardTitle>
           </div>
@@ -240,11 +240,11 @@ export default function DashBoardTable() {
     <Card className="w-full">
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between gap-2 sm:items-center">
-          <CardTitle className="text-lg sm:text-xl flex-shrink-0">
+          <CardTitle className="text-lg sm:text-xl shrink-0">
             Test Results
           </CardTitle>
           <Select value={filterby} onValueChange={handleFilterChange}>
-            <SelectTrigger className="w-[160px] sm:w-[180px] flex-shrink-0">
+            <SelectTrigger className="w-[160px] sm:w-[180px] shrink-0">
               <SelectValue placeholder="Filter by..." />
             </SelectTrigger>
             <SelectContent>
@@ -360,7 +360,7 @@ export default function DashBoardTable() {
                             Pending
                           </Badge>
                         ) : (
-                          <Badge variant="easy">{test.score}</Badge>
+                          <Badge variant="secondary">{test.score}</Badge>
                         )}
                       </TableCell>
 

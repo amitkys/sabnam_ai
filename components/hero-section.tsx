@@ -177,20 +177,20 @@ export default function HeroSection() {
               <div className="relative -mr-56 mt-8 overflow-hidden px-2 sm:mr-0 sm:mt-12 md:mt-20">
                 <div
                   aria-hidden
-                  className="pointer-events-none absolute inset-0 z-10 bg-gradient-to-b from-transparent from-35% to-background"
+                  className="pointer-events-none absolute inset-0 z-10 bg-linear-to-b from-transparent from-35% to-background"
                 />
-                <div className="group relative mx-auto max-w-5xl overflow-hidden rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 p-1 shadow-2xl shadow-primary/40 transition-all duration-500 hover:shadow-primary/60 dark:from-primary/30 dark:to-primary/10 dark:shadow-primary/30">
+                <div className="group relative mx-auto max-w-5xl overflow-hidden rounded-2xl bg-linear-to-br from-primary/20 to-primary/5 p-1 shadow-2xl shadow-primary/40 transition-all duration-500 hover:shadow-primary/60 dark:from-primary/30 dark:to-primary/10 dark:shadow-primary/30">
                   <div className="rounded-xl bg-background p-2">
                     <Image
                       alt="app screen"
-                      className="relative hidden aspect-[15/8] rounded-lg bg-background dark:block"
+                      className="relative hidden aspect-15/8 rounded-lg bg-background dark:block"
                       height="1440"
                       src="/sabnam-new-dark.png"
                       width="2700"
                     />
                     <Image
                       alt="app screen"
-                      className="relative z-20 aspect-[15/8] rounded-lg border border-border/25 dark:hidden"
+                      className="relative z-20 aspect-15/8 rounded-lg border border-border/25 dark:hidden"
                       height="1440"
                       src="/sabnam-new-light.png"
                       width="2700"

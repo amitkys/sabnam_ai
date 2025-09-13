@@ -22,7 +22,7 @@ export function AuroraText({
     <motion.span
       className={cn(
         "relative inline-block bg-clip-text text-transparent",
-        "bg-gradient-to-r from-purple-400 to-pink-500 animate-text",
+        "bg-linear-to-r from-purple-400 to-pink-500 animate-text",
         className
       )}
       {...props}

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import "./globals.css";
+import "@bprogress/core/css";
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 
@@ -39,7 +40,7 @@ export default function RootLayout({
             disableTransitionOnChange
             enableSystem
             attribute="class"
-            defaultTheme="light"
+            defaultTheme="system"
           >
             <SidebarProvider>
               <SessionSync />

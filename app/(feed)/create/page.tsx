@@ -59,14 +59,14 @@ export default function DifficultySelector() {
   };
 
   return (
-    <div className="h-screen w-full bg-black/[0.96] antialiased bg-grid-white/[0.02] flex flex-col items-center justify-center relative overflow-hidden">
+    <div className="h-screen w-full bg-black/96 antialiased bg-grid-white/[0.02] flex flex-col items-center justify-center relative overflow-hidden">
       <div className="my-10">
         <AnimatedGradientTextDemo />
       </div>
       <Spotlight />
 
       {/* Centered Text */}
-      <h1 className="text-4xl md:text-7xl font-bold text-center bg-clip-text text-transparent bg-gradient-to-b from-neutral-50 to-neutral-400 bg-opacity-50 mb-10">
+      <h1 className="text-4xl md:text-7xl font-bold text-center bg-clip-text text-transparent bg-linear-to-b from-neutral-50 to-neutral-400 bg-opacity-50 mb-10">
         <AuroraText>Sabnam</AuroraText> AI
       </h1>
 

@@ -12,8 +12,7 @@ import {
 } from "lucide-react";
 import { useCallback, useState } from "react";
 
-import { ModeToggle } from "../mode-toggle";
-
+import { ModeToggle } from "@/components/mode-toggle";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -137,8 +136,9 @@ export const QuizHeader = ({ duration, onExit, onSubmit }: QuizHeaderProps) => {
           {exactName}
         </p>
       </div>
-      <div className="flex space-x-2 flex-shrink-0">
+      <div className="flex space-x-2 shrink-0">
         <ModeToggle />
+
         <AlertDialog>
           <AlertDialogTrigger asChild>
             <Button className="gap-2 lg:w-64" disabled={isSubmitting}>
@@ -201,7 +201,7 @@ export const QuizHeader = ({ duration, onExit, onSubmit }: QuizHeaderProps) => {
                 <TooltipTrigger asChild>
                   <DropdownMenuTrigger asChild>
                     <Button
-                      className="h-9 w-9 rounded-full focus-visible:outline-none whitespace-normal"
+                      className="h-9 w-9 rounded-full focus-visible:outline-hidden whitespace-normal"
                       disabled={isSubmitting}
                       size="icon"
                       variant="outline"

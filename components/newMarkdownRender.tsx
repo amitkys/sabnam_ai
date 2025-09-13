@@ -451,7 +451,7 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
   const commonComponents = {
     table: ({ children }: ComponentProps) => (
       <div className="my-6">
-        <div className="overflow-hidden rounded-lg border border-border shadow-sm custom-scrollbar">
+        <div className="overflow-hidden rounded-lg border border-border shadow-xs custom-scrollbar">
           <div className="overflow-x-auto">
             <table className="w-full border-collapse">{children}</table>
           </div>
@@ -514,7 +514,7 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
       <li className="flex items-start gap-2 text-foreground/90">
         <span
           className={cn(
-            "bg-primary rounded-full mt-2 flex-shrink-0",
+            "bg-primary rounded-full mt-2 shrink-0",
             variant === "minimal" ? "w-1 h-1" : "w-1.5 h-1.5",
           )}
         />

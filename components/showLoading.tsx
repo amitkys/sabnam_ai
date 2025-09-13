@@ -29,6 +29,7 @@ export const ShowLoading = ({
       <Loader
         className="text-muted-foreground"
         size={loadingSize ? loadingSize : "small"}
+        variant="ring"
       />
       <p className="">{text}</p>
     </div>

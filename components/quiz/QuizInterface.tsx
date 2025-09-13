@@ -251,7 +251,7 @@ export default function QuizInterface({
 
   return (
     <div className="min-h-screen bg-background text-foreground mb-48 sm:mb-0 transition-colors no-scrollbar">
-      <div className="flex-grow max-w-7xl mx-auto w-full">
+      <div className="grow max-w-7xl mx-auto w-full">
         <div className="border border-border rounded-lg p-4 space-y-4 h-full flex flex-col">
           {!isFullscreen && showFullscreenAlert && (
             <Alert
@@ -267,7 +267,7 @@ export default function QuizInterface({
               </div>
 
               {/* Right side: actions */}
-              <div className="flex gap-2 sm:flex-shrink-0">
+              <div className="flex gap-2 sm:shrink-0">
                 <Button
                   className="flex-1 sm:flex-none"
                   size="sm"
@@ -292,7 +292,7 @@ export default function QuizInterface({
             onExit={handleExit}
             onSubmit={handleSubmit}
           />
-          <div className="flex flex-col lg:flex-row gap-6 flex-grow min-h-0">
+          <div className="flex flex-col lg:flex-row gap-6 grow min-h-0">
             <div className="flex-1 flex flex-col min-h-0">
               <Card className="bg-card text-card-foreground border border-border flex-1 flex flex-col min-h-0">
                 <QuestionCard

@@ -50,13 +50,13 @@ export default function Pricing() {
             Special Launch Offer
           </Badge>
         </div>
-        <h2 className="text-4xl md:text-6xl font-bold tracking-tight mb-4 bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+        <h2 className="text-4xl md:text-6xl font-bold tracking-tight mb-4 bg-linear-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
           Simple Pricing
         </h2>
         <p className="text-lg text-muted-foreground mb-6">
           Start your Journey from here.
         </p>
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/20">
+        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-linear-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/20">
           <Sparkles className="h-4 w-4 text-yellow-600" />
           <span className="text-sm font-medium text-yellow-700 dark:text-yellow-300">
             Limited time offer - Get started today!
@@ -68,18 +68,18 @@ export default function Pricing() {
       <div className="flex justify-center pt-6">
         <Card
           className={cn(
-            "relative overflow-hidden border-0 bg-gradient-to-br from-background to-muted/20 backdrop-blur-sm transition-all duration-500 ease-out w-full max-w-lg",
+            "relative overflow-hidden border-0 bg-linear-to-br from-background to-muted/20 backdrop-blur-xs transition-all duration-500 ease-out w-full max-w-lg",
             isHovered ? "shadow-2xl shadow-primary/20 translate-y-[-8px] scale-[1.02]" : "shadow-xl hover:shadow-2xl",
           )}
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
         >
           {/* Gradient Background */}
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-secondary/5" />
+          <div className="absolute inset-0 bg-linear-to-br from-primary/5 via-transparent to-secondary/5" />
 
           {/* Popular Badge */}
           <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10 mt-6">
-            <Badge className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground px-4 py-1.5 text-sm font-semibold shadow-lg whitespace-nowrap">
+            <Badge className="bg-linear-to-r from-primary to-primary/80 text-primary-foreground px-4 py-1.5 text-sm font-semibold shadow-lg whitespace-nowrap">
               🔥 MOST POPULAR
             </Badge>
           </div>
@@ -88,7 +88,7 @@ export default function Pricing() {
             <CardTitle className="text-2xl font-bold">Startup Plan</CardTitle>
             <div className="mb-4">
               <div className="flex items-center justify-center gap-2">
-                <span className="text-6xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+                <span className="text-6xl font-bold bg-linear-to-r from-primary to-primary/70 bg-clip-text text-transparent">
                   ₹0
                 </span>
                 <div className="text-left">
@@ -110,9 +110,9 @@ export default function Pricing() {
                 <li key={index} className="flex items-center gap-3 group">
                   <div
                     className={cn(
-                      "flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center transition-all duration-300",
+                      "shrink-0 w-5 h-5 rounded-full flex items-center justify-center transition-all duration-300",
                       feature.highlight
-                        ? "bg-gradient-to-r from-yellow-500 to-orange-500 text-white"
+                        ? "bg-linear-to-r from-yellow-500 to-orange-500 text-white"
                         : "bg-primary/10 text-primary group-hover:bg-primary/20",
                     )}
                   >
@@ -141,7 +141,7 @@ export default function Pricing() {
           <CardFooter className="relative z-10 p-6 pt-8">
             <Button
               className={cn(
-                "w-full h-12 text-base font-semibold transition-all duration-300 bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary shadow-lg hover:shadow-xl",
+                "w-full h-12 text-base font-semibold transition-all duration-300 bg-linear-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary shadow-lg hover:shadow-xl",
                 isHovered ? "scale-[1.02]" : "",
               )}
               onClick={() => {

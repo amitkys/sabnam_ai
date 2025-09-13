@@ -84,7 +84,7 @@ export const TestSeriesCardContent = ({
             onClick={handleViewHistory}
           >
             {isLoading ? (
-              <ShowLoading loadingSize="sm" text="Loading..." />
+              <ShowLoading loadingSize="small" text="Loading..." />
             ) : (
               <>
                 <History size={14} />

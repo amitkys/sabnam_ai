@@ -111,7 +111,7 @@ export const QuestionNavigation = ({
                   "w-9 h-9 font-bold",
                   "border border-border",
                   "text-red-500 hover:text-accent-foreground",
-                  "focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+                  "focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2",
                   getStatusColor(status),
                   isCurrent && "ring-2 ring-white", // Always apply ring for current question
                 )}

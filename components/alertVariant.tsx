@@ -54,7 +54,7 @@
 
 //   return (
 //     <button
-//       className={`inline-flex items-center justify-center rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 ${sizeClasses[size]} ${variantClasses[variant]} ${className}`}
+//       className={`inline-flex items-center justify-center rounded-md font-medium transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 ${sizeClasses[size]} ${variantClasses[variant]} ${className}`}
 //       {...props}
 //     >
 //       {children}
@@ -87,7 +87,7 @@
 //         variant="info"
 //       >
 //         <div className="flex items-start sm:items-center gap-3">
-//           <Monitor className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0 mt-0.5 sm:mt-0" />
+//           <Monitor className="h-4 w-4 sm:h-5 sm:w-5 shrink-0 mt-0.5 sm:mt-0" />
 //           <div className="min-w-0 flex-1">
 //             <AlertTitle>Enhance Your Experience</AlertTitle>
 //             <div className="text-xs sm:text-sm opacity-80 mt-1">
@@ -96,7 +96,7 @@
 //           </div>
 //         </div>
 
-//         <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 sm:flex-shrink-0">
+//         <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 sm:shrink-0">
 //           <Button
 //             className="w-full sm:w-auto justify-center sm:justify-start"
 //             size="sm"
@@ -121,7 +121,7 @@
 //       <div className="space-y-4">
 //         <Alert className="flex items-center justify-between" variant="success">
 //           <div className="flex items-center gap-3">
-//             <div className="w-2 h-2 bg-green-500 rounded-full flex-shrink-0" />
+//             <div className="w-2 h-2 bg-green-500 rounded-full shrink-0" />
 //             <div>
 //               <AlertTitle>Success!</AlertTitle>
 //               <div className="text-xs sm:text-sm opacity-80">
@@ -136,7 +136,7 @@
 
 //         <Alert className="flex flex-col sm:flex-row gap-3" variant="warning">
 //           <div className="flex items-start gap-3 flex-1">
-//             <div className="w-2 h-2 bg-amber-500 rounded-full flex-shrink-0 mt-2" />
+//             <div className="w-2 h-2 bg-amber-500 rounded-full shrink-0 mt-2" />
 //             <div className="min-w-0">
 //               <AlertTitle>Warning</AlertTitle>
 //               <div className="text-xs sm:text-sm opacity-80 mt-1">
@@ -145,7 +145,7 @@
 //               </div>
 //             </div>
 //           </div>
-//           <div className="flex gap-2 sm:flex-shrink-0">
+//           <div className="flex gap-2 sm:shrink-0">
 //             <Button className="flex-1 sm:flex-none" size="sm" variant="outline">
 //               Review
 //             </Button>
@@ -160,7 +160,7 @@
 //           variant="destructive"
 //         >
 //           <div className="flex items-start sm:items-center gap-3 flex-1">
-//             <div className="w-2 h-2 bg-red-500 rounded-full flex-shrink-0 mt-0.5 sm:mt-0" />
+//             <div className="w-2 h-2 bg-red-500 rounded-full shrink-0 mt-0.5 sm:mt-0" />
 //             <div className="min-w-0">
 //               <AlertTitle>Error</AlertTitle>
 //               <div className="text-xs sm:text-sm opacity-80 mt-1">

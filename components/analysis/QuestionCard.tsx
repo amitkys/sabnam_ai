@@ -80,7 +80,7 @@ Solve & Compare my answer with the actual correct answer. If no answer is given 
 
   return (
     <>
-      <div className="py-4 px-2 md:px-4 border border-border rounded-lg space-y-4 hover:shadow-sm transition-shadow">
+      <div className="py-4 px-2 md:px-4 border border-border rounded-lg space-y-4 hover:shadow-xs transition-shadow">
         <div className="flex justify-between items-start">
           <div className="flex items-center gap-3">
             <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-primary font-medium text-sm">

@@ -21,18 +21,18 @@ const loaderStyles = tv({
       danger: "text-danger",
     },
     size: {
-      "micro": "size-2",
-      "tiny": "size-2.5",
+      micro: "size-2",
+      tiny: "size-2.5",
       "extra-small": "size-3",
-      "xs": "size-3.5",
+      xs: "size-3.5",
       small: "size-4",
-      "sm": "size-5",
+      sm: "size-5",
       medium: "size-6",
-      "md": "size-7",
+      md: "size-7",
       large: "size-8",
-      "lg": "size-9",
+      lg: "size-9",
       "extra-large": "size-10",
-      "xl": "size-11",
+      xl: "size-11",
       "2xl": "size-12",
       "3xl": "size-16",
       "4xl": "size-20",
@@ -205,7 +205,7 @@ interface LoaderProps
   LoaderVariantProps {
   variant?: keyof typeof LOADERS;
   percentage?: number;
-  isIndeterminate?: boolean;
+  isIndeterminate?: boolean | undefined;
   formatOptions?: Intl.NumberFormatOptions;
 }
 
@@ -218,8 +218,7 @@ const Loader = React.forwardRef<SVGSVGElement, LoaderProps>(
       size,
       ...spinnerProps
     } = props;
-    const LoaderPrimitive =
-      LOADERS[variant in LOADERS ? variant : DEFAULT_SPINNER];
+    const LoaderPrimitive = LOADERS[variant in LOADERS ? variant : "ring"];
 
     return (
       <ProgressBar

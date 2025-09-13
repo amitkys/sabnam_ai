@@ -92,7 +92,7 @@ export function ScrollToTopButton() {
               variant="outline"
               onClick={scrollToTop}
             >
-              <ArrowUp className="h-4 w-4 flex-shrink-0" strokeWidth={4} />
+              <ArrowUp className="h-4 w-4 shrink-0" strokeWidth={4} />
               {isExpanded && (
                 <span
                   className={cn(

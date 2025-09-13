@@ -59,7 +59,7 @@ export default function AdminPanelLayout({
       <Sidebar />
       <main
         className={cn(
-          "min-h-[calc(100vh_-_56px)] transition-[margin-left] ease-in-out duration-300",
+          "min-h-[calc(100vh-56px)] transition-[margin-left] ease-in-out duration-300",
           !settings.disabled && (!getOpenState() ? "lg:ml-[90px]" : "lg:ml-72"),
         )}
       >

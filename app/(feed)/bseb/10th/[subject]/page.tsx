@@ -84,7 +84,7 @@ const Content = ({ subjectName }: ISubject) => {
               key={index}
               className="w-full text-base lg:text-lg py-6 font-serif"
               disabled={loadingChapter === chapter.url}
-              variant={"outline"}
+              variant={"default"}
               onClick={() => handleChapterSelect(chapter.url)}
             >
               {loadingChapter === chapter.url && (

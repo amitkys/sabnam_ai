@@ -275,7 +275,7 @@ export default function Page() {
         <div className="flex justify-center items-center py-8">
           <div className="text-center mb-3">
             <h1 className="text-[31px] md:text-5xl font-extrabold tracking-tight text-gray-900 dark:text-white">
-              <span className="bg-gradient-to-r from-primary to-secondary-foreground bg-clip-text text-transparent">
+              <span className="bg-linear-to-r from-primary to-secondary-foreground bg-clip-text text-transparent">
                 Be the Best, Give a Test
               </span>
             </h1>
@@ -286,7 +286,7 @@ export default function Page() {
         <div className="grid grid-cols-1 gap-6 px-2">
           <Card className="bg-background">
             <CardHeader>
-              <CardTitle className={`text-2xl font-bold bg-gradient-to-r from-foreground to-foreground/65 bg-clip-text text-transparent`}>
+              <CardTitle className={`text-2xl font-bold bg-linear-to-r from-foreground to-foreground/65 bg-clip-text text-transparent`}>
                 Exam Preparations
               </CardTitle>
             </CardHeader>
@@ -323,7 +323,7 @@ export default function Page() {
 
           <Card className="bg-background">
             <CardHeader>
-              <CardTitle className={`text-2xl font-bold bg-gradient-to-r from-foreground to-foreground/65 bg-clip-text text-transparent`}>Question Banks</CardTitle>
+              <CardTitle className={`text-2xl font-bold bg-linear-to-r from-foreground to-foreground/65 bg-clip-text text-transparent`}>Question Banks</CardTitle>
             </CardHeader>
             <CardContent className="grid grid-cols-1 lg:grid-cols-2 gap-6 px-5">
               {categoryCards.filter(card => card.id === "ncert" || card.id === "cbse").map((card) => (

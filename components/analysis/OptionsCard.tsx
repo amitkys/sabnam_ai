@@ -20,7 +20,7 @@ export function OptionCard({ option, isCorrect, isUserSelected }: OptionCardProp
             : 'border-border bg-background'
         }`}
     >
-      <div className="flex-shrink-0 mt-0.5">
+      <div className="shrink-0 mt-0.5">
         <div
           className={`w-4 h-4 rounded-full flex items-center justify-center ${isCorrect
               ? "bg-green-500"
@@ -33,7 +33,7 @@ export function OptionCard({ option, isCorrect, isUserSelected }: OptionCardProp
           {isUserSelected && !isCorrect && <XCircle className="w-2 h-2 text-white" />}
         </div>
       </div>
-      <div className="flex-grow">
+      <div className="grow">
         <MarkdownRenderer
           content={option.text}
           variant="option"

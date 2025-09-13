@@ -57,7 +57,7 @@ export default function Feature() {
             Features
           </Badge>
         </div>
-        <h2 className="text-4xl md:text-6xl font-bold tracking-tight mb-4 bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+        <h2 className="text-4xl md:text-6xl font-bold tracking-tight mb-4 bg-linear-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
           Sabnam Provides
         </h2>
         <p className="text-muted-foreground text-lg max-w-[700px] mx-auto">
@@ -70,7 +70,7 @@ export default function Feature() {
           <Card
             key={index}
             className={cn(
-              "group relative transition-all duration-500 ease-out border-0 bg-gradient-to-br from-background to-muted/20 backdrop-blur-sm overflow-hidden",
+              "group relative transition-all duration-500 ease-out border-0 bg-linear-to-br from-background to-muted/20 backdrop-blur-xs overflow-hidden",
               hoveredFeature === index
                 ? "shadow-2xl shadow-primary/10 translate-y-[-8px] scale-[1.02]"
                 : "shadow-lg hover:shadow-xl",
@@ -80,7 +80,7 @@ export default function Feature() {
           >
             <div
               className={cn(
-                "absolute inset-0 bg-gradient-to-br opacity-0 transition-opacity duration-500",
+                "absolute inset-0 bg-linear-to-br opacity-0 transition-opacity duration-500",
                 feature.gradient,
                 hoveredFeature === index ? "opacity-100" : "",
               )}
@@ -116,7 +116,7 @@ export default function Feature() {
 
             <div
               className={cn(
-                "absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-primary/50 to-primary transition-all duration-500",
+                "absolute bottom-0 left-0 right-0 h-1 bg-linear-to-r from-primary/50 to-primary transition-all duration-500",
                 hoveredFeature === index ? "opacity-100" : "opacity-0",
               )}
             />

@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/card";
 export default function TestSererisSkeleton() {
   return (
     <div className="min-h-screen bg-background text-foreground transition-colors">
-      <div className="flex-grow max-w-7xl mx-auto w-full">
+      <div className="grow max-w-7xl mx-auto w-full">
         <div className="border border-border rounded-lg p-4 space-y-4 h-full flex flex-col">
           {/* Timer and Exit */}
           <div className="flex justify-between items-center">
@@ -14,7 +14,7 @@ export default function TestSererisSkeleton() {
             <Skeleton className="h-10 w-20 rounded-md bg-muted" />
           </div>
 
-          <div className="flex flex-col lg:flex-row gap-6 flex-grow">
+          <div className="flex flex-col lg:flex-row gap-6 grow">
             {/* Question Card */}
             <div className="flex-1 overflow-auto">
               <Card className="bg-card text-card-foreground border border-border p-6">
