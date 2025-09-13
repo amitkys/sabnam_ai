@@ -8,7 +8,7 @@ const ProgressBarProvider = ({ children }: { children: React.ReactNode }) => {
   return (
     <ProgressProvider
       color={progressColor}
-      height="2px"
+      height="3px"
       options={{
         showSpinner: false,
         trickle: true,
