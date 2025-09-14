@@ -97,16 +97,16 @@ function Content({
   const shareUrl = `sabnam.amitkys.in/analysis/${latestAttempt?.attemptId}`;
 
   const chartData = [
-    { name: "Correct", value: correctAnswers, fill: "var(--color-correct)" },
+    { name: "Correct", value: correctAnswers, fill: "var(--primary)" },
     {
       name: "Incorrect",
       value: incorrectAnswers,
-      fill: "var(--color-incorrect)",
+      fill: "var(--destructive)",
     },
     {
       name: "Unanswered",
       value: unansweredQuestions,
-      fill: "var(--color-unanswered)",
+      fill: "var(--muted-foreground)",
     },
   ];
 

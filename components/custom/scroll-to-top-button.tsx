@@ -86,10 +86,10 @@ export function ScrollToTopButton() {
             <Button
               className={cn(
                 "rounded-full transition-all duration-300 flex items-center justify-center overflow-hidden",
-                isVisible ? "opacity-100 text-muted-foreground" : "opacity-0",
+                isVisible ? "opacity-100" : "opacity-0",
                 isExpanded ? "w-auto px-4" : "w-10 h-10 px-0",
               )}
-              variant="outline"
+              variant="secondary"
               onClick={scrollToTop}
             >
               <ArrowUp className="h-4 w-4 shrink-0" strokeWidth={4} />
