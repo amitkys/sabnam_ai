@@ -11,7 +11,5 @@ export async function GET() {
     age: 23,
   };
 
-  await new Promise((resolve) => setTimeout(resolve, 5000));
-
   return NextResponse.json({ user }, { status: 200 });
 }

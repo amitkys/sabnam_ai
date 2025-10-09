@@ -35,7 +35,14 @@ export function ModeToggle() {
         <DropdownMenuItem
           onClick={() => {
             setTheme("system");
-            toast.success("System theme applied.");
+            toast.success("System theme applied.", {
+              cancel: {
+                label: "Dismiss",
+                onClick: () => {
+                  toast.dismiss();
+                },
+              },
+            });
           }}
         >
           System
