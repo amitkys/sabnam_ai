@@ -24,7 +24,8 @@ export default function ToasterWrapper() {
   return (
     <Toaster
       position="top-center"
-      theme={oppositeTheme as "light" | "dark" | "system"}
+      swipeDirections={["right", "left"]}
+      theme={oppositeTheme}
       toastOptions={{
         className: GeistSans.className,
         style: hasSidebar

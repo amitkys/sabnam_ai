@@ -36,12 +36,13 @@ export function ModeToggle() {
           onClick={() => {
             setTheme("system");
             toast.success("System theme applied.", {
-              cancel: {
-                label: "Dismiss",
-                onClick: () => {
-                  toast.dismiss();
-                },
-              },
+              // cancel: {
+              //   label: <CircleX size={18} />,
+              //   onClick: () => { },
+              // },
+              // cancelButtonStyle: {
+              //   backgroundColor: "transparent",
+              // },
             });
           }}
         >
