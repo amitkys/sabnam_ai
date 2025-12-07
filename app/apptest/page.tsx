@@ -1,8 +1,7 @@
-"use client";
-import { ErrorDisplay } from "@/components/error/ErrorDisplay";
+import { Streamdown } from "streamdown";
 
 export default function Page() {
-  return (
-    <ErrorDisplay gotoHome={true} message="Hello world" retry={() => { }} />
-  );
+  const fullResponse = `##### रेखाखण्ड $AB$ के मध्य बिन्दु $(2, 4)$ है और बिन्दु $A$ के नियामक $(5, 7)$ हैं तो बिन्दु $B$ के नियामक हैं\n\nआपने प्रश्न का कोई उत्तर नहीं दिया है।\n\nआइए इस समस्या को हल करें:\n\nमाना बिन्दु $B$ के नियामक $(x, y)$ हैं।\n\nमध्य बिन्दु सूत्र:\n$$\\left(\\frac{x_1 + x_2}{2}, \\frac{y_1 + y_2}{2}\\right)$$\n\nदिए गए मानों को रखने पर:\n$2 = \\frac{5 + x}{2}$ ... (1)\n$4 = \\frac{7 + y}{2}$ ... (2)\n\nसमीकरण (1) को हल करने पर:\n$2 = \\frac{5 + x}{2}$\n$4 = 5 + x$\n$x = 4 - 5$\n$x = -1$\n\nसमीकरण (2) को हल करने पर:\n$4 = \\frac{7 + y}{2}$\n$8 = 7 + y$\n$y = 8 - 7$\n$y = 1$\n\nइसलिए बिन्दु $B$ के नियामक $(-1, 1)$ हैं।\n\nदिए गए विकल्पों में से विकल्प 4, $(-1, 1)$ सही उत्तर है।\n\nनिष्कर्ष: सही उत्तर विकल्प 4, $(-1, 1)$ है। **आपने इस प्रश्न का कोई उत्तर नहीं दिया था।**`;
+
+  return <Streamdown>{fullResponse}</Streamdown>;
 }

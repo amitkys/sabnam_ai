@@ -1,36 +1,63 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AI Question Generation Guidelines (Optimized)
 
-## Getting Started
+## 1. JSON Structure & Schema
+Output must be a single JSON object containing `testseries` metadata and a `questions` array.
 
-First, run the development server:
+{
+  "testseries": {
+    "title": "BSEB 10th Mathematics",
+    "exactName": "board/10th",
+    "duration": 90,
+    "level": "m",
+    "availableLanguage": ["English", "Hindi"],
+    "preferredLanguage": "Hindi",
+    "isPublic": false,
+    "questions": [
+      // ... Question Objects (see below)
+    ]
+  }
+}
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+### Question Object Format
+-note: `tags` uses for 'question previously asked year name like, 2025, 2026 etc. if not provided year then set to empty array
+**Strict Rule:** `tags` must always be an empty array `[]`.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+{
+  "text": {
+    "en": "##### What is the value of $E=mc^2$?",
+    "hi": "##### $E=mc^2$ का मान क्या है?"
+  },
+  "answerIndex": 2, // 0-based index matching the correct option
+  "options": [
+    { "en": "Option A", "hi": "विकल्प A" },
+    { "en": "Option B", "hi": "विकल्प B" },
+    { "en": "Correct Answer", "hi": "सही उत्तर" },
+    { "en": "Option D", "hi": "विकल्प D" }
+  ],
+  "marks": 1,
+  "tags": [] 
+}
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 2. Formatting & Syntax Rules
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Text & Elements
+* **Prefix:** Every question text must start with `#####`.
+* **Line Breaks:** Use `\n` to separate distinct sections (images, tables, code, quotes).
+* **Markdown Syntax:**
+    * **Images:** `\n ![Alt text](url) \n`
+    * **Tables:** `\n | Col 1 | Col 2 | \n | --- | --- | \n | Val 1 | Val 2 | \n`
+    * **Blockquotes:** `\n > Quote text \n`
+    * **Code Blocks:** `\n ````python \n code_here \n ```` \n`
 
-## Learn More
+### Math & LaTeX (Crucial)
+* **Delimiters:** Use `$` for all math expressions (inline and display). Example: `$x^2$`.
+* **Escaping:** You must double-escape backslashes for JSON validity.
+    * ❌ **Wrong:** `$880\ \text{cm}^2$` or `\frac`
+    * ✅ **Right:** `$880 \\, \\text{cm}^2$` or `\\dfrac`
+* **Fractions:** Use `\\dfrac` for better visibility.
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 3. Extraction Checklist
+1.  **Extract:** Content in both English (`en`) and Hindi (`hi`).
+2.  **Validate:** Ensure specific option text matches `answerIndex`.
+3.  **Sanitize:** Ensure strict JSON validity (no trailing commas, properly escaped quotes/backslashes).
+4.  **Tags:** Set `"tags": []`.
