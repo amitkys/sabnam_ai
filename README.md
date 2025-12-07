@@ -61,3 +61,5 @@ Output must be a single JSON object containing `testseries` metadata and a `ques
 2.  **Validate:** Ensure specific option text matches `answerIndex`.
 3.  **Sanitize:** Ensure strict JSON validity (no trailing commas, properly escaped quotes/backslashes).
 4.  **Tags:** Set `"tags": []`.
+
+I'll provide image you have to extract question in json object
