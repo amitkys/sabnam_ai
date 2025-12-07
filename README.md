@@ -1,5 +1,4 @@
-# AI Question Generation Guidelines (Optimized)
-
+# AI Question (In JSON object) Generation Guidelines  
 ## 1. JSON Structure & Schema
 Output must be a single JSON object containing `testseries` metadata and a `questions` array.
 
@@ -19,7 +18,8 @@ Output must be a single JSON object containing `testseries` metadata and a `ques
 }
 
 ### Question Object Format
--note: `tags` uses for 'question previously asked year name like, 2025, 2026 etc. if not provided year then set to empty array
+-note: `tags` uses for 'question previously asked year name like, 2025, 2026 etc. if not provided year then set to empty array.
+ -- from 2nd response onwards, only give question object (not metadata)
 **Strict Rule:** `tags` must always be an empty array `[]`.
 
 {
