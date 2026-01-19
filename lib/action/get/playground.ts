@@ -5,8 +5,11 @@ import { ErrorTypes } from "@/lib/error-type";
 
 export async function getPlayground() {
   return actionWrapper(async () => {
-    throw new ActionError("what the fuck is going here", ErrorTypes.BAD_REQUEST)
 
-    return 5;
+    const user = {
+      name: "amitkys",
+      age: 23
+    }
+    return user;
   })
 }

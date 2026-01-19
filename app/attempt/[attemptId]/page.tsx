@@ -1,16 +1,23 @@
-import { getAttemptAction } from "@/lib/action/get-attempt-action";
-import { AttemptSummary } from "./_components/AttemptSummary";
-import { QuestionReviewCard } from "./_components/QuestionReviewCard";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
+"use client";
+import { useAttemptTest } from "@/hooks/get-attemp-test";
+import { useParams } from "next/navigation";
 
-export default async function Page({ params }: { params: { attemptId: string } }) {
-  const { attemptId } = await params;
-  const result = await getAttemptAction(attemptId);
+export default function Page() {
+  const params = useParams<{ attemptId: string }>();
+  const attemptId = params.attemptId;
+
+  const { data, isLoading, error } = useAttemptTest({ attemptId })
+
+  if (isLoading) {
+    return <div>loading...</div>
+  }
+
+  if (error) {
+    return <div>got error: {error.message}</div>
+  }
+
 
   return (
-    <div>le bettaaa </div>
+    <div>hi there</div>
   )
 }

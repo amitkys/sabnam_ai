@@ -9,8 +9,9 @@ export default function Page() {
   if (error) {
     return <div>got error: {error.message}</div>
   }
-  console.log(data)
+
+
   return (
-    <div>hi there</div>
+    <div>{data?.name}</div>
   )
 }
