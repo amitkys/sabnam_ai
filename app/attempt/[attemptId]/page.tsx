@@ -17,12 +17,16 @@ export default function Page() {
     return <div>got error: {error.message}</div>
   }
 
+  if (!data) {
+    <div>data not found</div>
+  }
+
   console.log(data);
 
 
   return (
     <div>
-      <Header />
+      <Header attemptId={attemptId} />
     </div>
   )
 }
