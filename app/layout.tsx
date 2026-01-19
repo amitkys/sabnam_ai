@@ -6,11 +6,8 @@ import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 
 import { ThemeProvider } from "@/components/provider/theme-provider";
-import SessionWrapper from "@/components/sessionProvider";
+
 import ProgressBarProvider from "@/components/navigation-progress";
-import AuthRedirect from "@/components/auth-redirect";
-import SessionSync from "@/components/session-sync";
-import AuthStatus from "@/utils/auth-status";
 import ToasterWrapper from "@/components/ToasterWrapper";
 import { SidebarProvider } from "@/components/sidebarContext";
 
@@ -29,29 +26,24 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <SessionWrapper>
-      <html
-        suppressHydrationWarning
-        className={`${GeistSans.variable} ${GeistMono.variable}`}
-        lang="en"
-      >
-        <body className="font-sans antialiased bg-background text-foreground">
-          <ThemeProvider
-            disableTransitionOnChange
-            enableSystem
-            attribute="class"
-            defaultTheme="system"
-          >
-            <SidebarProvider>
-              <SessionSync />
-              <AuthStatus />
-              <ProgressBarProvider>{children}</ProgressBarProvider>
-              <ToasterWrapper />
-              <AuthRedirect />
-            </SidebarProvider>
-          </ThemeProvider>
-        </body>
-      </html>
-    </SessionWrapper>
+    <html
+      suppressHydrationWarning
+      className={`${GeistSans.variable} ${GeistMono.variable}`}
+      lang="en"
+    >
+      <body className="font-sans antialiased bg-background text-foreground">
+        <ThemeProvider
+          disableTransitionOnChange
+          enableSystem
+          attribute="class"
+          defaultTheme="system"
+        >
+          <SidebarProvider>
+            <ProgressBarProvider>{children}</ProgressBarProvider>
+            <ToasterWrapper />
+          </SidebarProvider>
+        </ThemeProvider>
+      </body>
+    </html>
   );
 }

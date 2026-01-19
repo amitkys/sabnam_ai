@@ -1,4 +1,3 @@
-import { Text, Typography } from "@/components/ui/typography";
 import { prisma } from "@/lib/db";
 import Link from "next/link";
 

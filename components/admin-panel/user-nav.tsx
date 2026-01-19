@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { LayoutGrid, LogOut } from "lucide-react";
-import { useSession, signOut } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -22,10 +22,12 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 import { useAuthStore } from "@/lib/store/auth-store";
+import { authClient } from "@/lib/auth-client";
 
 export function UserNav() {
-  const { data: session, status } = useSession();
+  const { data: session, isPending } = authClient.useSession();
   const { isAuthenticated } = useAuthStore();
+  const router = useRouter();
 
   // If not authenticated, show login button
   if (!isAuthenticated) {
@@ -61,7 +63,7 @@ export function UserNav() {
             <DropdownMenuTrigger asChild>
               <Button
                 className="relative h-8 w-8 rounded-full"
-                disabled={status === "loading"}
+                disabled={isPending}
                 variant="outline"
               >
                 <Avatar className="h-8 w-8">
@@ -77,7 +79,7 @@ export function UserNav() {
         </Tooltip>
       </TooltipProvider>
 
-      {status === "authenticated" && (
+      {session && (
         <DropdownMenuContent forceMount align="end" className="w-56">
           <DropdownMenuLabel className="font-normal">
             <div className="flex flex-col space-y-1">
@@ -105,7 +107,15 @@ export function UserNav() {
           <DropdownMenuSeparator />
           <DropdownMenuItem
             className="hover:cursor-pointer"
-            onClick={() => signOut({ callbackUrl: "/" })}
+            onClick={async () => {
+              await authClient.signOut({
+                fetchOptions: {
+                  onSuccess: () => {
+                    router.push("/");
+                  },
+                },
+              });
+            }}
           >
             <LogOut className="w-4 h-4 mr-3 text-muted-foreground" />
             Logout

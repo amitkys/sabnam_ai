@@ -2,9 +2,9 @@
 
 import { Ellipsis, LogOut, LogIn } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
-import { signOut } from "next-auth/react";
 import Link from "next/link";
 import { useAuthStore } from "@/lib/store/auth-store";
+import { authClient } from "@/lib/auth-client";
 
 import { cn } from "@/lib/utils";
 import { getMenuList } from "@/lib/menu-list";
@@ -24,6 +24,7 @@ interface MenuProps {
 
 export function Menu({ isOpen }: MenuProps) {
   const pathname = usePathname();
+  const router = useRouter();
   const menuList = getMenuList(pathname);
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
@@ -124,7 +125,15 @@ export function Menu({ isOpen }: MenuProps) {
                     <Button
                       className="w-full justify-center h-10 mt-5"
                       variant="outline"
-                      onClick={() => signOut({ callbackUrl: "/" })}
+                      onClick={async () => {
+                        await authClient.signOut({
+                          fetchOptions: {
+                            onSuccess: () => {
+                              router.push("/");
+                            },
+                          },
+                        });
+                      }}
                     >
                       <span className={cn(isOpen === false ? "" : "mr-2")}>
                         <LogOut size={18} />

@@ -1,5 +1,5 @@
 "use client";
-import { signIn } from "next-auth/react";
+import { authClient } from "@/lib/auth-client";
 import { useState, useEffect } from "react";
 import { FaGoogle } from "react-icons/fa";
 import { useSearchParams } from "next/navigation";
@@ -38,14 +38,20 @@ export default function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
     try {
       setLoading(true);
       // Store the current URL before redirecting to login
+      let redirectTo = "/home";
       if (typeof window !== "undefined") {
         const callbackUrl = searchParams.get("callbackUrl");
-        const redirectTo =
+        redirectTo =
           callbackUrl || window.location.pathname + window.location.search;
 
         setRedirectUrl(redirectTo);
       }
-      await signIn("google");
+
+      await authClient.signIn.social({
+        provider: "google",
+        callbackURL: redirectTo,
+      });
+
     } catch (error) {
       console.error("Login error:", error);
       setLoading(false);

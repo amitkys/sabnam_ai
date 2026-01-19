@@ -22,7 +22,7 @@ async function main() {
         data: {
           name: faker.person.fullName(),
           email: faker.internet.email(),
-          avatar: faker.image.avatar(),
+          image: faker.image.avatar(),
           createdAt: faker.date.past({ years: 1 }),
         },
       });

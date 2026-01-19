@@ -1,15 +1,15 @@
 "use client";
-import { useSession } from "next-auth/react";
 import { useEffect } from "react";
 import { useAuthStore } from "@/lib/store/auth-store";
+import { authClient } from "@/lib/auth-client";
 
 export default function SessionSync() {
-  const { data: session, status } = useSession();
+  const { data: session, isPending, error } = authClient.useSession();
   const { setIsAuthenticated } = useAuthStore();
 
   useEffect(() => {
     // Update auth store when session changes
-    if (status === "loading") {
+    if (isPending) {
       // Still loading, don't change anything
       return;
     }
@@ -21,7 +21,7 @@ export default function SessionSync() {
       // User is not authenticated
       setIsAuthenticated(false);
     }
-  }, [session, status, setIsAuthenticated]);
+  }, [session, isPending, setIsAuthenticated]);
 
   return null; // This component doesn't render anything
-} 
+}
