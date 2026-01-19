@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client";
+import { Prisma } from "@/lib/generated/prisma/client";
 
 export interface MultiLangText extends Prisma.JsonObject {
   en: string;

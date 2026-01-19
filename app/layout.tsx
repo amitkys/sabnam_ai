@@ -10,6 +10,7 @@ import { ThemeProvider } from "@/components/provider/theme-provider";
 import ProgressBarProvider from "@/components/navigation-progress";
 import ToasterWrapper from "@/components/ToasterWrapper";
 import { SidebarProvider } from "@/components/sidebarContext";
+import QueryProviders from "@/components/provider/query-provider";
 
 export const metadata: Metadata = {
   title: "Sabnam",
@@ -39,7 +40,13 @@ export default function RootLayout({
           defaultTheme="system"
         >
           <SidebarProvider>
-            <ProgressBarProvider>{children}</ProgressBarProvider>
+            <ProgressBarProvider>
+              <QueryProviders>
+
+                {children}
+              </QueryProviders>
+
+            </ProgressBarProvider>
             <ToasterWrapper />
           </SidebarProvider>
         </ThemeProvider>

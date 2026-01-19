@@ -5,8 +5,10 @@ import { useRouter } from "next/navigation";
 
 export function StartTest({ testId }: { testId: string }) {
   const router = useRouter();
+
   const handleTestStart = async () => {
     const attemptId = await startTest({ testId });
+    console.log(attemptId)
     if (attemptId) {
       router.push(`/attempt/${attemptId}`);
     }

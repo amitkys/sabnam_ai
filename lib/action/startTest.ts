@@ -6,6 +6,7 @@ import { headers } from "next/headers";
 
 export async function startTest({testId}: {testId: string}) {
   const session = await auth.api.getSession({ headers: await headers() })
+  console.log(session);
 
   if(!session?.user.id){
     return null;
