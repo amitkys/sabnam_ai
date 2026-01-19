@@ -2,7 +2,7 @@
 import { revalidatePath } from "next/cache";
 
 import { ITestSeriesInput } from "@/lib/type";
-import prisma from "@/lib/db";
+import {prisma} from "@/lib/db";
 import { GetServerSessionHere } from "@/auth.config";
 
 export async function CreateTest(data: ITestSeriesInput) {

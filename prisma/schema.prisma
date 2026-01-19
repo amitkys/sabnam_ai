@@ -1,81 +1,229 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
 generator client {
-  provider = "prisma-client-js"
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
 }
 
 datasource db {
-  provider = "mongodb"
-  url      = env("DATABASE_URL")
+  provider = "postgresql"
 }
 
 model User {
-  id           String        @id @default(cuid()) @map("_id")
-  name         String
-  email        String        @unique
-  avatar       String?
-  testSeries   TestSeries[]
+  id            String    @id
+  name          String
+  email         String
+  emailVerified Boolean   @default(false)
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  sessions      Session[]
+  accounts      Account[]
+
   testAttempts TestAttempt[]
-  createdAt    DateTime      @default(now())
+
+  language String? @default("en")
+
+  @@unique([email])
+  @@map("user")
 }
 
-model TestSeries {
-  id                String        @id @default(cuid()) @map("_id")
-  title             String
-  exactName         String
-  questions         Question[]
-  testAttempts      TestAttempt[]
-  availableLanguage String[]      @default([])
-  preferredLanguage String // preferred language should come from db, suppose it's bseb, should be hindi, cbse, should be english
-  createdAt         DateTime      @default(now())
-  updatedAt         DateTime      @updatedAt
-  duration          Int
-  level             String        @default("n") //n for not specified, e for easy, m for medium, h for hard
-  isPublic          Boolean       @default(false) // whether this test is public or private
-  user              User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId            String
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([token])
+  @@index([userId])
+  @@map("session")
 }
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([userId])
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+  @@map("verification")
+}
+
+// ==========================================
+// 1. USER & AUTH
+// ==========================================
+
+// ==========================================
+// 2. THE CATEGORY TREE (Hierarchical)
+// ==========================================
+
+model Category {
+  id       String       @id @default(cuid())
+  name     String // e.g., "BSEB"
+  slug     String // e.g., "bseb"
+  type     CategoryType // Recursive Self-Relation
+  parentId String?
+  parent   Category?    @relation("CategoryHierarchy", fields: [parentId], references: [id])
+  children Category[]   @relation("CategoryHierarchy")
+
+  // Content
+  questions Question[]
+  tests     TestPaper[]
+
+  @@unique([slug, parentId])
+  @@index([slug])
+}
+
+enum CategoryType {
+  EXAM_BODY
+  EXAM_NAME
+  STANDARD
+  SUBJECT // full subject test belongs where chapter lives in subject 
+  CHAPTER
+  PYQ
+}
+
+// ==========================================
+// 3. QUESTION BANK
+// ==========================================
 
 model Question {
-  id           String     @id @default(cuid()) @map("_id")
-  text         Json
-  answerIndex  Int
-  options      Json
-  tags         String[]   @default([])
-  marks        Int        @default(1)
-  testSeriesId String
-  testSeries   TestSeries @relation(fields: [testSeriesId], references: [id], onDelete: Cascade)
-  answers      Answer[] // user answer wheather it's wrong or right
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
+  id           String       @id @default(cuid())
+  // Multi-language: { "en": "What is..", "hi": "Kya hai.." }
+  content      Json
+  imageUrl     String?
+  type         QuestionType
+  difficulty   Difficulty   @default(MEDIUM)
+  // { "en": "Explanation..", "hi": "Vivaran.." }
+  solution     Json? // Array of options with language support
+  options      Json?
+  correctValue String? // Organization
+  categoryId   String
+  category     Category     @relation(fields: [categoryId], references: [id])
 
-  @@index([testSeriesId])
+  // Relations
+  usedInTests TestQuestion[]
+  responses   StudentResponse[]
+
+  createdAt DateTime @default(now())
 }
+
+enum QuestionType {
+  MCQ_SINGLE
+  MCQ_MULTIPLE
+  INTEGER
+  NUMERICAL
+}
+
+enum Difficulty {
+  EASY
+  MEDIUM
+  HARD
+}
+
+// ==========================================
+// 4. TEST PAPERS
+// ==========================================
+
+model TestPaper {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  description String?
+  // Summary of languages available in this test
+  languages   String[] @default(["en"]) // <--- FIX: Lowercase "en" is standard
+  duration    Int
+  totalMarks  Int
+  isPublished Boolean  @default(false)
+
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id])
+
+  questions TestQuestion[]
+  attempts  TestAttempt[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+}
+
+model TestQuestion {
+  id            String    @id @default(cuid())
+  testPaperId   String
+  testPaper     TestPaper @relation(fields: [testPaperId], references: [id])
+  questionId    String
+  question      Question  @relation(fields: [questionId], references: [id])
+  positiveMarks Float
+  negativeMarks Float
+  orderIndex    Int
+
+  @@unique([testPaperId, questionId])
+}
+
+// ==========================================
+// 5. USER ATTEMPTS & ANALYTICS
+// ==========================================
 
 model TestAttempt {
-  id               String     @id @default(cuid()) @map("_id")
-  userId           String
-  testSeriesId     String
-  selectedLanguage String?
-  startedAt        DateTime   @default(now())
-  completedAt      DateTime?
-  score            Int?       @default(0)
-  totalMarks       Int? // Total possible marks
-  timeSpent        Int? // Time spent in minutes
-  user             User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  testSeries       TestSeries @relation(fields: [testSeriesId], references: [id], onDelete: Cascade)
-  answers          Answer[]
+  id          String        @id @default(cuid())
+  userId      String
+  user        User          @relation(fields: [userId], references: [id])
+  testPaperId String
+  testPaper   TestPaper     @relation(fields: [testPaperId], references: [id])
+  score       Float?
+  status      AttemptStatus @default(STARTED)
+  startedAt   DateTime      @default(now())
+  submittedAt DateTime?
 
-  @@index([userId, testSeriesId])
+  responses StudentResponse[]
 }
 
-model Answer {
-  id                  String      @id @default(cuid()) @map("_id")
-  testAttemptId       String
-  questionId          String
-  selectedOptionIndex Int? // Index of selected option in the options JSON array
-  markAs              String?
-  isCorrect           Boolean? // Added to store if the selected option was correct
-  testAttempt         TestAttempt @relation(fields: [testAttemptId], references: [id], onDelete: Cascade)
-  question            Question    @relation(fields: [questionId], references: [id], onDelete: Cascade)
+model StudentResponse {
+  id         String      @id @default(cuid())
+  attemptId  String
+  attempt    TestAttempt @relation(fields: [attemptId], references: [id])
+  questionId String
+  question   Question    @relation(fields: [questionId], references: [id])
+  userAnswer String?
+  isCorrect  Boolean     @default(false)
+  timeTaken  Int // <--- CRITICAL FIX BELOW:
+  // This constraint is required for prisma.studentResponse.upsert()
+  // It ensures a student can't have 2 answers for the same question in one attempt.
+  @@unique([attemptId, questionId])
+}
 
-  @@index([testAttemptId, questionId])
+enum AttemptStatus {
+  STARTED
+  PAUSED
+  COMPLETED
 }

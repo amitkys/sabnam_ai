@@ -709,3 +709,120 @@ layer(base);
   from { left: -80%; width: 80%; }
   to { left: 110%; width: 10%; }
 }
+
+
+/* ============================================================================
+   TYPOGRAPHY UTILITY CLASSES
+   Add these to your global CSS file (globals.css or styles.css)
+   ============================================================================ */
+
+/* Heading Styles */
+.text-h1 {
+  @apply scroll-m-20 text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl xl:text-6xl;
+}
+
+.text-h2 {
+  @apply scroll-m-20 text-2xl font-semibold tracking-tight sm:text-3xl lg:text-4xl;
+}
+
+.text-h3 {
+  @apply scroll-m-20 text-xl font-semibold tracking-tight sm:text-2xl lg:text-3xl;
+}
+
+.text-h4 {
+  @apply scroll-m-20 text-lg font-semibold tracking-tight sm:text-xl lg:text-2xl;
+}
+
+.text-h5 {
+  @apply scroll-m-20 text-base font-semibold tracking-tight sm:text-lg;
+}
+
+.text-h6 {
+  @apply scroll-m-20 text-sm font-semibold tracking-tight sm:text-base;
+}
+
+/* Body Text Styles */
+.text-p {
+  @apply text-base leading-7;
+}
+
+.text-lead {
+  @apply text-lg leading-relaxed text-muted-foreground sm:text-xl;
+}
+
+.text-large {
+  @apply text-lg font-semibold sm:text-xl;
+}
+
+.text-small {
+  @apply text-sm leading-snug font-medium;
+}
+
+.text-muted {
+  @apply text-sm text-muted-foreground leading-relaxed;
+}
+
+.text-xs-text {
+  @apply text-xs leading-tight;
+}
+
+/* Special Elements */
+.text-blockquote {
+  @apply mt-6 border-l-2 border-border pl-4 italic text-base sm:pl-6;
+}
+
+.text-code {
+  @apply relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-xs font-semibold sm:text-sm;
+}
+
+.text-inline {
+  @apply font-mono text-sm bg-muted px-1 py-0.5 rounded;
+}
+
+.text-link {
+  @apply font-medium text-primary underline underline-offset-4 hover:text-primary/80 transition-colors;
+}
+
+/* Color Variants */
+.text-destructive-color {
+  @apply text-destructive;
+}
+
+.text-warning-color {
+  @apply text-yellow-600 dark:text-yellow-500;
+}
+
+.text-success-color {
+  @apply text-green-600 dark:text-green-500;
+}
+
+/* ============================================================================
+   USAGE EXAMPLES
+   ============================================================================ */
+
+/*
+// Button with typography
+<button className="bg-primary text-primary-foreground px-4 py-2 rounded text-large">
+  Click me
+</button>
+
+// Link with typography  
+<Link href="/about" className="text-lead text-link">
+  About Us
+</Link>
+
+// Card title with typography
+<h3 className="text-h3">
+  Card Title
+</h3>
+
+// Paragraph with different styles
+<p className="text-lead">Important introduction text</p>
+<p className="text-p">Regular paragraph</p>
+<p className="text-muted">Less important text</p>
+
+// Combining styles
+<button className="bg-secondary text-h4 text-destructive-color">
+  Warning Button
+</button>
+*/
