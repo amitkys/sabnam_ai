@@ -1,6 +1,7 @@
 "use client";
 import { useAttemptTest } from "@/hooks/get-attemp-test";
 import { useParams } from "next/navigation";
+import { Header } from "./_components/header";
 
 export default function Page() {
   const params = useParams<{ attemptId: string }>();
@@ -16,8 +17,12 @@ export default function Page() {
     return <div>got error: {error.message}</div>
   }
 
+  console.log(data);
+
 
   return (
-    <div>hi there</div>
+    <div>
+      <Header />
+    </div>
   )
 }

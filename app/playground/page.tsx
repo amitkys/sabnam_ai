@@ -1,17 +1,14 @@
-"use client";
-import { usePlayground } from "@/hooks/use-playground";
+import { getAttemptAction } from "@/lib/action/get-attempt-action";
+import { prisma } from "@/lib/db"
 
-export default function Page() {
-  const { data, error, isLoading } = usePlayground();
-  if (isLoading) {
-    return <div>loading</div>
+export default async function Page() {
+  const res = await getAttemptAction("cmkkxl7z7001k42czda9hb795");
+
+  if (res.success) {
+    const data = res.data;
+
+    console.log(JSON.stringify(data, null, 2))
   }
-  if (error) {
-    return <div>got error: {error.message}</div>
-  }
 
-
-  return (
-    <div>{data?.name}</div>
-  )
+  return null;
 }
