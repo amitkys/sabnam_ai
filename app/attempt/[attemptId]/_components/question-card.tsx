@@ -2,6 +2,8 @@
 
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
 import { useNewTestAttemptStore } from "@/lib/store/new-attempt-store";
 import { cn } from "@/lib/utils";
 import { Check, Circle } from "lucide-react";
@@ -63,7 +65,7 @@ export function QuestionCard() {
   };
 
   return (
-    <div className="">
+    <div className="w-full max-w-full">
       <Card className="px-2.5">
         <CardHeader className="">
           <div className="flex items-center justify-between">
@@ -82,7 +84,7 @@ export function QuestionCard() {
           </div>
 
           <div className="">
-            <h3 className="text-xl md:text-2xl font-semibold leading-relaxed ">
+            <h3 className="text-xl md:text-2xl font-semibold leading-relaxed break-all">
               {/* @ts-ignore: Prisma JSON types */}
               {getQuestionText(question.content)}
             </h3>
@@ -101,13 +103,17 @@ export function QuestionCard() {
         </CardHeader>
 
         <CardContent className="px-0">
-          <div className="grid gap-3">
+          <RadioGroup
+            value={currentAnswer || ""}
+            onValueChange={handleSelect}
+            className="grid gap-3"
+          >
             {options.map((opt) => {
               const isSelected = currentAnswer === opt.id;
               return (
-                <div
+                <Label
                   key={opt.id}
-                  onClick={() => handleSelect(opt.id)}
+                  htmlFor={opt.id}
                   className={cn(
                     "group relative flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all duration-200 ease-in-out",
                     "hover:border-primary/50 hover:bg-accent/30",
@@ -116,18 +122,20 @@ export function QuestionCard() {
                       : "border-muted bg-card"
                   )}
                 >
+                  <RadioGroupItem value={opt.id} id={opt.id} className="sr-only" />
+
                   {/* Option Label (A, B, C...) */}
                   <div className={cn(
-                    "flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold border-2 transition-colors",
+                    "flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold border-2 transition-colors",
                     isSelected
                       ? "border-primary bg-primary text-primary-foreground"
-                      : "border-muted-foreground/20 text-muted-foreground group-hover:border-primary/50 group-hover:text-primary"
+                      : "border-muted-foreground/10 text-muted-foreground group-hover:border-primary/20 group-hover:text-primary"
                   )}>
                     {opt.id}
                   </div>
 
                   {/* Option Text */}
-                  <div className="flex-1 text-base md:text-lg font-medium text-foreground/90">
+                  <div className="flex-1 text-base  font-medium break-all leading-normal">
                     {opt.text}
                   </div>
 
@@ -138,10 +146,10 @@ export function QuestionCard() {
                   )}>
                     <Check className="w-6 h-6" />
                   </div>
-                </div>
+                </Label>
               );
             })}
-          </div>
+          </RadioGroup>
         </CardContent>
       </Card>
 
