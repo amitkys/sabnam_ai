@@ -1,10 +1,33 @@
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { useAttemptTest } from "@/hooks/get-attemp-test"
+import { submitAttempt } from "@/lib/action/attempt-actions"
+import { useRouter } from "next/navigation"
 
 export function Header({ attemptId }: { attemptId: string }) {
-
+  const router = useRouter()
   const { data } = useAttemptTest({ attemptId })
+
+  const handleSubmit = async () => {
+    const confirm = window.confirm("Are you sure you want to submit the test?");
+    if (!confirm) return;
+
+    const submitResult = await submitAttempt(attemptId);
+    if (submitResult.success) {
+      router.refresh();
+      // Optionally redirect to result page
+      // router.push(`/attempt/${attemptId}/result`);
+    } else {
+      alert("Failed to submit test");
+    }
+  };
+
+  const handleExit = () => {
+    const confirm = window.confirm("Are you sure you want to exit? Your progress is saved.");
+    if (confirm) {
+      router.push("/");
+    }
+  }
 
   return (
     <Card className="relative flex flex-col gap-4 p-4 md:flex-row md:items-center md:justify-between">
@@ -19,7 +42,10 @@ export function Header({ attemptId }: { attemptId: string }) {
         {data?.testPaper.duration} min
       </p>
       {/* test controler button  */}
-      <Button size={"sm"} className="w-full md:w-auto">Submit</Button>
+      <div className="flex items-center gap-2 w-full md:w-auto">
+        <Button size={"sm"} variant="outline" className="w-full md:w-auto" onClick={handleExit}>Exit</Button>
+        <Button size={"sm"} className="w-full md:w-auto" onClick={handleSubmit}>Submit</Button>
+      </div>
     </Card>
   )
 }
