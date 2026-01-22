@@ -8,6 +8,7 @@ import { QuestionCard } from "./_components/question-card";
 import { QuestionPalette } from "./_components/question-palette";
 import { AttemptFooter } from "./_components/attempt-footer";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Card } from "@/components/ui/card";
 
 export default function Page() {
   const params = useParams<{ attemptId: string }>();
@@ -55,6 +56,11 @@ export default function Page() {
         <Header attemptId={attemptId} />
       </div>
 
+      {/* Mobile Question Palette */}
+      <div className="md:hidden flex-none px-4 py-3 border-b bg-background overflow-x-auto">
+        <QuestionPalette />
+      </div>
+
       {/* Scrollable Main Content Area */}
       <div className="flex-1 mt-2.5">
         <div className=" h-full pb-4">
@@ -70,7 +76,11 @@ export default function Page() {
             {/* Right Column: Question Palette (Scrollable) */}
             <div className="hidden md:flex md:col-span-4 lg:col-span-3 h-full flex-col overflow-hidden">
               <ScrollArea className="flex-1">
-                <QuestionPalette />
+                <Card className="h-full border-none shadow-sm">
+                  <div className="p-4">
+                    <QuestionPalette />
+                  </div>
+                </Card>
               </ScrollArea>
             </div>
           </div>
