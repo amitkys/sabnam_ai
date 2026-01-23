@@ -57,7 +57,7 @@ export default function Page() {
       </div>
 
       {/* Mobile Question Palette */}
-      <div className="md:hidden flex-none px-4 py-3 border-b bg-background overflow-x-auto">
+      <div className="md:hidden flex-none px-4 py-3 border-b bg-background  overflow-x-auto">
         <QuestionPalette />
       </div>
 
@@ -67,22 +67,20 @@ export default function Page() {
           <div className="grid grid-cols-1  md:grid-cols-12  h-full">
 
             {/* Left Column: Question Card (Scrollable) */}
-            <div className="md:col-span-8 lg:col-span-9 pr-8  h-full flex flex-col overflow-hidden">
-              <ScrollArea className="flex-1 ">
+            <Card className="md:col-span-8 lg:col-span-9  md:mr-8 flex flex-col overflow-hidden">
+              <ScrollArea className="flex-1">
                 <QuestionCard />
               </ScrollArea>
-            </div>
+            </Card>
 
             {/* Right Column: Question Palette (Scrollable) */}
-            <div className="hidden md:flex md:col-span-4 lg:col-span-3 h-full flex-col overflow-hidden">
+            <Card className="hidden  md:flex md:col-span-4  lg:col-span-3 h-full flex-col overflow-hidden">
               <ScrollArea className="flex-1">
-                <Card className="h-full border-none shadow-sm">
-                  <div className="p-4">
-                    <QuestionPalette />
-                  </div>
-                </Card>
+                <div className="p-4">
+                  <QuestionPalette />
+                </div>
               </ScrollArea>
-            </div>
+            </Card>
           </div>
         </div>
       </div>

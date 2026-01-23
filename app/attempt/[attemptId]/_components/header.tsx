@@ -42,9 +42,22 @@ export function Header({ attemptId }: { attemptId: string }) {
         {data?.testPaper.duration} min
       </p>
       {/* test controler button  */}
-      <div className="flex items-center gap-2 w-full md:w-auto">
-        <Button size={"sm"} variant="outline" className="w-full md:w-auto" onClick={handleExit}>Exit</Button>
-        <Button size={"sm"} className="w-full md:w-auto" onClick={handleSubmit}>Submit</Button>
+      <div className="flex items-center w-full md:w-auto">
+        <Button
+          size={"sm"}
+          variant="outline"
+          className="flex-1 md:w-auto rounded-r-none border-r-0"
+          onClick={handleExit}
+        >
+          Exit
+        </Button>
+        <Button
+          size={"sm"}
+          className="flex-1 md:w-auto rounded-l-none"
+          onClick={handleSubmit}
+        >
+          Submit
+        </Button>
       </div>
     </Card>
   )

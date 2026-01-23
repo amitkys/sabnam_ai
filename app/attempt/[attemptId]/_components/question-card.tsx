@@ -65,8 +65,8 @@ export function QuestionCard() {
   };
 
   return (
-    <div className="w-full max-w-full">
-      <Card className="px-2.5">
+    <div className="">
+      <Card className="px-2.5 border-none flex-1">
         <CardHeader className="">
           <div className="flex items-center justify-between">
             <p>
