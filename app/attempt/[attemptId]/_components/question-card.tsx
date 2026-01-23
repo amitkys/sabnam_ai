@@ -10,6 +10,7 @@ import { Check, Circle } from "lucide-react";
 import { useAttemptTest } from "@/hooks/get-attemp-test";
 import { useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { MarkdownRenderer } from "@/components/newMarkdownRender";
 
 // Define types based on what we expect from the API
 interface QuestionOption {
@@ -69,8 +70,8 @@ export function QuestionCard() {
       <Card className="px-2.5 border-none flex-1">
         <CardHeader className="">
           <div className="flex items-center justify-between">
-            <p>
-              Question {orderIndex}
+            <p className="text-muted">
+              Q.{orderIndex}
             </p>
             <div className="flex items-center gap-3 text-sm font-medium">
               <span className="text-emerald-600 flex items-center gap-1">
@@ -84,10 +85,10 @@ export function QuestionCard() {
           </div>
 
           <div className="">
-            <h3 className="text-xl md:text-2xl font-semibold leading-relaxed break-all">
+            <div className="font-semibold leading-relaxed">
               {/* @ts-ignore: Prisma JSON types */}
-              {getQuestionText(question.content)}
-            </h3>
+              <MarkdownRenderer content={getQuestionText(question.content)} variant="question" />
+            </div>
             {/* @ts-ignore: Prisma JSON types */}
             {question.imageUrl && (
               <div className="mt-6 rounded-xl overflow-hidden border bg-white p-2 inline-block">
@@ -135,8 +136,8 @@ export function QuestionCard() {
                   </div>
 
                   {/* Option Text */}
-                  <div className="flex-1 text-base  font-medium break-all leading-normal">
-                    {opt.text}
+                  <div className="flex-1 text-base font-medium leading-normal">
+                    <MarkdownRenderer content={opt.text} variant="option" />
                   </div>
 
                   {/* Selection Indicator */}

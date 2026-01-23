@@ -50,7 +50,7 @@ export default function Page() {
   }
 
   return (
-    <div className="flex flex-col px-2.5 pt-2 h-screen">
+    <div className="flex flex-col px-2.5  pt-2 h-screen">
       {/* Fixed Header */}
       <div className="flex-none">
         <Header attemptId={attemptId} />
