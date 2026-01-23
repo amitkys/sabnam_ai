@@ -24,22 +24,31 @@ export function QuestionPalette() {
         const isAnswered = answers.has(q.questionId);
         const isReview = markedForReview.has(q.questionId);
 
-        let variantClass = "bg-white text-muted-foreground hover:bg-muted hover:border-primary/30";
+        let variantClass =
+          "bg-muted/40 text-muted-foreground border border-border hover:bg-muted hover:border-primary/30";
+
+        if (isAnswered) {
+          variantClass =
+            "bg-emerald-900/60 text-emerald-100 border-none  hover:bg-emerald-900 shadow-[0_0_0_1px_rgba(16,185,129,0.25)]";
+        }
+
+        if (isReview) {
+          variantClass =
+            "bg-blue-900/50 text-blue-100 border border-blue-700 hover:bg-blue-900";
+        }
 
         if (isActive) {
-          variantClass = "bg-primary text-primary-foreground border-primary ring-2 ring-primary/20";
-        } else if (isReview) {
-          variantClass = "bg-blue-100 text-blue-700 border-blue-300";
-        } else if (isAnswered) {
-          variantClass = "bg-emerald-500 text-white border-emerald-500 hover:bg-emerald-600";
+          variantClass +=
+            " ring-2 ring-primary/40 ring-offset-2 ring-offset-background";
         }
+
 
         return (
           <button
             key={q.id}
             onClick={() => setActiveQuestionIndex(idx)}
             className={cn(
-              "flex-shrink-0 h-9 w-9 rounded-lg text-sm font-medium transition-all duration-200 border",
+              "flex-shrink-0 h-9 w-9 rounded-lg text-sm font-medium transition-all duration-200 border mt-2",
               variantClass
             )}
           >
