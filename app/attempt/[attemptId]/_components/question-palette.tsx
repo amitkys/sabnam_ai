@@ -29,9 +29,9 @@ export function QuestionPalette() {
         if (isActive) {
           variantClass = "bg-primary text-primary-foreground border-primary ring-2 ring-primary/20";
         } else if (isReview) {
-          variantClass = "bg-yellow-100 text-yellow-700 border-yellow-300";
+          variantClass = "bg-blue-100 text-blue-700 border-blue-300";
         } else if (isAnswered) {
-          variantClass = "bg-green-100 text-green-700 border-green-300";
+          variantClass = "bg-emerald-500 text-white border-emerald-500 hover:bg-emerald-600";
         }
 
         return (

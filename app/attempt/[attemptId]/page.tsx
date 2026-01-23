@@ -62,7 +62,7 @@ export default function Page() {
       </div>
 
       {/* Scrollable Main Content Area */}
-      <div className="flex-1 mt-2.5">
+      <div className="flex-1 mt-2.5 min-h-0">
         <div className=" h-full pb-4">
           <div className="grid grid-cols-1  md:grid-cols-12  h-full">
 
