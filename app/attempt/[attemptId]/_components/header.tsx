@@ -7,8 +7,10 @@ import { useFullscreen } from "@/hooks/use-fullscreen"
 import { submitAttempt } from "@/lib/action/attempt-actions"
 import { EllipsisVertical } from "lucide-react"
 import { useRouter } from "next/navigation"
+import { useTheme } from "next-themes"
 
 export function Header({ attemptId }: { attemptId: string }) {
+  const { setTheme } = useTheme();
   const router = useRouter()
   const { toggleFullscreen, isFullscreen } = useFullscreen();
   const { data } = useAttemptTest({ attemptId })
@@ -72,8 +74,8 @@ export function Header({ attemptId }: { attemptId: string }) {
             <DrawerStatelessSub>
               <DrawerStatelessSubTrigger>Appearance</DrawerStatelessSubTrigger>
               <DrawerStatelessSubContent>
-                <DrawerStatelessItem>Light</DrawerStatelessItem>
-                <DrawerStatelessItem>Dark</DrawerStatelessItem>
+                <DrawerStatelessItem onClick={() => setTheme("light")}>Light</DrawerStatelessItem>
+                <DrawerStatelessItem onClick={() => setTheme("dark")}>Dark</DrawerStatelessItem>
               </DrawerStatelessSubContent>
             </DrawerStatelessSub>
           </DrawerStatelessContent>
