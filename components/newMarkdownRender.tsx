@@ -419,7 +419,7 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
 
         // Handle option variant specially - use span for true inline
         if (variant === "option") {
-          return <span className="text-foreground inline">{children}</span>;
+          return <span className="text-foreground inline break-words">{children}</span>;
         }
 
         // Safe to use <p> tag
@@ -560,7 +560,7 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
     const variantClass = {
       default: "prose-base md:prose-lg",
       question: "prose-base md:prose-lg",
-      option: "prose-sm",
+      option: "prose-sm break-words break-all",
       analysis: "prose-sm",
       minimal: "prose-xs md:prose-sm",
     }[variant];

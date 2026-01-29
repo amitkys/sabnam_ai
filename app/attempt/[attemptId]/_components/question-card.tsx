@@ -87,9 +87,7 @@ export function QuestionCard() {
           <div className="">
             <div className="font-semibold leading-relaxed">
               {/* @ts-ignore: Prisma JSON types */}
-              {/* <MarkdownRenderer content={getQuestionText(question.content)} variant="question" /> */}
-              hi there Lorem ipsum dolor sit, amet consectetur adipisicing elit. Maiores dolorum molestias minus, itaque rerum officiis consequuntur eaque quia unde ad ex non sit quis similique eius excepturi, hic, facilis explicabo.
-              Minima animi eum tempore a! Quas officia totam porro perferendis veritatis voluptatem quibusdam aliquam temporibus delectus suscipit in minima nobis blanditiis quam provident, maiores modi, ut laborum obcaecati? Eveniet, temporibus.
+              <MarkdownRenderer content={getQuestionText(question.content)} variant="question" />
             </div>
             {/* @ts-ignore: Prisma JSON types */}
             {question.imageUrl && (
@@ -138,7 +136,7 @@ export function QuestionCard() {
                   </div>
 
                   {/* Option Text */}
-                  <div className="flex-1 text-base font-medium leading-normal">
+                  <div className="flex-1 text-base font-medium leading-normal break-words overflow-wrap-anywhere min-w-0">
                     <MarkdownRenderer content={opt.text} variant="option" />
                   </div>
 
