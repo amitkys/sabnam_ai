@@ -1,7 +1,7 @@
 import { ModeToggle } from "@/components/mode-toggle"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
-import { DropDrawer, DropDrawerContent, DropDrawerItem, DropDrawerSub, DropDrawerSubContent, DropDrawerSubTrigger, DropDrawerTrigger } from "@/components/ui/dropdrawer"
+import { DrawerStateless, DrawerStatelessContent, DrawerStatelessItem, DrawerStatelessSub, DrawerStatelessSubContent, DrawerStatelessSubTrigger, DrawerStatelessTrigger } from "@/components/ui/dropdrawer-stateless"
 import { useAttemptTest } from "@/hooks/get-attemp-test"
 import { useFullscreen } from "@/hooks/use-fullscreen"
 import { submitAttempt } from "@/lib/action/attempt-actions"
@@ -63,21 +63,21 @@ export function Header({ attemptId }: { attemptId: string }) {
         >
           Submit
         </Button>
-        <DropDrawer>
-          <DropDrawerTrigger asChild>
+        <DrawerStateless>
+          <DrawerStatelessTrigger asChild>
             <Button className="ml-2" variant="secondary" size={"icon-sm"}><EllipsisVertical /></Button>
-          </DropDrawerTrigger>
-          <DropDrawerContent>
-            <DropDrawerItem onClick={toggleFullscreen}>{isFullscreen ? "Exit Fullscreen" : "Full Screen"}</DropDrawerItem>
-            <DropDrawerSub>
-              <DropDrawerSubTrigger>Appearance</DropDrawerSubTrigger>
-              <DropDrawerSubContent>
-                <DropDrawerItem>Light</DropDrawerItem>
-                <DropDrawerItem>Dark</DropDrawerItem>
-              </DropDrawerSubContent>
-            </DropDrawerSub>
-          </DropDrawerContent>
-        </DropDrawer>
+          </DrawerStatelessTrigger>
+          <DrawerStatelessContent>
+            <DrawerStatelessItem onClick={toggleFullscreen}>{isFullscreen ? "Exit Fullscreen" : "Full Screen"}</DrawerStatelessItem>
+            <DrawerStatelessSub>
+              <DrawerStatelessSubTrigger>Appearance</DrawerStatelessSubTrigger>
+              <DrawerStatelessSubContent>
+                <DrawerStatelessItem>Light</DrawerStatelessItem>
+                <DrawerStatelessItem>Dark</DrawerStatelessItem>
+              </DrawerStatelessSubContent>
+            </DrawerStatelessSub>
+          </DrawerStatelessContent>
+        </DrawerStateless>
       </div>
     </Card>
   )
