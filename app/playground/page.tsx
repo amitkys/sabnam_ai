@@ -1,9 +1,8 @@
-import { ScrollArea } from "@/components/ui/scroll-area";
+"use client";
+import { ModeToggle } from "@/components/mode-toggle";
 
 export default function Page() {
   return (
-    <ScrollArea>
-      <div>he there </div>
-    </ScrollArea>
+    <ModeToggle />
   )
 }

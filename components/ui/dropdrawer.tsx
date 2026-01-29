@@ -674,9 +674,9 @@ interface SubmenuContextType {
 
 const SubmenuContext = React.createContext<SubmenuContextType>({
   activeSubmenu: null,
-  setActiveSubmenu: () => {},
+  setActiveSubmenu: () => { },
   submenuTitle: null,
-  setSubmenuTitle: () => {},
+  setSubmenuTitle: () => { },
   navigateToSubmenu: undefined,
   registerSubmenuContent: undefined,
 });

@@ -1,11 +1,16 @@
+import { ModeToggle } from "@/components/mode-toggle"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
+import { DropDrawer, DropDrawerContent, DropDrawerItem, DropDrawerSub, DropDrawerSubContent, DropDrawerSubTrigger, DropDrawerTrigger } from "@/components/ui/dropdrawer"
 import { useAttemptTest } from "@/hooks/get-attemp-test"
+import { useFullscreen } from "@/hooks/use-fullscreen"
 import { submitAttempt } from "@/lib/action/attempt-actions"
+import { EllipsisVertical } from "lucide-react"
 import { useRouter } from "next/navigation"
 
 export function Header({ attemptId }: { attemptId: string }) {
   const router = useRouter()
+  const { toggleFullscreen, isFullscreen } = useFullscreen();
   const { data } = useAttemptTest({ attemptId })
 
   const handleSubmit = async () => {
@@ -58,6 +63,21 @@ export function Header({ attemptId }: { attemptId: string }) {
         >
           Submit
         </Button>
+        <DropDrawer>
+          <DropDrawerTrigger asChild>
+            <Button className="ml-2" variant="secondary" size={"icon-sm"}><EllipsisVertical /></Button>
+          </DropDrawerTrigger>
+          <DropDrawerContent>
+            <DropDrawerItem onClick={toggleFullscreen}>{isFullscreen ? "Exit Fullscreen" : "Full Screen"}</DropDrawerItem>
+            <DropDrawerSub>
+              <DropDrawerSubTrigger>Appearance</DropDrawerSubTrigger>
+              <DropDrawerSubContent>
+                <DropDrawerItem>Light</DropDrawerItem>
+                <DropDrawerItem>Dark</DropDrawerItem>
+              </DropDrawerSubContent>
+            </DropDrawerSub>
+          </DropDrawerContent>
+        </DropDrawer>
       </div>
     </Card>
   )
