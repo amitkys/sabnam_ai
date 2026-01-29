@@ -709,6 +709,11 @@ layer(base);
   from { left: -80%; width: 80%; }
   to { left: 110%; width: 10%; }
 }
+/* get rid of scroll view (getting min-w-100% by default) */
+[data-radix-scroll-area-viewport] > div {
+  min-width: 0 !important;
+  display: block !important;
+}
 
 
 /* ============================================================================

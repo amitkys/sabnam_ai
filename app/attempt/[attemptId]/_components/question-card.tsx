@@ -68,7 +68,7 @@ export function QuestionCard() {
   return (
     <div className="">
       <Card className="px-2.5 border-none flex-1">
-        <CardHeader className="">
+        <CardHeader className="px-2 md:px-6">
           <div className="flex items-center justify-between">
             <p className="text-muted">
               Q.{orderIndex}
@@ -87,7 +87,9 @@ export function QuestionCard() {
           <div className="">
             <div className="font-semibold leading-relaxed">
               {/* @ts-ignore: Prisma JSON types */}
-              <MarkdownRenderer content={getQuestionText(question.content)} variant="question" />
+              {/* <MarkdownRenderer content={getQuestionText(question.content)} variant="question" /> */}
+              hi there Lorem ipsum dolor sit, amet consectetur adipisicing elit. Maiores dolorum molestias minus, itaque rerum officiis consequuntur eaque quia unde ad ex non sit quis similique eius excepturi, hic, facilis explicabo.
+              Minima animi eum tempore a! Quas officia totam porro perferendis veritatis voluptatem quibusdam aliquam temporibus delectus suscipit in minima nobis blanditiis quam provident, maiores modi, ut laborum obcaecati? Eveniet, temporibus.
             </div>
             {/* @ts-ignore: Prisma JSON types */}
             {question.imageUrl && (

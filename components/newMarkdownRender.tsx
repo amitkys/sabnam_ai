@@ -288,7 +288,7 @@ const CodeBlock = React.memo(({
             </button>
           </div>
         </div>
-        <div className="custom-scrollbar border-b border-l border-r border-border rounded-b-lg overflow-hidden">
+        <div className="custom-scrollbar border-b border-l border-r border-border rounded-b-lg overflow-x-auto">
           <SyntaxHighlighter
             PreTag="div"
             codeTagProps={{ className: "font-mono" }}
@@ -359,8 +359,22 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
       const Tag = `h${level}` as const;
 
       const sizeClasses = {
-        minimal: ["text-2xl", "text-xl", "text-lg", "text-base", "text-sm", "text-xs"],
-        default: ["text-4xl", "text-3xl", "text-2xl", "text-xl", "text-lg", "text-base"],
+        minimal: [
+          "text-xl md:text-2xl",
+          "text-lg md:text-xl",
+          "text-base md:text-lg",
+          "text-sm md:text-base",
+          "text-xs md:text-sm",
+          "text-xs"
+        ],
+        default: [
+          "text-2xl md:text-4xl",
+          "text-xl md:text-3xl",
+          "text-lg md:text-2xl",
+          "text-base md:text-xl",
+          "text-sm md:text-lg",
+          "text-xs md:text-base"
+        ],
       }[variant === "minimal" ? "minimal" : "default"];
 
       const baseClass = level <= 2
@@ -395,10 +409,10 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
         // If it has block elements, use a div instead of p
         if (hasBlock) {
           const textClass = variant === "minimal"
-            ? "mb-2 text-sm text-foreground/90"
+            ? "mb-2 text-sm text-foreground/90 break-words"
             : variant === "analysis"
-              ? "mb-2 leading-relaxed text-foreground/75"
-              : "mb-4 leading-relaxed text-foreground/90";
+              ? "mb-2 leading-relaxed text-foreground/75 break-words"
+              : "mb-4 leading-relaxed text-foreground/90 break-words";
 
           return <div className={textClass}>{children}</div>;
         }
@@ -410,10 +424,10 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
 
         // Safe to use <p> tag
         const textClass = variant === "minimal"
-          ? "mb-2 text-sm text-foreground/90"
+          ? "mb-2 text-sm text-foreground/90 break-words"
           : variant === "analysis"
-            ? "mb-2 leading-relaxed text-foreground/75"
-            : "mb-4 leading-relaxed text-foreground/90";
+            ? "mb-2 leading-relaxed text-foreground/75 break-words"
+            : "mb-4 leading-relaxed text-foreground/90 break-words";
 
         return <p className={textClass}>{children}</p>;
       },
@@ -463,7 +477,7 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
       ),
 
       th: ({ children }: BaseComponentProps) => (
-        <th className="px-4 py-3 text-left text-sm font-semibold text-foreground border-r border-border last:border-r-0">
+        <th className="px-2 py-2 md:px-4 md:py-3 text-left text-sm font-semibold text-foreground border-r border-border last:border-r-0">
           <div className="flex items-center">{children}</div>
         </th>
       ),
@@ -473,7 +487,7 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
       ),
 
       td: ({ children }: BaseComponentProps) => (
-        <td className="px-4 py-3 text-sm text-foreground/90 border-b border-border border-r last:border-r-0">
+        <td className="px-2 py-2 md:px-4 md:py-3 text-sm text-foreground/90 border-b border-border border-r last:border-r-0">
           {children}
         </td>
       ),
@@ -544,11 +558,11 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
   const wrapperClasses = useMemo(() => {
     const base = "prose prose-neutral dark:prose-invert max-w-none";
     const variantClass = {
-      default: "prose-lg",
-      question: "prose-lg",
+      default: "prose-base md:prose-lg",
+      question: "prose-base md:prose-lg",
       option: "prose-sm",
       analysis: "prose-sm",
-      minimal: "prose-sm",
+      minimal: "prose-xs md:prose-sm",
     }[variant];
 
     return cn(base, variantClass, className);

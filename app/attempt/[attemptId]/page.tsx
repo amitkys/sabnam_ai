@@ -65,7 +65,6 @@ export default function Page() {
       <div className="flex-1 mt-2.5 min-h-0">
         <div className=" h-full pb-4">
           <div className="grid grid-cols-1  md:grid-cols-12  h-full">
-
             {/* Left Column: Question Card (Scrollable) */}
             <Card className="md:col-span-8 lg:col-span-9  md:mr-8 flex flex-col overflow-hidden">
               <ScrollArea className="flex-1">
