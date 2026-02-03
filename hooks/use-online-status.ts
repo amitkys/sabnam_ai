@@ -1,79 +1,100 @@
-import { useCallback, useEffect, useState } from "react";
+"use client";
+
+import { useCallback, useEffect, useRef, useState } from "react";
+import { onlineManager } from "@tanstack/react-query";
 
 export function useOnlineStatus(pingUrl = "https://httpbin.org/status/200") {
   const [isOnline, setIsOnline] = useState(
-    typeof navigator !== "undefined" ? navigator.onLine : true,
+    typeof navigator !== "undefined" ? navigator.onLine : true
   );
 
-  const checkConnection = useCallback(async () => {
-    // If navigator says we're offline, trust it immediately
-    if (typeof navigator !== "undefined" && !navigator.onLine) {
-      setIsOnline(false);
+  // Prevent stale async updates
+  const checkIdRef = useRef(0);
 
+  const checkConnection = useCallback(async () => {
+    const checkId = ++checkIdRef.current;
+
+    // If browser already knows we're offline, trust it
+    if (typeof navigator !== "undefined" && !navigator.onLine) {
+      if (checkId === checkIdRef.current) {
+        setIsOnline(false);
+      }
       return;
     }
 
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 3000); // 5 second timeout
+      const timeoutId = setTimeout(() => controller.abort(), 3000);
 
       const response = await fetch(pingUrl, {
-        method: "HEAD",
+        method: "GET", // GET is more reliable than HEAD
         cache: "no-store",
         signal: controller.signal,
       });
 
       clearTimeout(timeoutId);
-      setIsOnline(response.ok);
-    } catch (error) {
-      // Don't immediately assume offline if it's a CORS or network error
-      // and navigator.onLine says we're online
-      if (typeof navigator !== "undefined" && navigator.onLine) {
-        // Try a different approach - create an image request to a reliable endpoint
-        try {
-          await new Promise((resolve, reject) => {
-            const img = new Image();
 
-            img.onload = resolve;
-            img.onerror = reject;
-            img.src = "https://www.google.com/favicon.ico?" + Date.now();
+      if (checkId === checkIdRef.current) {
+        setIsOnline(response.ok);
+      }
+    } catch {
+      // Fallback: lightweight image request (same-origin preferred)
+      if (typeof navigator !== "undefined" && navigator.onLine) {
+        try {
+          await new Promise<void>((resolve, reject) => {
+            const img = new Image();
+            img.onload = () => resolve();
+            img.onerror = () => reject();
+            img.src = `/favicon.ico?${Date.now()}`;
           });
-          setIsOnline(true);
+
+          if (checkId === checkIdRef.current) {
+            setIsOnline(true);
+          }
         } catch {
-          setIsOnline(false);
+          if (checkId === checkIdRef.current) {
+            setIsOnline(false);
+          }
         }
       } else {
-        setIsOnline(false);
+        if (checkId === checkIdRef.current) {
+          setIsOnline(false);
+        }
       }
     }
   }, [pingUrl]);
 
+  // Browser events + polling
   useEffect(() => {
-    if (typeof window === "undefined") {
-      return;
-    }
+    if (typeof window === "undefined") return;
 
     const handleOnline = () => {
       setIsOnline(true);
-      checkConnection(); // Verify the connection
+      checkConnection();
     };
 
-    const handleOffline = () => setIsOnline(false);
+    const handleOffline = () => {
+      setIsOnline(false);
+    };
 
-    // Initial check after a short delay to avoid race conditions
     const initialCheck = setTimeout(checkConnection, 100);
 
     window.addEventListener("online", handleOnline);
     window.addEventListener("offline", handleOffline);
-    const interval = setInterval(checkConnection, 10000);
+
+    const interval = setInterval(checkConnection, 15000); // 15s is safer
 
     return () => {
       clearTimeout(initialCheck);
+      clearInterval(interval);
       window.removeEventListener("online", handleOnline);
       window.removeEventListener("offline", handleOffline);
-      clearInterval(interval);
     };
   }, [checkConnection]);
+
+  useEffect(() => {
+    onlineManager.setOnline(isOnline);
+  }, [isOnline]);
 
   return isOnline;
 }
