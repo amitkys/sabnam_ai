@@ -9,9 +9,12 @@ import { QuestionPalette } from "./_components/question-palette";
 import { AttemptFooter } from "./_components/attempt-footer";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card } from "@/components/ui/card";
+import { OfflineAlert } from "./_components/offline-alert";
 
 export default function Page() {
   const params = useParams<{ attemptId: string }>();
+
+
   const attemptId = params.attemptId;
 
   const { data, isLoading, error } = useAttemptTest({ attemptId })
@@ -49,8 +52,10 @@ export default function Page() {
     return <div className="flex h-screen items-center justify-center">Test data not found</div>
   }
 
+
   return (
     <div className="flex flex-col px-2.5  pt-2 h-screen">
+      <OfflineAlert />
       {/* Fixed Header */}
       <div className="flex-none">
         <Header attemptId={attemptId} />
