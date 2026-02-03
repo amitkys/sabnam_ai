@@ -5,12 +5,13 @@ import { persist } from "zustand/middleware";
 
 type Answer = string; // could be "A", or "A, B, C"
 
-type QuestionStatus = "answered" | "reviewed" | "unanswered" ;
+type QuestionStatus = "answered" | "reviewed" | "unanswered";
 
 interface TestAttemptState {
   // core state
   answers: Map<string, Answer>;
   markedForReview: Set<string>;
+  pendingSync: Set<string>;
   activeQuestionIndex: number;
 
   // actions
@@ -18,6 +19,7 @@ interface TestAttemptState {
   toggleReview: (questionId: string) => void;
   setActiveQuestionIndex: (index: number) => void;
   clearAnswer: (questionId: string) => void;
+  markAsSynced: (questionId: string) => void;
 
   // navigation
   goToNext: (totalQuestions: number) => void;
@@ -38,12 +40,13 @@ interface TestAttemptState {
   reset: () => void;
 }
 
-export const useNewTestAttemptStore = create<TestAttemptState>() (
+export const useNewTestAttemptStore = create<TestAttemptState>()(
   persist(
     (set, get) => ({
       // intial state
       answers: new Map(),
       markedForReview: new Set(),
+      pendingSync: new Set(),
       activeQuestionIndex: 0,
 
       // set / update answer
@@ -51,7 +54,19 @@ export const useNewTestAttemptStore = create<TestAttemptState>() (
         set((state) => {
           const newAnswers = new Map(state.answers);
           newAnswers.set(questionId, answer);
-          return {answers: newAnswers}
+
+          const newPending = new Set(state.pendingSync);
+          newPending.add(questionId);
+
+          return { answers: newAnswers, pendingSync: newPending }
+        });
+      },
+
+      markAsSynced: (questionId) => {
+        set((state) => {
+          const newPending = new Set(state.pendingSync);
+          newPending.delete(questionId);
+          return { pendingSync: newPending };
         });
       },
 
@@ -59,7 +74,7 @@ export const useNewTestAttemptStore = create<TestAttemptState>() (
       toggleReview: (questionId) => {
         set((state) => {
           const newReview = new Set(state.markedForReview);
-          if(newReview.has(questionId)) {
+          if (newReview.has(questionId)) {
             newReview.delete(questionId);
           } else {
             newReview.add(questionId);
@@ -72,43 +87,52 @@ export const useNewTestAttemptStore = create<TestAttemptState>() (
 
       clearAnswer: (questionId) => {
         set((state) => {
-            const newAnswers = new Map(state.answers);
-            newAnswers.delete(questionId);
-            return { answers: newAnswers };
+          const newAnswers = new Map(state.answers);
+          newAnswers.delete(questionId);
+          return { answers: newAnswers };
         });
       },
 
       goToNext: (totalQuestions) => {
         set((state) => {
-            if (state.activeQuestionIndex < totalQuestions - 1) {
-                return { activeQuestionIndex: state.activeQuestionIndex + 1 };
-            }
-            return {};
+          if (state.activeQuestionIndex < totalQuestions - 1) {
+            return { activeQuestionIndex: state.activeQuestionIndex + 1 };
+          }
+          return {};
         });
       },
 
       goToPrevious: () => {
         set((state) => {
-            if (state.activeQuestionIndex > 0) {
-                return { activeQuestionIndex: state.activeQuestionIndex - 1 };
-            }
-            return {};
+          if (state.activeQuestionIndex > 0) {
+            return { activeQuestionIndex: state.activeQuestionIndex - 1 };
+          }
+          return {};
         });
       },
 
       // initialize from server responses
       hydrateFromServer: (responses) => {
-        const answersMap = new Map(
-          responses.map(r => [r.questionId, r.userAnswer])
-        );
-        set({answers: answersMap});
+        set((state) => {
+          const newAnswers = new Map(state.answers);
+
+          responses.forEach(r => {
+            // CRITICAL: Only overwrite if we don't have pending local changes for this question
+            if (!state.pendingSync.has(r.questionId)) {
+              newAnswers.set(r.questionId, r.userAnswer);
+            }
+          });
+
+          return { answers: newAnswers };
+        });
+
       },
 
       // derived state
       getQuestionStatus: (questionId) => {
         const state = get();
-        if(state.markedForReview.has(questionId)) return "reviewed";
-        if(state.answers.has(questionId)) return "answered";
+        if (state.markedForReview.has(questionId)) return "reviewed";
+        if (state.answers.has(questionId)) return "answered";
         return "unanswered";
       },
 
@@ -116,9 +140,10 @@ export const useNewTestAttemptStore = create<TestAttemptState>() (
       isMarkedForReview: (questionId) => get().markedForReview.has(questionId),
 
       reset: () => set({
-          answers: new Map(),
-          markedForReview: new Set(),
-          activeQuestionIndex: 0
+        answers: new Map(),
+        markedForReview: new Set(),
+        pendingSync: new Set(),
+        activeQuestionIndex: 0
       }),
     }),
 
@@ -135,6 +160,7 @@ export const useNewTestAttemptStore = create<TestAttemptState>() (
               ...parsed.state,
               answers: new Map(Object.entries(parsed.state.answers || {})),
               markedForReview: new Set(parsed.state.markedForReview || []),
+              pendingSync: new Set(parsed.state.pendingSync || []),
             },
           };
         },
@@ -144,6 +170,7 @@ export const useNewTestAttemptStore = create<TestAttemptState>() (
               ...value.state,
               answers: Object.fromEntries(value.state.answers),
               markedForReview: Array.from(value.state.markedForReview),
+              pendingSync: Array.from(value.state.pendingSync),
             },
           });
           sessionStorage.setItem(name, str);

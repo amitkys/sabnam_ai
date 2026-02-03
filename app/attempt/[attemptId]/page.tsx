@@ -9,7 +9,8 @@ import { QuestionPalette } from "./_components/question-palette";
 import { AttemptFooter } from "./_components/attempt-footer";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card } from "@/components/ui/card";
-import { OfflineAlert } from "./_components/offline-alert";
+import { OfflineAlert, SyncAlert } from "./_components/offline-alert";
+import { useSyncAnswers } from "@/hooks/use-sync-answers";
 
 export default function Page() {
   const params = useParams<{ attemptId: string }>();
@@ -18,6 +19,9 @@ export default function Page() {
   const attemptId = params.attemptId;
 
   const { data, isLoading, error } = useAttemptTest({ attemptId })
+
+  // Initialize Sync Manager
+  useSyncAnswers(attemptId);
 
   const hydrateFromServer = useNewTestAttemptStore(s => s.hydrateFromServer);
 
@@ -56,6 +60,7 @@ export default function Page() {
   return (
     <div className="flex flex-col px-2.5  pt-2 h-screen">
       <OfflineAlert />
+      <SyncAlert />
       {/* Fixed Header */}
       <div className="flex-none">
         <Header attemptId={attemptId} />

@@ -20,6 +20,7 @@ import {
 } from "@tabler/icons-react";
 import { ButtonGroup } from "@/components/ui/button-group";
 import { MoreHorizontalIcon } from "lucide-react";
+import { DrawerStateless, DrawerStatelessContent, DrawerStatelessItem, DrawerStatelessTrigger } from "@/components/ui/dropdrawer-stateless";
 
 export function AttemptFooter() {
   const params = useParams<{ attemptId: string }>();
@@ -30,6 +31,7 @@ export function AttemptFooter() {
   const toggleReview = useNewTestAttemptStore((s) => s.toggleReview);
   const isMarkedForReview = useNewTestAttemptStore((s) => s.isMarkedForReview);
   const answers = useNewTestAttemptStore((s) => s.answers);
+  const markAsSynced = useNewTestAttemptStore((s) => s.markAsSynced);
 
   if (!data) return null;
 
@@ -40,23 +42,27 @@ export function AttemptFooter() {
   if (!currentQuestion) return null;
 
   const handleSaveAndNext = async () => {
+    // 1. Trigger Save (Optimistic)
+    // The answer is already in the store (and marked pending) via the QuestionCard selection.
+    // We just need to try pushing it to the server.
     const userAnswer = answers.get(currentQuestion.questionId);
 
     if (userAnswer) {
-      const result = await saveStudentResponse(
+      // Fire and forget (almost)
+      // We don't await this to block navigation. The user feels it's instant.
+      saveStudentResponse(
         params.attemptId,
         currentQuestion.questionId,
         userAnswer
-      );
-
-      if (result.error) {
-        console.error(result.error);
-        alert("Failed to save answer: " + result.error);
-        return;
-      }
+      ).then((result) => {
+        if (result.success) {
+          markAsSynced(currentQuestion.questionId);
+        }
+        // If error, it stays in pendingSync and the background hook picks it up.
+      });
     }
 
-    // Move to next if not last
+    // 2. Move to next immediately
     if (activeQuestionIndex < totalQuestions - 1) {
       setActiveQuestionIndex(activeQuestionIndex + 1);
     }
@@ -89,18 +95,18 @@ export function AttemptFooter() {
             <IconDeviceFloppy size={18} className="mr-2" />
             Save & Next
           </Button>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
+          <DrawerStateless>
+            <DrawerStatelessTrigger asChild>
               <Button className="px-3">
                 <MoreHorizontalIcon />
               </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => toggleReview(currentQuestion.questionId)}>
+            </DrawerStatelessTrigger>
+            <DrawerStatelessContent align="end">
+              <DrawerStatelessItem onClick={() => toggleReview(currentQuestion.questionId)}>
                 <ReviewButtonContent />
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+              </DrawerStatelessItem>
+            </DrawerStatelessContent>
+          </DrawerStateless>
         </ButtonGroup>
 
         {/* Row 2: Navigation Buttons */}

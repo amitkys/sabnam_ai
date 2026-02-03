@@ -11,6 +11,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { IconMobiledataOff } from "@tabler/icons-react";
 
 export function OfflineAlert() {
   const isOnline = useOnlineStatus();
@@ -36,10 +38,27 @@ export function OfflineAlert() {
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogAction onClick={() => setShowOfflineAlert(false)}>
-            Continue
+            Continue without Internet
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
   );
+}
+
+export function SyncAlert() {
+  const isOnline = useOnlineStatus();
+  return (
+    !isOnline ? (
+      <Alert size="sm" variant="warning">
+        <AlertTitle className="flex items-center gap-2">
+          <IconMobiledataOff stroke={2} className="h-4 w-4" />
+          <p>Sync Paused: Waiting for Connection</p>
+        </AlertTitle>
+        <AlertDescription>
+          You can proceed with the test, but do not close the tab or browser.
+        </AlertDescription>
+      </Alert>
+    ) : null
+  )
 }
