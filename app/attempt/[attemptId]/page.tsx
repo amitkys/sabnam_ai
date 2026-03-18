@@ -13,6 +13,7 @@ import { OfflineAlert, SyncAlert } from "./_components/offline-alert";
 import { useSyncAnswers } from "@/hooks/use-sync-answers";
 import { AttemptPreflightScreen } from "./_components/attempt-preflight";
 import { FullscreenSuggestDialog } from "./_components/fullscreen-suggest-dialog";
+import { startAttemptSession } from "@/lib/action/attempt-actions";
 
 /**
  * Main Test Attempt Page
@@ -36,6 +37,19 @@ export default function Page() {
   useSyncAnswers(attemptId);
 
   const hydrateFromServer = useNewTestAttemptStore(s => s.hydrateFromServer);
+  const storeAttemptId = useNewTestAttemptStore(s => s.attemptId);
+  const setStoreAttemptId = useNewTestAttemptStore(s => s.setAttemptId);
+  const resetStore = useNewTestAttemptStore(s => s.reset);
+  const setLanguage = useNewTestAttemptStore(s => s.setLanguage);
+
+  // Clear store if the tab was loaded with a different test's storage,
+  // or if explicitly starting a brand new one.
+  useEffect(() => {
+    if (storeAttemptId !== attemptId) {
+      resetStore();
+      setStoreAttemptId(attemptId);
+    }
+  }, [attemptId, storeAttemptId, resetStore, setStoreAttemptId]);
 
   // Pre-fill the global store with the user's previously saved answers
   useEffect(() => {
@@ -56,19 +70,28 @@ export default function Page() {
 
   // Session persistence on reload
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const storedState = localStorage.getItem(`attempt_started_${attemptId}`);
-      if (storedState === "true") {
+    if (!isLoading && data) {
+      // 1. Check DB first (authoritative source)
+      if (data.hasStartedSession) {
         setHasStartedSession(true);
-      } else if (data && data.responses && data.responses.length > 0) {
-        // If data indicates they already answered questions, skip preflight
-        setHasStartedSession(true);
-        localStorage.setItem(`attempt_started_${attemptId}`, "true");
+        if (data.language) {
+          setSelectedLang(data.language);
+          setLanguage(data.language);
+        }
+      } 
+      // 2. Fallback to localStorage and response check
+      else {
+        const storedState = typeof window !== "undefined" ? localStorage.getItem(`attempt_started_${attemptId}`) : null;
+        if (storedState === "true" || (data.responses && data.responses.length > 0)) {
+          setHasStartedSession(true);
+          if (typeof window !== "undefined") {
+            localStorage.setItem(`attempt_started_${attemptId}`, "true");
+          }
+        }
       }
-    }
-    // Only turn off the checking flag once we've processed data if available
-    if (!isLoading) {
       setIsCheckingSession(false);
+    } else if (!isLoading) {
+        setIsCheckingSession(false);
     }
   }, [attemptId, data, isLoading]);
 
@@ -87,10 +110,16 @@ export default function Page() {
     return <div className="flex h-screen items-center justify-center">Test data not found</div>
   }
 
-  const handleStartSession = (lang: string) => {
+  const handleStartSession = async (lang: string) => {
     setSelectedLang(lang);
+    setLanguage(lang);
     setHasStartedSession(true);
-    localStorage.setItem(`attempt_started_${attemptId}`, "true");
+    if (typeof window !== "undefined") {
+      localStorage.setItem(`attempt_started_${attemptId}`, "true");
+    }
+    
+    // Save to database
+    await startAttemptSession(attemptId, lang);
   };
 
   // ── PRE-FLIGHT GATE SCREEN ──
@@ -104,7 +133,7 @@ export default function Page() {
       {/* Global Alerts & Modals */}
       <OfflineAlert />
       <SyncAlert />
-      <FullscreenSuggestDialog />
+      {data.status !== "COMPLETED" && <FullscreenSuggestDialog />}
       
       {/* Fixed Header */}
       <div className="flex-none">

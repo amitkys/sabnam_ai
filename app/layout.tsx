@@ -11,6 +11,7 @@ import ProgressBarProvider from "@/components/navigation-progress";
 import ToasterWrapper from "@/components/ToasterWrapper";
 import { SidebarProvider } from "@/components/sidebarContext";
 import QueryProviders from "@/components/provider/query-provider";
+import "vercel-toast/css";
 
 export const metadata: Metadata = {
   title: "Sabnam",

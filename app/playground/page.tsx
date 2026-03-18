@@ -1,5 +1,9 @@
+"use client";
+
+import { createToast } from "vercel-toast";
+
 export default function PlaygroundPage() {
   return (
-    <div>hi there</div>
+    <button onClick={() => createToast("hi there", { type: "success", timeout: 1000 },)}>trigger toast</button>
   )
 }

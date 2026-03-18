@@ -9,12 +9,16 @@ type QuestionStatus = "answered" | "reviewed" | "unanswered";
 
 interface TestAttemptState {
   // core state
+  attemptId: string | null;
+  language: string;
   answers: Map<string, Answer>;
   markedForReview: Set<string>;
   pendingSync: Set<string>;
   activeQuestionIndex: number;
 
   // actions
+  setAttemptId: (attemptId: string) => void;
+  setLanguage: (lang: string) => void;
   setAnswer: (questionId: string, answer: Answer) => void;
   toggleReview: (questionId: string) => void;
   setActiveQuestionIndex: (index: number) => void;
@@ -43,11 +47,16 @@ interface TestAttemptState {
 export const useNewTestAttemptStore = create<TestAttemptState>()(
   persist(
     (set, get) => ({
-      // intial state
+      // initial state
+      attemptId: null,
+      language: "en",
       answers: new Map(),
       markedForReview: new Set(),
       pendingSync: new Set(),
       activeQuestionIndex: 0,
+
+      setAttemptId: (attemptId) => set({ attemptId }),
+      setLanguage: (lang) => set({ language: lang }),
 
       // set / update answer
       setAnswer: (questionId, answer) => {
@@ -140,6 +149,8 @@ export const useNewTestAttemptStore = create<TestAttemptState>()(
       isMarkedForReview: (questionId) => get().markedForReview.has(questionId),
 
       reset: () => set({
+        attemptId: null,
+        language: "en",
         answers: new Map(),
         markedForReview: new Set(),
         pendingSync: new Set(),
@@ -158,6 +169,8 @@ export const useNewTestAttemptStore = create<TestAttemptState>()(
           return {
             state: {
               ...parsed.state,
+              attemptId: parsed.state.attemptId || null,
+              language: parsed.state.language || "en",
               answers: new Map(Object.entries(parsed.state.answers || {})),
               markedForReview: new Set(parsed.state.markedForReview || []),
               pendingSync: new Set(parsed.state.pendingSync || []),
@@ -168,6 +181,8 @@ export const useNewTestAttemptStore = create<TestAttemptState>()(
           const str = JSON.stringify({
             state: {
               ...value.state,
+              attemptId: value.state.attemptId,
+              language: value.state.language,
               answers: Object.fromEntries(value.state.answers),
               markedForReview: Array.from(value.state.markedForReview),
               pendingSync: Array.from(value.state.pendingSync),

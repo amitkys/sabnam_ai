@@ -4,33 +4,26 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { startTest } from "@/lib/action/startTest";
+import { createToast } from "vercel-toast";
+import { useNewTestAttemptStore } from "@/lib/store/new-attempt-store";
+import { useStartTest } from "@/lib/action/mutation/use-start-test";
 
 export function StartTestButton({ testId }: { testId: string }) {
-  const router = useRouter();
-  const [isStarting, setIsStarting] = useState(false);
 
-  console.log("testId", testId);
+  const { mutateAsync: startTest, isPending } = useStartTest({ testId });
 
   const handleStart = async () => {
-    setIsStarting(true);
-    try {
-      const attemptId = await startTest({ testId });
-      if (attemptId) {
-        // Direct to the attempt route, which will show the pre-flight info screen
-        router.push(`/attempt/${attemptId}`);
-      }
-    } finally {
-      setIsStarting(false);
-    }
+    await startTest();
   };
 
   return (
     <Button
       className="w-full"
       onClick={handleStart}
-      disabled={isStarting}
+      disabled={isPending}
+      isLoading={isPending}
     >
-      {isStarting ? "Preparing..." : "View Details & Start →"}
+      Start Test
     </Button>
   );
 }

@@ -43,22 +43,30 @@ export function QuestionCard() {
   const setAnswer = useNewTestAttemptStore((s) => s.setAnswer);
   const toggleReview = useNewTestAttemptStore((s) => s.toggleReview);
   const isMarkedForReview = useNewTestAttemptStore((s) => s.isMarkedForReview);
+  const preferredLang = useNewTestAttemptStore((s) => s.language) || "en";
 
   if (!data) return null;
 
-  const currentQuestion = data.testPaper.questions[activeQuestionIndex];
   const totalQuestions = data.testPaper.questions.length;
+  // Fallback if stale sessionStorage tries to access an out-of-bounds question
+  const safeIndex = activeQuestionIndex >= totalQuestions ? 0 : activeQuestionIndex;
+  const currentQuestion = data.testPaper.questions[safeIndex];
+
+  if (!currentQuestion) return null; // Safe guard if questions array is totally empty
+
   const { question, positiveMarks, negativeMarks, orderIndex } = currentQuestion;
 
   // @ts-ignore: Prisma JSON types are tricky
   const currentAnswer = answers.get(question.id);
 
   // Helper to safely extract string data from Prisma JSON content
-  // Safely handling English vs Hindi content objects
-  const getQuestionText = (content: any) => {
+  const getTextByLanguage = (content: any) => {
     if (typeof content === "string") return content;
+    if (!content) return "";
+    // Prefer the explicitly selected language
+    if (content[preferredLang]) return content[preferredLang];
     // Fallback logic for nested JSON structures where an 'en' or 'hi' field might exist
-    return content?.en || content?.hi || JSON.stringify(content);
+    return content.en || content.hi || JSON.stringify(content);
   };
 
   // Safe cast options
@@ -93,7 +101,7 @@ export function QuestionCard() {
           <div className="">
             <div className="font-semibold leading-relaxed">
               {/* @ts-ignore: Prisma JSON types */}
-              <MarkdownRenderer content={getQuestionText(question.content)} variant="question" />
+              <MarkdownRenderer content={getTextByLanguage(question.content)} variant="question" />
             </div>
             {/* @ts-ignore: Prisma JSON types */}
             {question.imageUrl && (
@@ -133,7 +141,7 @@ export function QuestionCard() {
 
                   {/* Option Label (A, B, C...) */}
                   <div className={cn(
-                    "flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold border-2 transition-colors",
+                    "shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold border-2 transition-colors",
                     isSelected
                       ? "border-primary bg-primary text-primary-foreground"
                       : "border-muted-foreground/10 text-muted-foreground group-hover:border-primary/20 group-hover:text-primary"
@@ -142,13 +150,13 @@ export function QuestionCard() {
                   </div>
 
                   {/* Option Text */}
-                  <div className="flex-1 text-base font-medium leading-normal break-words overflow-wrap-anywhere min-w-0">
-                    <MarkdownRenderer content={opt.text} variant="option" />
+                  <div className="flex-1 text-base font-medium leading-normal wrap-break-word overflow-wrap-anywhere min-w-0">
+                    <MarkdownRenderer content={getTextByLanguage(opt.text)} variant="option" />
                   </div>
 
                   {/* Selection Indicator */}
                   <div className={cn(
-                    "flex-shrink-0 text-primary transition-opacity",
+                    "shrink-0 text-primary transition-opacity",
                     isSelected ? "opacity-100" : "opacity-0"
                   )}>
                     <Check className="w-6 h-6" />

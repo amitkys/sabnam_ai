@@ -128,3 +128,26 @@ export async function submitAttempt(attemptId: string) {
     return { error: "Failed to submit attempt" };
   }
 }
+
+/**
+ * Marks the attempt session as officially started (preflight complete)
+ * and saves the user's selected language medium.
+ */
+export async function startAttemptSession(attemptId: string, language: string) {
+  try {
+    const updated = await prisma.testAttempt.update({
+      where: { id: attemptId },
+      data: {
+        hasStartedSession: true,
+        language
+      }
+    });
+    
+    revalidatePath(`/attempt/${attemptId}`);
+    return { success: true, data: updated };
+  } catch (error) {
+    console.error("Error starting attempt session:", error);
+    return { error: "Failed to start attempt session" };
+  }
+}
+

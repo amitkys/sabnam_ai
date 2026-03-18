@@ -17,7 +17,7 @@ export function CategoryHeader({
   name,
   parent,
 }: CategoryHeaderProps) {
-  const backHref  = parent ? `/apptest/${parent.id}/${parent.slug}` : '/apptest';
+  const backHref = parent ? `/apptest/${parent.id}/${parent.slug}` : '/apptest';
   const backLabel = parent ? parent.name : 'All Exams';
 
   return (
@@ -26,7 +26,7 @@ export function CategoryHeader({
       {/* Back button — pill style */}
       <Link
         href={backHref}
-        className="group bg-muted hover:bg-muted/70 text-muted-foreground hover:text-foreground inline-flex w-fit items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-all"
+        className="group bg-muted hover:bg-muted/70 text-muted-foreground hover:text-foreground inline-flex w-fit items-center gap-1.5  px-3 py-1.5 text-xs font-medium transition-all"
       >
         <ArrowLeftIcon className="h-3 w-3 transition-transform group-hover:-translate-x-0.5" />
         {backLabel}

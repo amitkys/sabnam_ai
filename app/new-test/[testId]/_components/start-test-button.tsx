@@ -2,6 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { startTest } from "@/lib/action/startTest";
 import { useRouter } from "next/navigation";
+import { useNewTestAttemptStore } from "@/lib/store/new-attempt-store";
 
 export function StartTest({ testId }: { testId: string }) {
   const router = useRouter();
@@ -10,7 +11,7 @@ export function StartTest({ testId }: { testId: string }) {
     const attemptId = await startTest({ testId });
     console.log(attemptId)
     if (attemptId) {
-      router.push(`/attempt/${attemptId}`);
+      useNewTestAttemptStore.getState().reset();
     }
   }
   return (

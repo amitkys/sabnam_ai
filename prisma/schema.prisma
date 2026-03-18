@@ -213,9 +213,11 @@ model TestAttempt {
   testPaperId String
   testPaper   TestPaper     @relation(fields: [testPaperId], references: [id])
   score       Float?
-  status      AttemptStatus @default(STARTED)
-  startedAt   DateTime      @default(now())
-  submittedAt DateTime?
+  status            AttemptStatus @default(STARTED)
+  startedAt         DateTime      @default(now())
+  submittedAt       DateTime?
+  hasStartedSession Boolean       @default(false)
+  language          String        @default("en")
 
   responses StudentResponse[]
 }
