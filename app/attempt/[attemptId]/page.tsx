@@ -1,8 +1,8 @@
 "use client";
+import { useState, useEffect } from "react";
 import { useAttemptTest } from "@/hooks/get-attemp-test";
 import { useParams } from "next/navigation";
 import { Header } from "./_components/header";
-import { useEffect } from "react";
 import { useNewTestAttemptStore } from "@/lib/store/new-attempt-store";
 import { QuestionCard } from "./_components/question-card";
 import { QuestionPalette } from "./_components/question-palette";
@@ -11,6 +11,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card } from "@/components/ui/card";
 import { OfflineAlert, SyncAlert } from "./_components/offline-alert";
 import { useSyncAnswers } from "@/hooks/use-sync-answers";
+import { AttemptPreflightScreen } from "./_components/attempt-preflight";
+import { FullscreenSuggestDialog } from "./_components/fullscreen-suggest-dialog";
 
 /**
  * Main Test Attempt Page
@@ -21,6 +23,11 @@ export default function Page() {
 
 
   const attemptId = params.attemptId;
+
+  // Local State
+  const [hasStartedSession, setHasStartedSession] = useState(false);
+  const [isCheckingSession, setIsCheckingSession] = useState(true);
+  const [selectedLang, setSelectedLang] = useState("en");
 
   // Fetch test data
   const { data, isLoading, error } = useAttemptTest({ attemptId })
@@ -47,9 +54,29 @@ export default function Page() {
     }
   }, [data, hydrateFromServer]);
 
+  // Session persistence on reload
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const storedState = localStorage.getItem(`attempt_started_${attemptId}`);
+      if (storedState === "true") {
+        setHasStartedSession(true);
+      } else if (data && data.responses && data.responses.length > 0) {
+        // If data indicates they already answered questions, skip preflight
+        setHasStartedSession(true);
+        localStorage.setItem(`attempt_started_${attemptId}`, "true");
+      }
+    }
+    // Only turn off the checking flag once we've processed data if available
+    if (!isLoading) {
+      setIsCheckingSession(false);
+    }
+  }, [attemptId, data, isLoading]);
+
   // Loading / Error States
-  if (isLoading) {
-    return <div className="flex h-screen items-center justify-center">Loading test...</div>
+  // While we are figuring out whether to show the Preflight screen vs the Test screen,
+  // we keep the loading skeleton active to avoid flashing the preflight.
+  if (isLoading || isCheckingSession) {
+    return <div className="flex h-screen items-center justify-center">Loading test environment...</div>
   }
 
   if (error) {
@@ -60,11 +87,24 @@ export default function Page() {
     return <div className="flex h-screen items-center justify-center">Test data not found</div>
   }
 
+  const handleStartSession = (lang: string) => {
+    setSelectedLang(lang);
+    setHasStartedSession(true);
+    localStorage.setItem(`attempt_started_${attemptId}`, "true");
+  };
+
+  // ── PRE-FLIGHT GATE SCREEN ──
+  if (!hasStartedSession) {
+    return <AttemptPreflightScreen test={data.testPaper} onStart={handleStartSession} />;
+  }
+
+  // ── ACTUAL TEST UI SCREEN ──
   return (
     <div className="flex flex-col px-2.5  pt-2 h-screen">
-      {/* Global Alerts */}
+      {/* Global Alerts & Modals */}
       <OfflineAlert />
       <SyncAlert />
+      <FullscreenSuggestDialog />
       
       {/* Fixed Header */}
       <div className="flex-none">

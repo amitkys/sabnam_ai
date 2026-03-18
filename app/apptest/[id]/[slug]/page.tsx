@@ -36,6 +36,9 @@ export default async function CategoryPage({ params }: PageProps) {
       tests: {
         where: { isPublished: true },
         orderBy: { createdAt: 'desc' },
+        include: {
+          _count: { select: { questions: true } },
+        },
       },
       parent: true,
     },

@@ -10,12 +10,18 @@ import {
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 
+import { StartTestButton } from './start-test-button';
+
 interface TestPaper {
   id: string;
   title: string;
   description: string | null;
   duration: number;
   totalMarks: number;
+  languages: string[];
+  _count: {
+    questions: number;
+  };
 }
 
 interface TestListProps {
@@ -25,7 +31,7 @@ interface TestListProps {
 /**
  * Renders a list of published test paper cards.
  * Each card shows the title, description, duration, total marks,
- * and a "Start" button that navigates to the test attempt page.
+ * and a "Start" button that opens the attempt page directly.
  * Shown only when at least one published test exists.
  */
 export function TestList({ tests }: TestListProps) {
@@ -68,9 +74,7 @@ export function TestList({ tests }: TestListProps) {
             </CardContent>
 
             <CardFooter>
-              <Button asChild className="w-full">
-                <Link href={`/new-test/${test.id}`}>Start →</Link>
-              </Button>
+              <StartTestButton testId={test.id} />
             </CardFooter>
           </Card>
         ))}
@@ -78,3 +82,4 @@ export function TestList({ tests }: TestListProps) {
     </section>
   );
 }
+

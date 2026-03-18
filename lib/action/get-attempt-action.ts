@@ -21,6 +21,9 @@ export async function getAttemptAction(attemptId: string) {
             id: true,
             title: true,
             duration: true,
+            description: true,
+            totalMarks: true,
+            languages: true,
             questions: {
               orderBy: { orderIndex: 'asc' }, // Keep questions in order
               include: {

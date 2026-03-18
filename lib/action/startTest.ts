@@ -4,11 +4,11 @@ import { prisma } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 
-export async function startTest({testId}: {testId: string}) {
+export async function startTest({ testId }: { testId: string }) {
   const session = await auth.api.getSession({ headers: await headers() })
-  console.log(session);
+  console.log("session", session);
 
-  if(!session?.user.id){
+  if (!session?.user.id) {
     return null;
   }
   // 1. Check if an unfinished attempt already exists?
@@ -20,7 +20,7 @@ export async function startTest({testId}: {testId: string}) {
     }
   });
 
-  if(existing) {
+  if (existing) {
     // resume this attempt
     return existing.id;
   };
