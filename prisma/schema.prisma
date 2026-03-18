@@ -89,14 +89,15 @@ model Verification {
 // ==========================================
 
 model Category {
-  id       String       @id @default(cuid())
-  name     String // e.g., "BSEB"
-  slug     String // e.g., "bseb"
-  type     CategoryType // Recursive Self-Relation
-  parentId String?
-  parent   Category?    @relation("CategoryHierarchy", fields: [parentId], references: [id])
-  children Category[]   @relation("CategoryHierarchy")
 
+ id       String         @id @default(cuid())
+  name     String
+  slug     String
+  level    CategoryLevel  // What DEPTH in the tree is this node?
+  domain   ExamDomain?    // What KIND of exam is this? (only set at top level)
+  parentId String?
+  parent   Category?      @relation("CategoryHierarchy", fields: [parentId], references: [id])
+  children Category[]     @relation("CategoryHierarchy")
   // Content
   questions Question[]
   tests     TestPaper[]
@@ -105,13 +106,24 @@ model Category {
   @@index([slug])
 }
 
-enum CategoryType {
-  EXAM_BODY
-  EXAM_NAME
-  STANDARD
-  SUBJECT // full subject test belongs where chapter lives in subject 
-  CHAPTER
-  PYQ
+enum CategoryLevel {
+  ROOT        // Top-level grouping (replaces EXAM_BODY)
+  EXAM        // Specific exam name (replaces EXAM_NAME)
+  STANDARD    // Class/grade level
+  SUBJECT     // Subject within a standard
+  CHAPTER     // Chapter within a subject
+  PYQ         // Previous year questions
+}
+enum ExamDomain {
+  BOARD        // BSEB, CBSE, ICSE
+  COMPETITIVE  // SSC, RRB, UPSC, BPSC
+  ENTRANCE     // JEE, NEET, CUET
+  OLYMPIAD     // IMO, NSO, NTSE
+  LANGUAGE     // IELTS, TOEFL
+  UNIVERSITY   // BHU UET, DU
+  RECRUITMENT  // State PSC, police, army
+  SCHOLARSHIP  // NMMS, INSPIRE
+  VOCATIONAL   // ITI, polytechnic
 }
 
 // ==========================================

@@ -8,10 +8,17 @@ import { Clock, BookOpen, Calendar, Globe, CheckCircle2 } from "lucide-react";
 import { format } from "date-fns";
 import { StartTest } from "./_components/start-test-button";
 
+/**
+ * Server Component for the test introduction page.
+ * Displays test details (metadata, duration, marks) before a user starts the attempt.
+ */
 export default async function Page({ params }: { params: { testId: string } }) {
 
 
   const { testId } = await params;
+  
+  // Fetch test details, including its category and total question count
+
   const testPaper = await prisma.testPaper.findUnique({
     where: {
       id: testId
@@ -24,6 +31,7 @@ export default async function Page({ params }: { params: { testId: string } }) {
     }
   });
 
+  // Render a 404 page if the test ID is invalid or doesn't exist
   if (!testPaper) {
     return notFound();
   }
@@ -36,6 +44,8 @@ export default async function Page({ params }: { params: { testId: string } }) {
   return (
     <div className="container mx-auto py-10 px-4 max-w-4xl">
       <Card className="w-full shadow-lg border-t-4 border-t-primary">
+        
+        {/* Test Metadata Header: Status, Category, Title, and Description */}
         <CardHeader className="space-y-4">
           <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
             <div className="space-y-2">
@@ -58,6 +68,8 @@ export default async function Page({ params }: { params: { testId: string } }) {
         </CardHeader>
 
         <CardContent className="space-y-8">
+          
+          {/* Key Metrics Grid: Duration, Total Marks, and Question Count */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="flex items-center gap-3 p-4 rounded-lg bg-muted/50 border border-border/50">
               <div className="p-2 bg-background rounded-full shadow-sm text-primary">
@@ -92,6 +104,7 @@ export default async function Page({ params }: { params: { testId: string } }) {
 
           <Separator />
 
+          {/* Additional Details Grid: Supported Languages and Creation Date */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-3">
               <h3 className="text-h4 flex items-center gap-2">
@@ -119,6 +132,7 @@ export default async function Page({ params }: { params: { testId: string } }) {
           </div>
         </CardContent>
 
+        {/* Action Area */}
         <CardFooter className="flex justify-end pt-6 pb-8">
           <StartTest testId={testId} />
         </CardFooter>

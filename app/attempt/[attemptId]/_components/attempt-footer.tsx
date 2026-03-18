@@ -22,6 +22,10 @@ import { ButtonGroup } from "@/components/ui/button-group";
 import { MoreHorizontalIcon } from "lucide-react";
 import { DrawerStateless, DrawerStatelessContent, DrawerStatelessItem, DrawerStatelessTrigger } from "@/components/ui/dropdrawer-stateless";
 
+/**
+ * Action bar displayed at the bottom of the test page. 
+ * Provides navigation (Next/Prev) and actions (Save, Mark for Review).
+ */
 export function AttemptFooter() {
   const params = useParams<{ attemptId: string }>();
   const { data } = useAttemptTest({ attemptId: params.attemptId });
@@ -41,6 +45,10 @@ export function AttemptFooter() {
   // Guard clause if index is out of bounds
   if (!currentQuestion) return null;
 
+  /**
+   * Saves the current answer to the server and advances to the next question.
+   * Uses optimistic UI updates to prevent blocking navigation.
+   */
   const handleSaveAndNext = async () => {
     // 1. Trigger Save (Optimistic)
     // The answer is already in the store (and marked pending) via the QuestionCard selection.
@@ -68,10 +76,12 @@ export function AttemptFooter() {
     }
   };
 
+  /** Move back one question, preventing out-of-bounds errors */
   const handlePrevious = () => {
     setActiveQuestionIndex(Math.max(0, activeQuestionIndex - 1));
   };
 
+  /** Move forward one question, preventing out-of-bounds errors */
   const handleNext = () => {
     setActiveQuestionIndex(Math.min(totalQuestions - 1, activeQuestionIndex + 1));
   };

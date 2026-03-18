@@ -1,8 +1,5 @@
-"use client";
-import { ModeToggle } from "@/components/mode-toggle";
-
-export default function Page() {
+export default function PlaygroundPage() {
   return (
-    <ModeToggle />
+    <div>hi there</div>
   )
 }

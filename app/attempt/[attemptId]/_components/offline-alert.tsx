@@ -14,6 +14,10 @@ import {
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { IconMobiledataOff } from "@tabler/icons-react";
 
+/**
+ * Displays a blocking popup when the user loses internet connection.
+ * Informs them that local saving is active and sync will resume later.
+ */
 export function OfflineAlert() {
   const isOnline = useOnlineStatus();
   const [showOfflineAlert, setShowOfflineAlert] = useState(false);
@@ -30,7 +34,7 @@ export function OfflineAlert() {
     <AlertDialog open={showOfflineAlert} onOpenChange={setShowOfflineAlert}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>You are offline</AlertDialogTitle>
+          <AlertDialogTitle>Poor or lost connection</AlertDialogTitle>
           <AlertDialogDescription>
             Your answers are being saved locally and will be synced once you are
             back online. You can continue with the test.
@@ -46,6 +50,10 @@ export function OfflineAlert() {
   );
 }
 
+/**
+ * A persistent inline banner indicating the app is currently offline
+ * and answers are waiting to be synchronized to the server.
+ */
 export function SyncAlert() {
   const isOnline = useOnlineStatus();
   return (

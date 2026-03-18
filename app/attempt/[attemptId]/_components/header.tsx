@@ -9,12 +9,19 @@ import { EllipsisVertical } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useTheme } from "next-themes"
 
+/**
+ * Top navigation bar during a test attempt.
+ * Houses the test title, timer, and primary actions (Submit, Exit, Settings).
+ */
 export function Header({ attemptId }: { attemptId: string }) {
   const { setTheme } = useTheme();
   const router = useRouter()
   const { toggleFullscreen, isFullscreen } = useFullscreen();
   const { data } = useAttemptTest({ attemptId })
 
+  /**
+   * Finalizes the test attempt and navigates the user away upon success.
+   */
   const handleSubmit = async () => {
     const confirm = window.confirm("Are you sure you want to submit the test?");
     if (!confirm) return;

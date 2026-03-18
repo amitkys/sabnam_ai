@@ -28,6 +28,10 @@ interface QuestionOption {
 //   data: QuestionItem;
 // }
 
+/**
+ * Renders the active question, displaying its content, any associated images,
+ * constraints (positive/negative marks), and interactive MCQs for the user to select.
+ */
 export function QuestionCard() {
   const params = useParams<{ attemptId: string }>();
   const { data } = useAttemptTest({ attemptId: params.attemptId });
@@ -49,10 +53,11 @@ export function QuestionCard() {
   // @ts-ignore: Prisma JSON types are tricky
   const currentAnswer = answers.get(question.id);
 
-  // Helper to get localized content (default to 'en')
+  // Helper to safely extract string data from Prisma JSON content
+  // Safely handling English vs Hindi content objects
   const getQuestionText = (content: any) => {
     if (typeof content === "string") return content;
-    // Fallback logic for JSON content
+    // Fallback logic for nested JSON structures where an 'en' or 'hi' field might exist
     return content?.en || content?.hi || JSON.stringify(content);
   };
 
@@ -60,6 +65,7 @@ export function QuestionCard() {
   // @ts-ignore: Prisma JSON types are tricky
   const options = (question.options as unknown as QuestionOption[]) || [];
 
+  /** Directly updates the Zustand store when the user selects a radio option */
   const handleSelect = (optionId: string) => {
     // @ts-ignore: Prisma JSON types are tricky
     setAnswer(question.id, optionId);

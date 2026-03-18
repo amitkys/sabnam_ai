@@ -6,6 +6,11 @@ import { cn } from "@/lib/utils";
 import { useAttemptTest } from "@/hooks/get-attemp-test";
 import { useParams } from "next/navigation";
 
+/**
+ * Render a visual grid of all questions in the test.
+ * Color-codes each button based on its state (answered, review, or unattempted).
+ * Lets users quickly jump between questions using the numbers.
+ */
 export function QuestionPalette() {
   const params = useParams<{ attemptId: string }>();
   const { data } = useAttemptTest({ attemptId: params.attemptId });
@@ -24,19 +29,23 @@ export function QuestionPalette() {
         const isAnswered = answers.has(q.questionId);
         const isReview = markedForReview.has(q.questionId);
 
+        // Default styling (Unanswered / Neutral)
         let variantClass =
           "bg-muted/40 text-muted-foreground border border-border hover:bg-muted hover:border-primary/30";
 
+        // Green styling: The user has selected an option
         if (isAnswered) {
           variantClass =
             "bg-emerald-900/60 text-emerald-100 border-none  hover:bg-emerald-900 shadow-[0_0_0_1px_rgba(16,185,129,0.25)]";
         }
 
+        // Blue styling: The user explicitly flagged this question for 'Review'
         if (isReview) {
           variantClass =
             "bg-blue-900/50 text-blue-100 border border-blue-700 hover:bg-blue-900";
         }
 
+        // Add an extra highlight ring if this is the currently active question
         if (isActive) {
           variantClass +=
             " ring-2 ring-primary/40 ring-offset-2 ring-offset-background";
