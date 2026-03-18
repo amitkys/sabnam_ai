@@ -13,7 +13,7 @@ export function useStartTest({ testId }: { testId: string }) {
     onSuccess: (res) => {
       if (!res.success) {
         if (res.errorCode === ErrorTypes.UNAUTHORIZED) {
-          createToast("Unauthorized User", { type: "error", timeout: 500 });
+          createToast("Unauthorized User", { type: "error", timeout: 5000 });
         }
       }
       if (res.success) {

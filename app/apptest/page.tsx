@@ -17,14 +17,14 @@ export default async function AppTestPage() {
     orderBy: { name: 'asc' },
   });
 
-  const grouped      = groupByDomain(rootCategories);
+  const grouped = groupByDomain(rootCategories);
   const activeDomains = getActiveDomains(grouped);
 
   return (
     <div className="flex flex-col gap-10">
 
       {activeDomains.map((domain, idx) => {
-        const meta  = DOMAIN_META[domain];
+        const meta = DOMAIN_META[domain];
         const exams = grouped[domain];
 
         return (
@@ -50,7 +50,7 @@ export default async function AppTestPage() {
               {exams.map((exam) => (
                 <Link key={exam.id} href={`/apptest/${exam.id}/${exam.slug}`}>
                   <Card className="group hover:bg-primary/10">
-                    <CardContent className="flex items-center justify-between px-5 py-4">
+                    <CardContent className="flex items-center font-mono justify-between px-5 py-4">
                       {exam.name}
                       <ChevronRightIcon className="text-muted-foreground group-hover:text-primary h-4 w-4 shrink-0 transition-all group-hover:translate-x-0.5" />
                     </CardContent>

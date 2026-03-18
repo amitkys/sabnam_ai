@@ -14,7 +14,7 @@ export async function startTest({ testId }: { testId: string }) {
     console.log("session", session);
 
     if (!session?.user.id) {
-      throw new ActionError(ErrorTypes.UNAUTHORIZED, "User not authenticated")
+      throw new ActionError("User not authenticated", ErrorTypes.UNAUTHORIZED)
     }
     // 1. Check if an unfinished attempt already exists?
     const existing = await prisma.testAttempt.findFirst({

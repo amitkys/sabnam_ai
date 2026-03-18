@@ -31,7 +31,7 @@ export function ChildrenGrid({ heading, children }: ChildrenGridProps) {
         {children.map((child) => (
           <Link key={child.id} href={`/apptest/${child.id}/${child.slug}`}>
             <Card className="group hover:bg-primary/10">
-              <CardContent className="flex items-center justify-between px-5 py-4">
+              <CardContent className="flex items-center font-mono justify-between px-5 py-4">
                 {child.name}
                 <ChevronRightIcon className="text-muted-foreground group-hover:text-primary h-4 w-4 shrink-0 transition-all group-hover:translate-x-0.5" />
               </CardContent>
