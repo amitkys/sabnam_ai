@@ -62,7 +62,7 @@ export function FullscreenSuggestDialog() {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="sm:max-w-md [&>button]:hidden">
         {/* We hide the default close button using the [&>button]:hidden trick to compel user choice */}
-        
+
         <DialogHeader className="flex flex-col items-center text-center gap-2 pt-4">
           <div className="p-3 bg-primary/10 rounded-full text-primary mb-2">
             <Maximize className="w-8 h-8" />
@@ -74,8 +74,8 @@ export function FullscreenSuggestDialog() {
         </DialogHeader>
 
         <DialogFooter className="mr-auto ml-auto w-full gap-2 sm:gap-0 mt-4 flex-col sm:flex-row">
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             onClick={() => {
               setHasDeclinedFullscreen(true);
               setOpen(false);
@@ -84,7 +84,7 @@ export function FullscreenSuggestDialog() {
           >
             Stay in Tab
           </Button>
-          <Button 
+          <Button
             onClick={enterFullscreen}
             className="w-full sm:w-auto"
           >

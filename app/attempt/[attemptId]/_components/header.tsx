@@ -1,14 +1,21 @@
-import { ModeToggle } from "@/components/mode-toggle"
-import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
-import { DrawerStateless, DrawerStatelessContent, DrawerStatelessItem, DrawerStatelessSub, DrawerStatelessSubContent, DrawerStatelessSubTrigger, DrawerStatelessTrigger } from "@/components/ui/dropdrawer-stateless"
-import { useAttemptTest } from "@/hooks/get-attemp-test"
-import { useFullscreen } from "@/hooks/use-fullscreen"
-import { EllipsisVertical } from "lucide-react"
-import { useRouter } from "next/navigation"
-import { useTheme } from "next-themes"
-import { useState } from "react"
-import { SubmitConfirmationDialog } from "./submit-confirmation-dialog"
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import {
+  DrawerStateless,
+  DrawerStatelessContent,
+  DrawerStatelessItem,
+  DrawerStatelessSub,
+  DrawerStatelessSubContent,
+  DrawerStatelessSubTrigger,
+  DrawerStatelessTrigger,
+} from "@/components/ui/dropdrawer-stateless";
+import { useAttemptTest } from "@/hooks/get-attemp-test";
+import { useFullscreen } from "@/hooks/use-fullscreen";
+import { EllipsisVertical } from "lucide-react";
+import { useTheme } from "next-themes";
+import { useState } from "react";
+import { ExitConfirmationDialog } from "./exit-confirmation-dialog";
+import { SubmitConfirmationDialog } from "./submit-confirmation-dialog";
 
 /**
  * Top navigation bar during a test attempt.
@@ -16,29 +23,28 @@ import { SubmitConfirmationDialog } from "./submit-confirmation-dialog"
  */
 export function Header({ attemptId }: { attemptId: string }) {
   const { setTheme } = useTheme();
-  const router = useRouter()
   const { toggleFullscreen, isFullscreen } = useFullscreen();
-  const { data } = useAttemptTest({ attemptId })
+  const { data } = useAttemptTest({ attemptId });
 
   const [isSubmitDialogOpen, setIsSubmitDialogOpen] = useState(false);
+  const [isExitDialogOpen, setIsExitDialogOpen] = useState(false);
 
-  /**
-   * Finalizes the test attempt and navigates the user away upon success.
-   */
   const handleSubmit = () => {
     setIsSubmitDialogOpen(true);
   };
 
   const handleExit = () => {
-    const confirm = window.confirm("Are you sure you want to exit? Your progress is saved.");
-    if (confirm) {
-      router.push("/");
-    }
-  }
+    setIsExitDialogOpen(true);
+  };
 
   return (
     <>
-      <SubmitConfirmationDialog 
+      <ExitConfirmationDialog
+        attemptId={attemptId}
+        open={isExitDialogOpen}
+        onOpenChange={setIsExitDialogOpen}
+      />
+      <SubmitConfirmationDialog
         attemptId={attemptId}
         open={isSubmitDialogOpen}
         onOpenChange={setIsSubmitDialogOpen}
@@ -73,15 +79,25 @@ export function Header({ attemptId }: { attemptId: string }) {
           </Button>
           <DrawerStateless>
             <DrawerStatelessTrigger asChild>
-              <Button className="ml-2" variant="secondary" size={"icon-sm"}><EllipsisVertical /></Button>
+              <Button className="ml-2" variant="secondary" size={"icon-sm"}>
+                <EllipsisVertical />
+              </Button>
             </DrawerStatelessTrigger>
             <DrawerStatelessContent>
-              <DrawerStatelessItem onClick={toggleFullscreen}>{isFullscreen ? "Exit Fullscreen" : "Full Screen"}</DrawerStatelessItem>
+              <DrawerStatelessItem onClick={toggleFullscreen}>
+                {isFullscreen ? "Exit Fullscreen" : "Full Screen"}
+              </DrawerStatelessItem>
               <DrawerStatelessSub>
-                <DrawerStatelessSubTrigger>Appearance</DrawerStatelessSubTrigger>
+                <DrawerStatelessSubTrigger>
+                  Appearance
+                </DrawerStatelessSubTrigger>
                 <DrawerStatelessSubContent>
-                  <DrawerStatelessItem onClick={() => setTheme("light")}>Light</DrawerStatelessItem>
-                  <DrawerStatelessItem onClick={() => setTheme("dark")}>Dark</DrawerStatelessItem>
+                  <DrawerStatelessItem onClick={() => setTheme("light")}>
+                    Light
+                  </DrawerStatelessItem>
+                  <DrawerStatelessItem onClick={() => setTheme("dark")}>
+                    Dark
+                  </DrawerStatelessItem>
                 </DrawerStatelessSubContent>
               </DrawerStatelessSub>
             </DrawerStatelessContent>
@@ -89,5 +105,5 @@ export function Header({ attemptId }: { attemptId: string }) {
         </div>
       </Card>
     </>
-  )
+  );
 }

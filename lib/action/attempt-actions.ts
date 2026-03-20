@@ -67,48 +67,55 @@ export async function saveStudentResponse(
 }
 
 /**
+ * Helper to calculate final score for an attempt.
+ */
+async function calculateScore(attemptId: string) {
+  const attempt = await prisma.testAttempt.findUnique({
+    where: { id: attemptId },
+    include: {
+      responses: true,
+      testPaper: {
+        include: {
+          questions: true // To get positive/negative marks per question
+        }
+      }
+    }
+  });
+
+  if (!attempt) return null;
+
+  let totalScore = 0;
+  const questionSettingsMap = new Map(
+    attempt.testPaper.questions.map(tq => [tq.questionId, tq])
+  );
+
+  for (const response of attempt.responses) {
+    const settings = questionSettingsMap.get(response.questionId);
+    if (!settings) continue;
+
+    if (response.isCorrect) {
+      totalScore += settings.positiveMarks;
+    } else if (response.userAnswer) {
+      // Only deduct if attempted (and incorrect)
+      // Assuming negativeMarks is a positive number representing deduction (e.g. 1.0)
+      // If it's stored as -1.0, add it. If stored as 1.0, subtract it.
+      // Usually stored as positive value to subtract.
+      totalScore -= settings.negativeMarks;
+    }
+  }
+
+  return totalScore;
+}
+
+/**
  * Finalizes the attempt.
  * Calculates final score and updates status.
  */
 export async function submitAttempt(attemptId: string) {
   try {
-    // 1. Fetch all responses for this attempt
-    const attempt = await prisma.testAttempt.findUnique({
-      where: { id: attemptId },
-      include: {
-        responses: true,
-        testPaper: {
-          include: {
-            questions: true // To get positive/negative marks per question
-          }
-        }
-      }
-    });
+    const totalScore = await calculateScore(attemptId);
 
-    if (!attempt) return { error: "Attempt not found" };
-
-    // 2. Calculate Score
-    let totalScore = 0;
-
-    // Create a map for quick lookup of question settings (marks)
-    const questionSettingsMap = new Map(
-      attempt.testPaper.questions.map(tq => [tq.questionId, tq])
-    );
-
-    for (const response of attempt.responses) {
-      const settings = questionSettingsMap.get(response.questionId);
-      if (!settings) continue;
-
-      if (response.isCorrect) {
-        totalScore += settings.positiveMarks;
-      } else if (response.userAnswer) {
-        // Only deduct if attempted (and incorrect)
-        // Assuming negativeMarks is a positive number representing deduction (e.g. 1.0)
-        // If it's stored as -1.0, add it. If stored as 1.0, subtract it.
-        // Usually stored as positive value to subtract.
-        totalScore -= settings.negativeMarks;
-      }
-    }
+    if (totalScore === null) return { error: "Attempt not found" };
 
     // 3. Update Attempt
     await prisma.testAttempt.update({
@@ -142,12 +149,48 @@ export async function startAttemptSession(attemptId: string, language: string) {
         language
       }
     });
-    
+
     revalidatePath(`/attempt/${attemptId}`);
     return { success: true, data: updated };
   } catch (error) {
     console.error("Error starting attempt session:", error);
     return { error: "Failed to start attempt session" };
+  }
+}
+
+/**
+ * Cancels the attempt.
+ * Updates status to COMPLETED.
+ */
+export async function cancelAttempt(attemptId: string) {
+  try {
+    const attempt = await prisma.testAttempt.findUnique({
+      where: { id: attemptId },
+      select: { status: true }
+    });
+
+    if (!attempt) return { error: "Attempt not found" };
+
+    if (attempt.status === AttemptStatus.COMPLETED) {
+      return { error: "Test is already submitted" };
+    }
+
+    const totalScore = await calculateScore(attemptId) ?? 0;
+
+    await prisma.testAttempt.update({
+      where: { id: attemptId },
+      data: {
+        status: AttemptStatus.COMPLETED,
+        submittedAt: new Date(),
+        score: totalScore
+      }
+    });
+
+    revalidatePath(`/attempt/${attemptId}`);
+    return { success: true };
+  } catch (error) {
+    console.error("Error canceling attempt:", error);
+    return { error: "Failed to cancel attempt" };
   }
 }
 

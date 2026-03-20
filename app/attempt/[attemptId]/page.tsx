@@ -83,7 +83,7 @@ export default function Page() {
           setSelectedLang(data.language);
           setLanguage(data.language);
         }
-      } 
+      }
       // 2. Fallback to localStorage and response check
       else {
         const storedState = typeof window !== "undefined" ? localStorage.getItem(`attempt_started_${attemptId}`) : null;
@@ -94,15 +94,15 @@ export default function Page() {
           }
         }
       }
-      
+
       // 3. Sync test status to Zustand
       if (testStatus === null && data.status) {
         setTestStatus(data.status === "COMPLETED" ? "submitted" : "active");
       }
-      
+
       setIsCheckingSession(false);
     } else if (!isLoading) {
-        setIsCheckingSession(false);
+      setIsCheckingSession(false);
     }
   }, [attemptId, data, isLoading, testStatus, setTestStatus, setHasStartedSession, setSelectedLang, setLanguage, setIsCheckingSession]);
 
@@ -128,7 +128,7 @@ export default function Page() {
     if (typeof window !== "undefined") {
       localStorage.setItem(`attempt_started_${attemptId}`, "true");
     }
-    
+
     // Save to database
     await startAttemptSession(attemptId, lang);
   };
@@ -145,7 +145,7 @@ export default function Page() {
       <OfflineAlert />
       <SyncAlert />
       <FullscreenSuggestDialog />
-      
+
       {/* Fixed Header */}
       <div className="flex-none">
         <Header attemptId={attemptId} />
