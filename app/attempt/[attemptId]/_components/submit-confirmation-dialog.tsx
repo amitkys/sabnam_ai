@@ -28,7 +28,7 @@ export function SubmitConfirmationDialog({
   const { data } = useAttemptTest({ attemptId });
   const answers = useNewTestAttemptStore((s) => s.answers);
   const setTestStatus = useNewTestAttemptStore((s) => s.setTestStatus);
-  
+
   const { mutate, isPending } = useSubmitTest({ attemptId });
 
   if (!data) return null;
@@ -43,8 +43,12 @@ export function SubmitConfirmationDialog({
       onSuccess: (res) => {
         if (res && res.success) {
           setTestStatus("submitted");
-          router.refresh();
+          // Close the dialog first, then refresh after the exit animation
+          // to prevent the page remount from resetting dialog state (double flash).
           onOpenChange(false);
+          setTimeout(() => {
+            router.refresh();
+          }, 300);
           // Optional: redirect to results
           // router.push(`/attempt/${attemptId}/result`);
         } else {
@@ -80,15 +84,15 @@ export function SubmitConfirmationDialog({
         </div>
 
         <AlertDialogFooter>
-          <Button 
-            variant="outline" 
-            onClick={() => onOpenChange(false)} 
+          <Button
+            variant="outline"
+            onClick={() => onOpenChange(false)}
             disabled={isPending}
           >
             Cancel
           </Button>
-          <Button 
-            onClick={handleConfirm} 
+          <Button
+            onClick={handleConfirm}
             disabled={isPending}
             isLoading={isPending}
             className="min-w-32"
