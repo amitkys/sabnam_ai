@@ -11,9 +11,8 @@ export async function startTest({ testId }: { testId: string }) {
 
   return actionWrapper(async () => {
     const session = await auth.api.getSession({ headers: await headers() })
-    console.log("session", session);
 
-    if (!session?.user.id) {
+    if (!session?.user?.id) {
       throw new ActionError("User not authenticated", ErrorTypes.UNAUTHORIZED)
     }
     // 1. Check if an unfinished attempt already exists?
@@ -21,7 +20,7 @@ export async function startTest({ testId }: { testId: string }) {
       where: {
         testPaperId: testId,
         userId: session.user.id,
-        status: "STARTED" // or PAUSED
+        status: { in: ["STARTED", "PAUSED"] }
       }
     });
 

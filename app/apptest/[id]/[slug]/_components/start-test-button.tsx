@@ -13,7 +13,12 @@ export function StartTestButton({ testId }: { testId: string }) {
   const { mutateAsync: startTest, isPending } = useStartTest({ testId });
 
   const handleStart = async () => {
-    await startTest();
+    try {
+      await startTest();
+    } catch (error) {
+      // Handle error appropriately (e.g., show toast notification)
+      console.error("Failed to start test:", error);
+    }
   };
 
   return (
