@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useAttemptTest } from "@/hooks/get-attemp-test";
 import { useParams } from "next/navigation";
 import { Header } from "./_components/header";
@@ -41,6 +41,8 @@ export default function Page() {
   const setStoreAttemptId = useNewTestAttemptStore(s => s.setAttemptId);
   const resetStore = useNewTestAttemptStore(s => s.reset);
   const setLanguage = useNewTestAttemptStore(s => s.setLanguage);
+  const testStatus = useNewTestAttemptStore(s => s.testStatus);
+  const setTestStatus = useNewTestAttemptStore(s => s.setTestStatus);
 
   // Clear store if the tab was loaded with a different test's storage,
   // or if explicitly starting a brand new one.
@@ -51,9 +53,11 @@ export default function Page() {
     }
   }, [attemptId, storeAttemptId, resetStore, setStoreAttemptId]);
 
+  const hasHydrated = useRef(false);
+
   // Pre-fill the global store with the user's previously saved answers
   useEffect(() => {
-    if (data?.responses) {
+    if (data?.responses && !hasHydrated.current) {
       const validResponses = data.responses
         // 1. Drop unanswered questions
         .filter((r) => r.userAnswer !== null)
@@ -65,8 +69,9 @@ export default function Page() {
 
       // 3. Update the client state so the UI selects the answered options
       hydrateFromServer(validResponses);
+      hasHydrated.current = true;
     }
-  }, [data, hydrateFromServer]);
+  }, [data?.responses, hydrateFromServer]);
 
   // Session persistence on reload
   useEffect(() => {
@@ -89,11 +94,17 @@ export default function Page() {
           }
         }
       }
+      
+      // 3. Sync test status to Zustand
+      if (testStatus === null && data.status) {
+        setTestStatus(data.status === "COMPLETED" ? "submitted" : "active");
+      }
+      
       setIsCheckingSession(false);
     } else if (!isLoading) {
         setIsCheckingSession(false);
     }
-  }, [attemptId, data, isLoading]);
+  }, [attemptId, data, isLoading, testStatus, setTestStatus, setHasStartedSession, setSelectedLang, setLanguage, setIsCheckingSession]);
 
   // Loading / Error States
   // While we are figuring out whether to show the Preflight screen vs the Test screen,
@@ -133,7 +144,7 @@ export default function Page() {
       {/* Global Alerts & Modals */}
       <OfflineAlert />
       <SyncAlert />
-      {data.status !== "COMPLETED" && <FullscreenSuggestDialog />}
+      <FullscreenSuggestDialog />
       
       {/* Fixed Header */}
       <div className="flex-none">

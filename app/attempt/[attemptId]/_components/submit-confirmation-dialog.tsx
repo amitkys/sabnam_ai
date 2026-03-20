@@ -27,6 +27,7 @@ export function SubmitConfirmationDialog({
   const router = useRouter();
   const { data } = useAttemptTest({ attemptId });
   const answers = useNewTestAttemptStore((s) => s.answers);
+  const setTestStatus = useNewTestAttemptStore((s) => s.setTestStatus);
   
   const { mutate, isPending } = useSubmitTest({ attemptId });
 
@@ -41,6 +42,7 @@ export function SubmitConfirmationDialog({
     mutate(undefined, {
       onSuccess: (res) => {
         if (res && res.success) {
+          setTestStatus("submitted");
           router.refresh();
           onOpenChange(false);
           // Optional: redirect to results

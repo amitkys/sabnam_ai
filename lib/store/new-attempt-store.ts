@@ -15,6 +15,8 @@ interface TestAttemptState {
   markedForReview: Set<string>;
   pendingSync: Set<string>;
   activeQuestionIndex: number;
+  hasDeclinedFullscreen: boolean;
+  testStatus: "active" | "submitted" | null;
 
   // actions
   setAttemptId: (attemptId: string) => void;
@@ -24,6 +26,8 @@ interface TestAttemptState {
   setActiveQuestionIndex: (index: number) => void;
   clearAnswer: (questionId: string) => void;
   markAsSynced: (questionId: string) => void;
+  setHasDeclinedFullscreen: (declined: boolean) => void;
+  setTestStatus: (status: "active" | "submitted" | null) => void;
 
   // navigation
   goToNext: (totalQuestions: number) => void;
@@ -54,9 +58,13 @@ export const useNewTestAttemptStore = create<TestAttemptState>()(
       markedForReview: new Set(),
       pendingSync: new Set(),
       activeQuestionIndex: 0,
+      hasDeclinedFullscreen: false,
+      testStatus: null,
 
       setAttemptId: (attemptId) => set({ attemptId }),
       setLanguage: (lang) => set({ language: lang }),
+      setHasDeclinedFullscreen: (declined) => set({ hasDeclinedFullscreen: declined }),
+      setTestStatus: (status) => set({ testStatus: status }),
 
       // set / update answer
       setAnswer: (questionId, answer) => {
@@ -154,7 +162,9 @@ export const useNewTestAttemptStore = create<TestAttemptState>()(
         answers: new Map(),
         markedForReview: new Set(),
         pendingSync: new Set(),
-        activeQuestionIndex: 0
+        activeQuestionIndex: 0,
+        hasDeclinedFullscreen: false,
+        testStatus: null,
       }),
     }),
 
@@ -174,6 +184,8 @@ export const useNewTestAttemptStore = create<TestAttemptState>()(
               answers: new Map(Object.entries(parsed.state.answers || {})),
               markedForReview: new Set(parsed.state.markedForReview || []),
               pendingSync: new Set(parsed.state.pendingSync || []),
+              hasDeclinedFullscreen: parsed.state.hasDeclinedFullscreen || false,
+              testStatus: parsed.state.testStatus || null,
             },
           };
         },
@@ -186,6 +198,8 @@ export const useNewTestAttemptStore = create<TestAttemptState>()(
               answers: Object.fromEntries(value.state.answers),
               markedForReview: Array.from(value.state.markedForReview),
               pendingSync: Array.from(value.state.pendingSync),
+              hasDeclinedFullscreen: value.state.hasDeclinedFullscreen,
+              testStatus: value.state.testStatus,
             },
           });
           sessionStorage.setItem(name, str);

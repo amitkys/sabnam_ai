@@ -11,13 +11,22 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { useNewTestAttemptStore } from "@/lib/store/new-attempt-store";
 
 export function FullscreenSuggestDialog() {
   const [open, setOpen] = useState(false);
+  const hasDeclinedFullscreen = useNewTestAttemptStore((state) => state.hasDeclinedFullscreen);
+  const setHasDeclinedFullscreen = useNewTestAttemptStore((state) => state.setHasDeclinedFullscreen);
+  const testStatus = useNewTestAttemptStore((state) => state.testStatus);
 
   useEffect(() => {
     // Function to check if we are in fullscreen mode
     const checkFullscreen = () => {
+      if (hasDeclinedFullscreen || testStatus === "submitted") {
+        setOpen(false);
+        return;
+      }
+
       if (typeof document !== "undefined" && !document.fullscreenElement) {
         setOpen(true);
       } else {
@@ -36,7 +45,7 @@ export function FullscreenSuggestDialog() {
       clearTimeout(initialTimer);
       document.removeEventListener("fullscreenchange", checkFullscreen);
     };
-  }, []);
+  }, [hasDeclinedFullscreen, testStatus]);
 
   const enterFullscreen = async () => {
     if (typeof document !== "undefined" && document.documentElement.requestFullscreen) {
@@ -67,7 +76,10 @@ export function FullscreenSuggestDialog() {
         <DialogFooter className="mr-auto ml-auto w-full gap-2 sm:gap-0 mt-4 flex-col sm:flex-row">
           <Button 
             variant="outline" 
-            onClick={() => setOpen(false)}
+            onClick={() => {
+              setHasDeclinedFullscreen(true);
+              setOpen(false);
+            }}
             className="w-full sm:w-auto"
           >
             Stay in Tab
