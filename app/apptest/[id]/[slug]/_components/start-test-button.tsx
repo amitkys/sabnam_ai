@@ -1,11 +1,6 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { startTest } from "@/lib/action/startTest";
-import { createToast } from "vercel-toast";
-import { useNewTestAttemptStore } from "@/lib/store/new-attempt-store";
 import { useStartTest } from "@/hooks/query/mutation/use-start-test";
 
 export function StartTestButton({ testId }: { testId: string }) {

@@ -1,18 +1,20 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
-import { useAttemptTest } from "@/hooks/get-attemp-test";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams } from "next/navigation";
+
 import { Header } from "./_components/header";
-import { useNewTestAttemptStore } from "@/lib/store/new-attempt-store";
 import { QuestionCard } from "./_components/question-card";
 import { QuestionPalette } from "./_components/question-palette";
 import { AttemptFooter } from "./_components/attempt-footer";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Card } from "@/components/ui/card";
 import { OfflineAlert, SyncAlert } from "./_components/offline-alert";
-import { useSyncAnswers } from "@/hooks/use-sync-answers";
 import { AttemptPreflightScreen } from "./_components/attempt-preflight";
 import { FullscreenSuggestDialog } from "./_components/fullscreen-suggest-dialog";
+
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Card } from "@/components/ui/card";
+import { useSyncAnswers } from "@/hooks/use-sync-answers";
+import { useNewTestAttemptStore } from "@/lib/store/new-attempt-store";
+import { useAttemptTest } from "@/hooks/get-attemp-test";
 import { startAttemptSession } from "@/lib/action/attempt-actions";
 
 /**
@@ -21,28 +23,26 @@ import { startAttemptSession } from "@/lib/action/attempt-actions";
  */
 export default function Page() {
   const params = useParams<{ attemptId: string }>();
-
-
   const attemptId = params.attemptId;
+  const attemptStartedStorageKey = `attempt_started_${attemptId}`;
 
   // Local State
   const [hasStartedSession, setHasStartedSession] = useState(false);
   const [isCheckingSession, setIsCheckingSession] = useState(true);
-  const [selectedLang, setSelectedLang] = useState("en");
 
   // Fetch test data
-  const { data, isLoading, error } = useAttemptTest({ attemptId })
+  const { data, isLoading, error } = useAttemptTest({ attemptId });
 
   // Start background sync
   useSyncAnswers(attemptId);
 
-  const hydrateFromServer = useNewTestAttemptStore(s => s.hydrateFromServer);
-  const storeAttemptId = useNewTestAttemptStore(s => s.attemptId);
-  const setStoreAttemptId = useNewTestAttemptStore(s => s.setAttemptId);
-  const resetStore = useNewTestAttemptStore(s => s.reset);
-  const setLanguage = useNewTestAttemptStore(s => s.setLanguage);
-  const testStatus = useNewTestAttemptStore(s => s.testStatus);
-  const setTestStatus = useNewTestAttemptStore(s => s.setTestStatus);
+  const hydrateFromServer = useNewTestAttemptStore((s) => s.hydrateFromServer);
+  const storeAttemptId = useNewTestAttemptStore((s) => s.attemptId);
+  const setStoreAttemptId = useNewTestAttemptStore((s) => s.setAttemptId);
+  const resetStore = useNewTestAttemptStore((s) => s.reset);
+  const setLanguage = useNewTestAttemptStore((s) => s.setLanguage);
+  const testStatus = useNewTestAttemptStore((s) => s.testStatus);
+  const setTestStatus = useNewTestAttemptStore((s) => s.setTestStatus);
 
   // Clear store if the tab was loaded with a different test's storage,
   // or if explicitly starting a brand new one.
@@ -53,89 +53,118 @@ export default function Page() {
     }
   }, [attemptId, storeAttemptId, resetStore, setStoreAttemptId]);
 
-  const hasHydrated = useRef(false);
+  // Track which attempt has already hydrated answers into the client store.
+  // This avoids duplicate hydrate work on refetch while still rehydrating when attemptId changes.
+  const hydratedAttemptIdRef = useRef<string | null>(null);
 
-  // Pre-fill the global store with the user's previously saved answers
+  // Hydrate previously saved answers once per attempt.
+  // We intentionally keep this idempotent because query data can refetch during the session.
   useEffect(() => {
-    if (data?.responses && !hasHydrated.current) {
-      const validResponses = data.responses
-        // 1. Drop unanswered questions
-        .filter((r) => r.userAnswer !== null)
-        // 2. Map database fields to the exact shape expected by the Zustand store
-        .map((r) => ({
-          questionId: r.questionId,
-          userAnswer: r.userAnswer as string,
-        }));
+    if (!data?.responses) return;
+    if (hydratedAttemptIdRef.current === attemptId) return;
 
-      // 3. Update the client state so the UI selects the answered options
-      hydrateFromServer(validResponses);
-      hasHydrated.current = true;
-    }
-  }, [data?.responses, hydrateFromServer]);
+    const validResponses = data.responses
+      .filter((r) => r.userAnswer !== null)
+      .map((r) => ({
+        questionId: r.questionId,
+        userAnswer: r.userAnswer as string,
+      }));
 
-  // Session persistence on reload
+    hydrateFromServer(validResponses);
+    hydratedAttemptIdRef.current = attemptId;
+  }, [attemptId, data?.responses, hydrateFromServer]);
+
+  // Resolve "has started" state using server as source of truth, then local fallback for reload continuity.
+  // We only mark localStorage for fallback path so DB-backed attempts remain authoritative.
   useEffect(() => {
-    if (!isLoading && data) {
-      // 1. Check DB first (authoritative source)
-      if (data.hasStartedSession) {
-        setHasStartedSession(true);
-        if (data.language) {
-          setSelectedLang(data.language);
-          setLanguage(data.language);
-        }
-      }
-      // 2. Fallback to localStorage and response check
-      else {
-        const storedState = typeof window !== "undefined" ? localStorage.getItem(`attempt_started_${attemptId}`) : null;
-        if (storedState === "true" || (data.responses && data.responses.length > 0)) {
-          setHasStartedSession(true);
-          if (typeof window !== "undefined") {
-            localStorage.setItem(`attempt_started_${attemptId}`, "true");
-          }
-        }
-      }
-
-      // 3. Sync test status to Zustand
-      if (testStatus === null && data.status) {
-        setTestStatus(data.status === "COMPLETED" ? "submitted" : "active");
-      }
-
+    if (isLoading) return;
+    if (!data) {
       setIsCheckingSession(false);
-    } else if (!isLoading) {
-      setIsCheckingSession(false);
+
+      return;
     }
-  }, [attemptId, data, isLoading, testStatus, setTestStatus, setHasStartedSession, setSelectedLang, setLanguage, setIsCheckingSession]);
+
+    const storedState =
+      typeof window !== "undefined"
+        ? localStorage.getItem(attemptStartedStorageKey)
+        : null;
+
+    const hasFallbackSession =
+      storedState === "true" || (data.responses?.length ?? 0) > 0;
+
+    if (data.hasStartedSession || hasFallbackSession) {
+      setHasStartedSession(true);
+    }
+
+    if (data.hasStartedSession && data.language) {
+      setLanguage(data.language);
+    } else if (hasFallbackSession && typeof window !== "undefined") {
+      localStorage.setItem(attemptStartedStorageKey, "true");
+    }
+
+    if (testStatus === null && data.status) {
+      setTestStatus(data.status === "COMPLETED" ? "submitted" : "active");
+    }
+
+    setIsCheckingSession(false);
+  }, [
+    attemptStartedStorageKey,
+    data,
+    isLoading,
+    testStatus,
+    setLanguage,
+    setTestStatus,
+  ]);
+
+  const handleStartSession = useCallback(
+    async (lang: string) => {
+      setLanguage(lang);
+      setHasStartedSession(true);
+
+      if (typeof window !== "undefined") {
+        localStorage.setItem(attemptStartedStorageKey, "true");
+      }
+
+      await startAttemptSession({ attemptId, language: lang });
+    },
+    [attemptId, attemptStartedStorageKey, setLanguage],
+  );
 
   // Loading / Error States
   // While we are figuring out whether to show the Preflight screen vs the Test screen,
   // we keep the loading skeleton active to avoid flashing the preflight.
   if (isLoading || isCheckingSession) {
-    return <div className="flex h-screen items-center justify-center">Loading test environment...</div>
+    return (
+      <div className="flex h-screen items-center justify-center">
+        Loading test environment...
+      </div>
+    );
   }
 
   if (error) {
-    return <div className="flex h-screen items-center justify-center text-red-500">Error: {error.message}</div>
+    return (
+      <div className="flex h-screen items-center justify-center text-red-500">
+        Error: {error.message}
+      </div>
+    );
   }
 
   if (!data) {
-    return <div className="flex h-screen items-center justify-center">Test data not found</div>
+    return (
+      <div className="flex h-screen items-center justify-center">
+        Test data not found
+      </div>
+    );
   }
-
-  const handleStartSession = async (lang: string) => {
-    setSelectedLang(lang);
-    setLanguage(lang);
-    setHasStartedSession(true);
-    if (typeof window !== "undefined") {
-      localStorage.setItem(`attempt_started_${attemptId}`, "true");
-    }
-
-    // Save to database
-    await startAttemptSession({ attemptId, language: lang });
-  };
 
   // ── PRE-FLIGHT GATE SCREEN ──
   if (!hasStartedSession) {
-    return <AttemptPreflightScreen test={data.testPaper} onStart={handleStartSession} />;
+    return (
+      <AttemptPreflightScreen
+        test={data.testPaper}
+        onStart={handleStartSession}
+      />
+    );
   }
 
   // ── ACTUAL TEST UI SCREEN ──
@@ -186,5 +215,5 @@ export default function Page() {
         </div>
       </div>
     </div>
-  )
+  );
 }

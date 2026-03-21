@@ -1,6 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { startTest } from "@/lib/action/startTest";
+import { startTest } from "@/lib/action/mutation/startTest";
 import { useRouter } from "next/navigation";
 import { useNewTestAttemptStore } from "@/lib/store/new-attempt-store";
 import { createToast } from "vercel-toast";
