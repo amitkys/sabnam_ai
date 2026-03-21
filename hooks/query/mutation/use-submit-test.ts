@@ -7,11 +7,13 @@ export function useSubmitTest({ attemptId }: { attemptId: string }) {
 
   return useMutation({
     mutationFn: async () => {
-      return await submitAttempt(attemptId);
+      return await submitAttempt({ attemptId });
     },
     onSuccess: (res) => {
       if (!res.success) {
-        createToast("Failed to submit test", { type: "error", timeout: 5000 });
+        createToast(res.error || "Failed to submit test", { type: "error", timeout: 5000 });
+      } else {
+        queryClient.invalidateQueries({ queryKey: ["attempt-test", attemptId] });
       }
     },
     onError: (error) => {

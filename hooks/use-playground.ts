@@ -1,4 +1,4 @@
-import { getPlayground } from "@/lib/action/get/playground";
+import { getPlayground } from "@/hooks/query/get/use-playground";
 import { useQuery } from "@tanstack/react-query";
 
 
@@ -7,11 +7,11 @@ export const usePlayground = () => {
     queryKey: ["playground"],
     queryFn: async () => {
       const res = await getPlayground();
-      if(!res.success) {
+      if (!res.success) {
         throw new Error(res.error);
       }
       return res.data;
     },
-   retry: false 
+    retry: false
   })
 }

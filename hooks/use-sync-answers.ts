@@ -35,11 +35,11 @@ export function useSyncAnswers(attemptId: string) {
           }
 
           // Attempt to save to server
-          const result = await saveStudentResponse(
+          const result = await saveStudentResponse({
             attemptId,
             questionId,
-            answer
-          );
+            userAnswer: answer,
+          });
 
           if (result.success) {
             // FIX: Only mark as synced if the answer hasn't changed since we started sending it

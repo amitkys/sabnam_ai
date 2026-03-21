@@ -11,7 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { FullPageLoader } from "@/components/ui/full-page-loader";
 import { useState } from "react";
-import { useCancelTest } from "@/lib/action/mutation/use-cancel-test";
+import { useCancelTest } from "@/hooks/query/mutation/use-cancel-test";
 
 interface ExitConfirmationDialogProps {
   attemptId: string;

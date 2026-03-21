@@ -1,7 +1,11 @@
-'use server'
+"use server";
 
-import { prisma } from "@/lib/db"; // Adjust path to your db client
+import { auth } from "@/lib/auth";
+import { ActionError, actionWrapper } from "@/lib/action-response";
+import { prisma } from "@/lib/db";
+import { ErrorTypes } from "@/lib/error-type";
 import { AttemptStatus } from "@/lib/generated/prisma/client";
+import { headers } from "next/headers";
 
 // Define the shape of your Option to help TypeScript
 interface QuestionOption {
@@ -10,11 +14,15 @@ interface QuestionOption {
   isCorrect?: boolean; // Optional because we might remove it
 }
 
-export async function getAttemptAction(attemptId: string) {
-  try {
-    // 1. Fetch the Attempt + Test + Questions + User Responses
-    const attempt = await prisma.testAttempt.findUnique({
-      where: { id: attemptId },
+export async function getAttemptAction({ attemptId }: { attemptId: string }) {
+  return actionWrapper(async () => {
+    const session = await auth.api.getSession({ headers: await headers() });
+    if (!session?.user?.id) {
+      throw new ActionError("User not authenticated", ErrorTypes.UNAUTHORIZED);
+    }
+
+    const attempt = await prisma.testAttempt.findFirst({
+      where: { id: attemptId, userId: session.user.id },
       include: {
         testPaper: {
           select: {
@@ -25,66 +33,56 @@ export async function getAttemptAction(attemptId: string) {
             totalMarks: true,
             languages: true,
             questions: {
-              orderBy: { orderIndex: 'asc' }, // Keep questions in order
+              orderBy: { orderIndex: "asc" },
               include: {
                 question: {
                   select: {
                     id: true,
                     content: true,
                     type: true,
-                    options: true,      // We fetch this, but will sanitize it
+                    options: true,
                     imageUrl: true,
-                    solution: true,     // We fetch this, but will sanitize it
-                    correctValue: true, // We fetch this, but will sanitize it
+                    solution: true,
+                    correctValue: true,
                   }
                 },
               }
             }
           }
         },
-        responses: true // Load previous answers so we can restore the UI
+        responses: true
       }
     });
 
     if (!attempt) {
-      return { error: "Attempt not found" };
+      throw new ActionError("Attempt not found", ErrorTypes.NOT_FOUND);
     }
 
-    // 2. CHECK STATUS: Is the user currently taking the test?
-    const isLiveAttempt = attempt.status === AttemptStatus.STARTED || attempt.status === AttemptStatus.PAUSED;
+    const isLiveAttempt =
+      attempt.status === AttemptStatus.STARTED ||
+      attempt.status === AttemptStatus.PAUSED;
 
-    // 3. SANITIZATION LOGIC (Security Layer)
     if (isLiveAttempt) {
-      // Loop through every question in the test paper
-      attempt.testPaper.questions.forEach((tq: any) => {
-        const q = tq.question;
+      attempt.testPaper.questions.forEach((tq) => {
+        const q = tq.question as {
+          options: unknown;
+          solution?: unknown;
+          correctValue?: unknown;
+        };
 
-        // A. DELETE explicit answers/solutions
-        // @ts-ignore: Deleting optional properties from the response object
-        delete q.solution; 
-        // @ts-ignore
+        delete q.solution;
         delete q.correctValue;
 
-        // B. FILTER the Options JSON
-        // We cast 'options' to our interface to manipulate it safely
-        const rawOptions = q.options as unknown as QuestionOption[];
-        
+        const rawOptions = q.options as QuestionOption[];
         if (Array.isArray(rawOptions)) {
-          // Overwrite the options with a "Clean" version
           q.options = rawOptions.map((opt) => ({
             id: opt.id,
             text: opt.text,
-            // NOTICE: We do NOT include 'isCorrect' here
           }));
         }
       });
     }
 
-    // 4. Return the safe data
-    return { success: true, data: attempt };
-
-  } catch (error) {
-    console.error("Error fetching attempt:", error);
-    return { error: "Failed to load test data" };
-  }
+    return attempt;
+  });
 }

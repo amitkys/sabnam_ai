@@ -130,7 +130,7 @@ export default function Page() {
     }
 
     // Save to database
-    await startAttemptSession(attemptId, lang);
+    await startAttemptSession({ attemptId, language: lang });
   };
 
   // ── PRE-FLIGHT GATE SCREEN ──

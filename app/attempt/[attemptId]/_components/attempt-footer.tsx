@@ -58,11 +58,11 @@ export function AttemptFooter() {
     if (userAnswer) {
       // Fire and forget (almost)
       // We don't await this to block navigation. The user feels it's instant.
-      saveStudentResponse(
-        params.attemptId,
-        currentQuestion.questionId,
-        userAnswer
-      ).then((result) => {
+      saveStudentResponse({
+        attemptId: params.attemptId,
+        questionId: currentQuestion.questionId,
+        userAnswer,
+      }).then((result) => {
         if (result.success) {
           markAsSynced(currentQuestion.questionId);
         }

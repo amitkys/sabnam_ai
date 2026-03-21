@@ -2,7 +2,7 @@
 
 import { useAttemptTest } from "@/hooks/get-attemp-test";
 import { useNewTestAttemptStore } from "@/lib/store/new-attempt-store";
-import { useSubmitTest } from "@/lib/action/mutation/use-submit-test";
+import { useSubmitTest } from "@/hooks/query/mutation/use-submit-test";
 import {
   AlertDialog,
   AlertDialogContent,
@@ -43,14 +43,8 @@ export function SubmitConfirmationDialog({
       onSuccess: (res) => {
         if (res && res.success) {
           setTestStatus("submitted");
-          // Close the dialog first, then refresh after the exit animation
-          // to prevent the page remount from resetting dialog state (double flash).
           onOpenChange(false);
-          setTimeout(() => {
-            router.refresh();
-          }, 300);
-          // Optional: redirect to results
-          // router.push(`/attempt/${attemptId}/result`);
+          router.push(`/result/${attemptId}`);
         } else {
           // Keep dialog open or close it based on preference if it errors
         }
