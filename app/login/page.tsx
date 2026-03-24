@@ -1,17 +1,17 @@
-"use client";
-import { Button } from "@/components/ui/button";
-import { authClient } from "@/lib/auth-client";
+import { redirect } from "next/navigation";
 
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ next?: string | string[]; callbackUrl?: string | string[] }>;
+}) {
+  const params = await searchParams;
+  const raw = params.next ?? params.callbackUrl;
+  const nextParam = Array.isArray(raw) ? raw[0] : raw;
 
-export default function Page() {
-  const handleSignin = async () => {
-    await authClient.signIn.social({
-      provider: "google",
-      callbackURL: "/home",
-      errorCallbackURL: "/api/auth/error",
-    })
+  if (nextParam) {
+    redirect(`/signin?next=${encodeURIComponent(nextParam)}`);
   }
-  return (
-    <Button onClick={handleSignin}>Signin with google</Button>
-  )
+
+  redirect("/signin");
 }

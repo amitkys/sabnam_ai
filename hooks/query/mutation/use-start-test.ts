@@ -3,7 +3,13 @@ import { startTest } from "@/lib/action/mutation/startTest";
 import { ErrorTypes } from "@/lib/error-type";
 import { createToast } from "vercel-toast";
 
-export function useStartTest({ testId }: { testId: string }) {
+export function useStartTest({
+  testId,
+  onUnauthorized,
+}: {
+  testId: string;
+  onUnauthorized?: () => void;
+}) {
   return useMutation({
     mutationFn: async () => {
       return await startTest({ testId });
@@ -11,12 +17,18 @@ export function useStartTest({ testId }: { testId: string }) {
     onSuccess: (res) => {
       if (!res.success) {
         if (res.errorCode === ErrorTypes.UNAUTHORIZED) {
-          createToast("Unauthorized User", { type: "error", timeout: 5000 });
+          if (onUnauthorized) {
+            onUnauthorized();
+          } else {
+            createToast("Unauthorized User", { type: "error", timeout: 5000 });
+          }
+          return;
         }
+        createToast(res.error || "Failed to start test", { type: "error", timeout: 5000 });
+        return;
       }
-      if (res.success) {
-        window.open(`/attempt/${res.data}`)
-      }
+
+      window.open(`/attempt/${res.data}`);
     },
   });
 }
