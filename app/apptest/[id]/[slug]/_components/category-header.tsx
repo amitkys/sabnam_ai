@@ -1,6 +1,3 @@
-import Link from 'next/link';
-import { ArrowLeftIcon } from 'lucide-react';
-
 interface CategoryHeaderProps {
   name: string;
   levelLabel: string;
@@ -15,15 +12,12 @@ interface CategoryHeaderProps {
  */
 export function CategoryHeader({
   name,
-  parent,
+  parent: _parent,
 }: CategoryHeaderProps) {
-  const backHref = parent ? `/apptest/${parent.id}/${parent.slug}` : '/apptest';
-  const backLabel = parent ? parent.name : 'All Exams';
-
   return (
     <div className="flex flex-col gap-3">
 
-      {/* Back button — pill style */}
+      {/* Back button moved to apptest sidebar header
       <Link
         href={backHref}
         className="group bg-muted hover:bg-muted/70 text-muted-foreground hover:text-foreground inline-flex w-fit items-center gap-1.5  px-3 py-1.5 text-xs font-medium transition-all"
@@ -31,6 +25,7 @@ export function CategoryHeader({
         <ArrowLeftIcon className="h-3 w-3 transition-transform group-hover:-translate-x-0.5" />
         {backLabel}
       </Link>
+      */}
 
       {/* Page title */}
       <h1 className="text-h3">{name}</h1>
