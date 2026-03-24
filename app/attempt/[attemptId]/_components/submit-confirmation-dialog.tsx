@@ -12,8 +12,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
-import { Loader2 } from "lucide-react";
+import { FullPageLoader } from "@/components/ui/full-page-loader";
 
 export function SubmitConfirmationDialog({
   attemptId,
@@ -24,14 +23,20 @@ export function SubmitConfirmationDialog({
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) {
-  const router = useRouter();
   const { data } = useAttemptTest({ attemptId });
   const answers = useNewTestAttemptStore((s) => s.answers);
   const setTestStatus = useNewTestAttemptStore((s) => s.setTestStatus);
 
-  const { mutate, isPending } = useSubmitTest({ attemptId });
+  const { mutate, isPending, isSuccess, isError } = useSubmitTest({
+    attemptId,
+    onSubmitted: () => {
+      setTestStatus("submitted");
+      onOpenChange(false);
+    },
+  });
 
   if (!data) return null;
+
 
   const totalQuestions = data.testPaper.questions.length;
   // Compute answered questions by checking which ones actually have a selected option
@@ -39,18 +44,12 @@ export function SubmitConfirmationDialog({
   const unansweredQuestions = totalQuestions - answeredQuestions;
 
   const handleConfirm = () => {
-    mutate(undefined, {
-      onSuccess: (res) => {
-        if (res && res.success) {
-          setTestStatus("submitted");
-          onOpenChange(false);
-          router.push(`/result/${attemptId}`);
-        } else {
-          // Keep dialog open or close it based on preference if it errors
-        }
-      },
-    });
+    mutate();
   };
+
+  if (isSuccess && !isError) {
+    return <FullPageLoader text="Redirecting to result page..." />
+  }
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
@@ -58,7 +57,8 @@ export function SubmitConfirmationDialog({
         <AlertDialogHeader>
           <AlertDialogTitle>Are you sure you want to submit?</AlertDialogTitle>
           <AlertDialogDescription>
-            Once you submit, you will not be able to return to the test. Please review your attempt summary below.
+            Once you submit, you will not be able to return to the test. Please
+            review your attempt summary below.
           </AlertDialogDescription>
         </AlertDialogHeader>
 
@@ -79,17 +79,17 @@ export function SubmitConfirmationDialog({
 
         <AlertDialogFooter>
           <Button
+            disabled={isPending}
             variant="outline"
             onClick={() => onOpenChange(false)}
-            disabled={isPending}
           >
             Cancel
           </Button>
           <Button
-            onClick={handleConfirm}
+            className="min-w-32"
             disabled={isPending}
             isLoading={isPending}
-            className="min-w-32"
+            onClick={handleConfirm}
           >
             Submit Test
           </Button>
