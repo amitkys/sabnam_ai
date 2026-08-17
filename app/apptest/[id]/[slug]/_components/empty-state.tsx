@@ -11,7 +11,7 @@ interface EmptyStateProps {
 export function EmptyState({ categoryName }: EmptyStateProps) {
   return (
     <Card>
-      <CardContent className="text-muted-foreground py-12 text-center text-sm">
+      <CardContent className="text-muted-foreground py-12 text-center body-sm">
         No content available yet for <strong>{categoryName}</strong>.
       </CardContent>
     </Card>

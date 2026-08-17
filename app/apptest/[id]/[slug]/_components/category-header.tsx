@@ -28,7 +28,7 @@ export function CategoryHeader({
       */}
 
       {/* Page title */}
-      <h1 className="text-h3">{name}</h1>
+      <h3 className="text-h3">{name}</h3>
 
     </div>
   );

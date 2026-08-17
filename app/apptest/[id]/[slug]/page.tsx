@@ -6,6 +6,8 @@ import { CategoryHeader } from './_components/category-header';
 import { ChildrenGrid } from './_components/children-grid';
 import { TestList } from './_components/test-list';
 import { EmptyState } from './_components/empty-state';
+import { ContentLayout } from '@/components/admin-panel/content-layout';
+import { Separator } from '@/components/ui/separator';
 
 interface PageProps {
   params: Promise<{ id: string; slug: string }>;
@@ -49,24 +51,25 @@ export default async function CategoryPage({ params }: PageProps) {
   const hasContent = category.children.length > 0 || category.tests.length > 0;
 
   return (
-    <div className="flex flex-col gap-8">
+    <ContentLayout title={category.name}>
+      <div className="flex flex-col gap-8">
 
-      <CategoryHeader
-        name={category.name}
-        levelLabel={getLevelLabel(category.level)}
-        domainLabel={getDomainLabel(category.domain)}
-        parent={category.parent}
-      />
+        <CategoryHeader
+          name={category.name}
+          levelLabel={getLevelLabel(category.level)}
+          domainLabel={getDomainLabel(category.domain)}
+          parent={category.parent}
+        />
 
-      <ChildrenGrid
-        heading={getChildrenHeading(category.level)}
-        children={category.children}
-      />
+        <ChildrenGrid
+          heading={getChildrenHeading(category.level)}
+          children={category.children}
+        />
+        <Separator />
+        <TestList tests={category.tests} />
 
-      <TestList tests={category.tests} />
+        {!hasContent && <EmptyState categoryName={category.name} />}
 
-      {!hasContent && <EmptyState categoryName={category.name} />}
-
-    </div>
-  );
+      </div>
+    </ContentLayout>);
 }

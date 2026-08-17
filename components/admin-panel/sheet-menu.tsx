@@ -1,35 +1,35 @@
-import { MenuIcon, PanelsTopLeft } from "lucide-react";
-
-import { Button } from "@/components/ui/button";
+import { MenuIcon } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
 import { Menu } from "@/components/admin-panel/menu";
+import { Button } from "@/components/ui/button";
 import {
   Sheet,
-  SheetHeader,
   SheetContent,
-  SheetTrigger,
+  SheetHeader,
   SheetTitle,
+  SheetTrigger,
 } from "@/components/ui/sheet";
-import Image from "next/image";
 
 export function SheetMenu() {
   return (
     <Sheet>
-      <SheetTrigger asChild className="lg:hidden">
-        <Button className="h-8" size="icon" variant="outline">
+      <SheetTrigger className="lg:hidden" asChild>
+        <Button className="h-8" variant="outline" size="icon">
           <MenuIcon size={20} />
         </Button>
       </SheetTrigger>
-      <SheetContent className="sm:w-72 px-3 h-full flex flex-col" side="left">
-        <SheetHeader>
+      <SheetContent className="sm:w-72 px-3 h-full flex flex-col bg-sidebar text-sidebar-foreground" side="left">
+        <SheetHeader className="text-left">
           <Button
-            asChild
-            className="flex justify-center items-center pb-2 pt-1"
+            className="flex justify-start items-center pb-2 pt-1 px-4"
             variant="link"
+            asChild
           >
-            <a className="flex items-center gap-2" href="/home">
-              <Image src={"/logo.svg"} width={40} height={40} alt="logo" />
-              <SheetTitle className="font-bold text-lg">Sabnam AI</SheetTitle>
-            </a>
+            <Link href="/dashboard" className="flex items-center gap-2">
+              <Image src="/logo.svg" alt="Logo" width={24} height={24} className="mr-1" />
+              <SheetTitle className="font-bold text-lg text-sidebar-foreground">Sabnam</SheetTitle>
+            </Link>
           </Button>
         </SheetHeader>
         <Menu isOpen />

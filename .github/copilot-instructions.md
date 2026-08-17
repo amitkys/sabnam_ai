@@ -23,6 +23,22 @@
 - Data model supports hierarchical category trees (`Category` with `ROOT -> ... -> CHAPTER/PYQ`) and multilingual content.
 - AI endpoints are in `app/api/chat/route.ts` and `app/api/gemini/route.ts`.
 
+## Typography and Styling Conventions
+- **Use Semantic Typography Classes:** This project uses a custom, responsive typography system defined in `app/typography.css`. Do **not** use raw Tailwind text size classes (like `text-xl`, `text-2xl`, etc.) or raw font weights if a semantic class fits.
+- **Headings:** Use the `.text-h1` through `.text-h6` classes on your heading tags.
+  - `.text-h1`: Page titles (e.g., `text-4xl` base)
+  - `.text-h2`: Major sections or main headings (e.g., `text-3xl` base)
+  - `.text-h3`: Subsections or cards (e.g., `text-2xl` base) - *Commonly used as the main heading in this app's pages.*
+  - `.text-h4`: Smaller sub-sections.
+- **Body & Paragraphs:**
+  - `.text-p`: Standard body text.
+  - `.text-lead`: Larger, muted text for subtitles or descriptions.
+  - `.text-large`: Emphasized, semi-bold body text.
+  - `.text-small`: Smaller body text.
+  - `.text-muted`: Small, muted/gray text.
+- **Colors & Links:** Use semantic text colors defined in the typography file (`.text-destructive-color`, `.text-warning-color`, `.text-success-color`, `.text-link`).
+- **Why?** These utility classes contain built-in responsive media queries, line-heights, letter spacing, and `scroll-margin-top` for anchor links. Mixing raw Tailwind sizes breaks the responsive scaling.
+
 ## Key conventions and constraints
 - Use the `@/*` import alias (`tsconfig.json`) instead of long relative paths.
 - For app data operations, prefer **Server Actions** under `lib/actions/**` as the data boundary. Keep fetch/mutation logic out of UI components.

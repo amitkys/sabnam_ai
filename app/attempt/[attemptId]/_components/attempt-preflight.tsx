@@ -24,7 +24,7 @@ interface AttemptPreflightProps {
     languages: string[];
     questions: any[];
   };
-  onStart: (language: string) => void;
+  onStart: (language: string) => Promise<void>;
 }
 
 const LANGUAGE_LABELS: Record<string, string> = {
@@ -62,16 +62,21 @@ export function AttemptPreflightScreen({ test, onStart }: AttemptPreflightProps)
 
   const handleStart = async () => {
     setIsStarting(true);
-    // Request fullscreen immediately on click
-    if (typeof document !== "undefined" && document.documentElement.requestFullscreen) {
-      try {
-        await document.documentElement.requestFullscreen();
-      } catch (e) {
-        console.warn("Fullscreen request failed", e);
+    try {
+      // Request fullscreen immediately on click
+      if (typeof document !== "undefined" && document.documentElement.requestFullscreen) {
+        try {
+          await document.documentElement.requestFullscreen();
+        } catch (e) {
+          console.warn("Fullscreen request failed", e);
+        }
       }
+      // Inform the parent component to transition the view
+      await onStart(selectedLang);
+    } catch (error) {
+      console.error("Failed to start test:", error);
+      setIsStarting(false);
     }
-    // Inform the parent component to transition the view
-    onStart(selectedLang);
   };
 
   return (

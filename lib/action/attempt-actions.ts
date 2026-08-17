@@ -1,12 +1,13 @@
-'use server';
+"use server";
+
+import { revalidatePath } from "next/cache";
+import { headers } from "next/headers";
 
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-import { AttemptStatus } from "@/lib/generated/prisma/client";
+import { AttemptStatus, Prisma } from "@/lib/generated/prisma/client";
 import { ActionError, actionWrapper } from "@/lib/action-response";
 import { ErrorTypes } from "@/lib/error-type";
-import { revalidatePath } from "next/cache";
-import { headers } from "next/headers";
 
 /**
  * Saves a single student response.
@@ -14,12 +15,14 @@ import { headers } from "next/headers";
  */
 async function getSessionUserId() {
   const session = await auth.api.getSession({ headers: await headers() });
+
   if (!session?.user?.id) {
     throw new ActionError("User not authenticated", ErrorTypes.UNAUTHORIZED);
   }
+
   return session.user.id;
 }
-
+// in test attempt, when user save the response,
 export async function saveStudentResponse({
   attemptId,
   questionId,
@@ -32,48 +35,89 @@ export async function saveStudentResponse({
   return actionWrapper(async () => {
     const userId = await getSessionUserId();
 
-    const attempt = await prisma.testAttempt.findFirst({
-      where: { id: attemptId, userId },
-      select: { status: true }
-    });
+    await prisma.$transaction(
+      async (tx) => {
+        const attempt = await tx.testAttempt.findFirst({
+          where: { id: attemptId, userId },
+          select: {
+            status: true,
+            testPaper: {
+              select: {
+                questions: {
+                  where: { questionId },
+                  select: {
+                    question: {
+                      select: { correctValue: true },
+                    },
+                  },
+                  take: 1,
+                },
+              },
+            },
+          },
+        });
 
-    if (!attempt) {
-      throw new ActionError("Attempt not found", ErrorTypes.NOT_FOUND);
-    }
-    if (attempt.status === AttemptStatus.COMPLETED) {
-      throw new ActionError("Test is already submitted", ErrorTypes.BAD_REQUEST);
-    }
+        if (!attempt) {
+          throw new ActionError("Attempt not found", ErrorTypes.NOT_FOUND);
+        }
 
-    const question = await prisma.question.findUnique({
-      where: { id: questionId },
-      select: { correctValue: true }
-    });
+        if (attempt.status === AttemptStatus.COMPLETED) {
+          throw new ActionError(
+            "Test is already submitted",
+            ErrorTypes.BAD_REQUEST,
+          );
+        }
 
-    if (!question) {
-      throw new ActionError("Question not found", ErrorTypes.NOT_FOUND);
-    }
+        const testQuestion = attempt.testPaper.questions[0];
 
-    const isCorrect = question.correctValue === userAnswer;
+        if (!testQuestion) {
+          throw new ActionError(
+            "Question does not belong to this attempt",
+            ErrorTypes.BAD_REQUEST,
+          );
+        }
 
-    await prisma.studentResponse.upsert({
-      where: {
-        attemptId_questionId: {
-          attemptId,
-          questionId,
-        },
+        const isCorrect = testQuestion.question.correctValue === userAnswer;
+
+        // Re-check status right before write to avoid late writes after submit/cancel race.
+        const liveAttempt = await tx.testAttempt.findFirst({
+          where: {
+            id: attemptId,
+            userId,
+            status: { in: [AttemptStatus.STARTED, AttemptStatus.PAUSED] },
+          },
+          select: { id: true },
+        });
+
+        if (!liveAttempt) {
+          throw new ActionError(
+            "Test is already submitted",
+            ErrorTypes.BAD_REQUEST,
+          );
+        }
+
+        await tx.studentResponse.upsert({
+          where: {
+            attemptId_questionId: {
+              attemptId,
+              questionId,
+            },
+          },
+          update: {
+            userAnswer,
+            isCorrect,
+          },
+          create: {
+            attemptId,
+            questionId,
+            userAnswer,
+            isCorrect,
+            timeTaken: 0,
+          },
+        });
       },
-      update: {
-        userAnswer,
-        isCorrect,
-      },
-      create: {
-        attemptId,
-        questionId,
-        userAnswer,
-        isCorrect,
-        timeTaken: 0,
-      },
-    });
+      { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
+    );
 
     return true;
   });
@@ -82,28 +126,39 @@ export async function saveStudentResponse({
 /**
  * Helper to calculate final score for an attempt.
  */
-async function calculateScore(attemptId: string, userId: string) {
-  const attempt = await prisma.testAttempt.findFirst({
+async function calculateScore(
+  db: Prisma.TransactionClient | typeof prisma,
+  attemptId: string,
+  userId: string,
+) {
+  const attempt = await db.testAttempt.findFirst({
     where: { id: attemptId, userId },
     include: {
-      responses: true,
+      responses: {
+        select: {
+          questionId: true,
+          isCorrect: true,
+          userAnswer: true,
+        },
+      },
       testPaper: {
         include: {
-          questions: true // To get positive/negative marks per question
-        }
-      }
-    }
+          questions: true, // To get positive/negative marks per question
+        },
+      },
+    },
   });
 
   if (!attempt) return null;
 
   let totalScore = 0;
   const questionSettingsMap = new Map(
-    attempt.testPaper.questions.map(tq => [tq.questionId, tq])
+    attempt.testPaper.questions.map((tq) => [tq.questionId, tq]),
   );
 
   for (const response of attempt.responses) {
     const settings = questionSettingsMap.get(response.questionId);
+
     if (!settings) continue;
 
     if (response.isCorrect) {
@@ -127,25 +182,57 @@ async function calculateScore(attemptId: string, userId: string) {
 export async function submitAttempt({ attemptId }: { attemptId: string }) {
   return actionWrapper(async () => {
     const userId = await getSessionUserId();
-    const totalScore = await calculateScore(attemptId, userId);
+    const now = new Date();
 
-    if (totalScore === null) {
-      throw new ActionError("Attempt not found", ErrorTypes.NOT_FOUND);
-    }
+    await prisma.$transaction(
+      async (tx) => {
+        const attempt = await tx.testAttempt.findFirst({
+          where: { id: attemptId, userId },
+          select: { status: true },
+        });
 
-    const submitResult = await prisma.testAttempt.updateMany({
-      where: { id: attemptId, userId },
-      data: {
-        status: AttemptStatus.COMPLETED,
-        submittedAt: new Date(),
-        score: totalScore
-      }
-    });
-    if (submitResult.count === 0) {
-      throw new ActionError("Attempt not found", ErrorTypes.NOT_FOUND);
-    }
+        if (!attempt) {
+          throw new ActionError("Attempt not found", ErrorTypes.NOT_FOUND);
+        }
+
+        if (attempt.status === AttemptStatus.COMPLETED) {
+          throw new ActionError(
+            "Test is already submitted",
+            ErrorTypes.BAD_REQUEST,
+          );
+        }
+
+        const totalScore = await calculateScore(tx, attemptId, userId);
+
+        if (totalScore === null) {
+          throw new ActionError("Attempt not found", ErrorTypes.NOT_FOUND);
+        }
+
+        const submitResult = await tx.testAttempt.updateMany({
+          where: {
+            id: attemptId,
+            userId,
+            status: { in: [AttemptStatus.STARTED, AttemptStatus.PAUSED] },
+          },
+          data: {
+            status: AttemptStatus.COMPLETED,
+            submittedAt: now,
+            score: totalScore,
+          },
+        });
+
+        if (submitResult.count === 0) {
+          throw new ActionError(
+            "Test is already submitted",
+            ErrorTypes.BAD_REQUEST,
+          );
+        }
+      },
+      { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
+    );
 
     revalidatePath(`/attempt/${attemptId}`);
+
     return true;
   });
 }
@@ -163,6 +250,62 @@ export async function startAttemptSession({
 }) {
   return actionWrapper(async () => {
     const userId = await getSessionUserId();
+    const normalizedLanguage = language.trim().toLowerCase();
+
+    const attempt = await prisma.testAttempt.findFirst({
+      where: { id: attemptId, userId },
+      select: {
+        status: true,
+        testPaper: {
+          select: { languages: true },
+        },
+      },
+    });
+
+    if (!attempt) {
+      throw new ActionError("Attempt not found", ErrorTypes.NOT_FOUND);
+    }
+    if (attempt.status === AttemptStatus.COMPLETED) {
+      throw new ActionError(
+        "Test is already submitted",
+        ErrorTypes.BAD_REQUEST,
+      );
+    }
+    const supportedLanguages = attempt.testPaper.languages.map((lang) =>
+      lang.toLowerCase(),
+    );
+
+    if (!supportedLanguages.includes(normalizedLanguage)) {
+      throw new ActionError(
+        "Selected language is not available for this test",
+        ErrorTypes.BAD_REQUEST,
+      );
+    }
+
+    const updateResult = await prisma.testAttempt.updateMany({
+      where: { id: attemptId, userId },
+      data: {
+        hasStartedSession: true,
+        language: normalizedLanguage,
+      },
+    });
+
+    if (updateResult.count === 0) {
+      throw new ActionError("Attempt not found", ErrorTypes.NOT_FOUND);
+    }
+
+    revalidatePath(`/attempt/${attemptId}`);
+
+    return true;
+  });
+}
+
+/**
+ * Saves progress and marks an in-progress attempt as paused so it can be resumed.
+ */
+export async function pauseAttempt({ attemptId }: { attemptId: string }) {
+  return actionWrapper(async () => {
+    const userId = await getSessionUserId();
 
     const attempt = await prisma.testAttempt.findFirst({
       where: { id: attemptId, userId },
@@ -172,22 +315,31 @@ export async function startAttemptSession({
     if (!attempt) {
       throw new ActionError("Attempt not found", ErrorTypes.NOT_FOUND);
     }
+
     if (attempt.status === AttemptStatus.COMPLETED) {
-      throw new ActionError("Test is already submitted", ErrorTypes.BAD_REQUEST);
+      throw new ActionError(
+        "Test is already submitted",
+        ErrorTypes.BAD_REQUEST,
+      );
     }
 
     const updateResult = await prisma.testAttempt.updateMany({
-      where: { id: attemptId, userId },
+      where: {
+        id: attemptId,
+        userId,
+        status: { in: [AttemptStatus.STARTED, AttemptStatus.PAUSED] },
+      },
       data: {
-        hasStartedSession: true,
-        language
-      }
+        status: AttemptStatus.PAUSED,
+      },
     });
+
     if (updateResult.count === 0) {
       throw new ActionError("Attempt not found", ErrorTypes.NOT_FOUND);
     }
 
     revalidatePath(`/attempt/${attemptId}`);
+
     return true;
   });
 }
@@ -199,34 +351,56 @@ export async function startAttemptSession({
 export async function cancelAttempt({ attemptId }: { attemptId: string }) {
   return actionWrapper(async () => {
     const userId = await getSessionUserId();
+    const now = new Date();
 
-    const attempt = await prisma.testAttempt.findFirst({
-      where: { id: attemptId, userId },
-      select: { status: true }
-    });
+    await prisma.$transaction(
+      async (tx) => {
+        const attempt = await tx.testAttempt.findFirst({
+          where: { id: attemptId, userId },
+          select: { status: true },
+        });
 
-    if (!attempt) {
-      throw new ActionError("Attempt not found", ErrorTypes.NOT_FOUND);
-    }
-    if (attempt.status === AttemptStatus.COMPLETED) {
-      throw new ActionError("Test is already submitted", ErrorTypes.BAD_REQUEST);
-    }
+        if (!attempt) {
+          throw new ActionError("Attempt not found", ErrorTypes.NOT_FOUND);
+        }
+        if (attempt.status === AttemptStatus.COMPLETED) {
+          throw new ActionError(
+            "Test is already submitted",
+            ErrorTypes.BAD_REQUEST,
+          );
+        }
 
-    const totalScore = (await calculateScore(attemptId, userId)) ?? 0;
+        const totalScore = await calculateScore(tx, attemptId, userId);
 
-    const cancelResult = await prisma.testAttempt.updateMany({
-      where: { id: attemptId, userId },
-      data: {
-        status: AttemptStatus.COMPLETED,
-        submittedAt: new Date(),
-        score: totalScore
-      }
-    });
-    if (cancelResult.count === 0) {
-      throw new ActionError("Attempt not found", ErrorTypes.NOT_FOUND);
-    }
+        if (totalScore === null) {
+          throw new ActionError("Attempt not found", ErrorTypes.NOT_FOUND);
+        }
+
+        const cancelResult = await tx.testAttempt.updateMany({
+          where: {
+            id: attemptId,
+            userId,
+            status: { in: [AttemptStatus.STARTED, AttemptStatus.PAUSED] },
+          },
+          data: {
+            status: AttemptStatus.COMPLETED,
+            submittedAt: now,
+            score: totalScore,
+          },
+        });
+
+        if (cancelResult.count === 0) {
+          throw new ActionError(
+            "Test is already submitted",
+            ErrorTypes.BAD_REQUEST,
+          );
+        }
+      },
+      { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
+    );
 
     revalidatePath(`/attempt/${attemptId}`);
+
     return true;
   });
 }

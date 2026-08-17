@@ -1,6 +1,7 @@
 import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 import { Slot } from "radix-ui";
+
 import { cn } from "@/lib/utils";
 import { Loader } from "@/components/ui/loader";
 
@@ -39,8 +40,9 @@ const buttonVariants = cva(
 );
 
 export interface ButtonProps
-  extends Omit<React.ComponentProps<"button">, "prefix">,
-  VariantProps<typeof buttonVariants> {
+  extends
+    Omit<React.ComponentProps<"button">, "prefix">,
+    VariantProps<typeof buttonVariants> {
   asChild?: boolean;
   isLoading?: boolean;
   prefix?: React.ReactNode;
@@ -62,6 +64,21 @@ function Button({
   const Comp = asChild ? Slot.Root : "button";
   const hasPrefix = !!prefix;
 
+  if (asChild) {
+    return (
+      <Comp
+        className={cn(
+          buttonVariants({ variant, size, className }),
+          isLoading && "relative",
+        )}
+        disabled={disabled || isLoading}
+        {...props}
+      >
+        {children}
+      </Comp>
+    );
+  }
+
   return (
     <Comp
       className={cn(
@@ -73,11 +90,11 @@ function Button({
     >
       {hasPrefix && (
         <span
-          data-icon="inline-start"
           className={cn(
             "inline-flex items-center justify-center",
             isLoading && "invisible",
           )}
+          data-icon="inline-start"
         >
           {prefix}
         </span>
@@ -96,11 +113,11 @@ function Button({
 
       {postfix && (
         <span
-          data-icon="inline-end"
           className={cn(
             "inline-flex items-center justify-center",
             isLoading && "invisible",
           )}
+          data-icon="inline-end"
         >
           {postfix}
         </span>

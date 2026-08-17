@@ -1,22 +1,19 @@
 "use client";
 
-import { Ellipsis, LogOut, LogIn } from "lucide-react";
-import { usePathname, useRouter } from "next/navigation";
+import { Ellipsis, LogOut } from "lucide-react";
 import Link from "next/link";
-import { useAuthStore } from "@/lib/store/auth-store";
-import { authClient } from "@/lib/auth-client";
-
-import { cn } from "@/lib/utils";
-import { getMenuList } from "@/lib/menu-list";
+import { usePathname } from "next/navigation";
+import { CollapseMenuButton } from "@/components/admin-panel/collapse-menu-button";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { CollapseMenuButton } from "@/components/admin-panel/collapse-menu-button";
 import {
   Tooltip,
-  TooltipTrigger,
   TooltipContent,
   TooltipProvider,
+  TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { getMenuList } from "@/lib/menu-list";
+import { cn } from "@/lib/utils";
 
 interface MenuProps {
   isOpen: boolean | undefined;
@@ -24,16 +21,17 @@ interface MenuProps {
 
 export function Menu({ isOpen }: MenuProps) {
   const pathname = usePathname();
-  const router = useRouter();
   const menuList = getMenuList(pathname);
-  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
   return (
-    <ScrollArea className="[&>div>div[style]]:block!">
+    <ScrollArea className="[&>div>div[style]]:!block">
       <nav className="mt-8 h-full w-full">
-        <ul className="flex flex-col min-h-[calc(100vh-48px-36px-16px-32px)] lg:min-h-[calc(100vh-32px-40px-32px)] items-start space-y-1 px-2">
-          {menuList.map(({ groupLabel, menus }, index) => (
-            <li key={index} className={cn("w-full", groupLabel ? "pt-5" : "")}>
+        <ul className="flex min-h-[calc(100vh-48px-36px-16px-32px)] flex-col items-start gap-1 px-2 lg:min-h-[calc(100vh-32px-40px-32px)]">
+          {menuList.map(({ groupLabel, menus }) => (
+            <li
+              className={cn("w-full", groupLabel ? "pt-5" : "")}
+              key={`${groupLabel}-${menus.map((menu) => menu.href).join("-")}`}
+            >
               {(isOpen && groupLabel) || isOpen === undefined ? (
                 <p className="text-sm font-medium text-muted-foreground px-4 pb-2 max-w-[248px] truncate">
                   {groupLabel}
@@ -52,68 +50,65 @@ export function Menu({ isOpen }: MenuProps) {
                   </Tooltip>
                 </TooltipProvider>
               ) : (
-                <p className="pb-2" />
+                <p className="pb-2"></p>
               )}
-              {menus.map(
-                ({ href, label, icon: Icon, active, submenus }, index) =>
-                  !submenus || submenus.length === 0 ? (
-                    <div key={index} className="w-full">
-                      <TooltipProvider disableHoverableContent>
-                        <Tooltip delayDuration={100}>
-                          <TooltipTrigger asChild>
-                            <Button
-                              asChild
-                              className="w-full justify-start h-10 mb-1"
-                              variant={
-                                (active === undefined &&
-                                  pathname.startsWith(href)) ||
-                                  active
-                                  ? "secondary"
-                                  : "ghost"
-                              }
-                            >
-                              <Link href={href}>
-                                <span
-                                  className={cn(isOpen === false ? "" : "mr-2")}
-                                >
-                                  <Icon className={cn(href.startsWith("/board") ? "text-green-500" : href.startsWith("/exams") ? "text-yellow-500" : "")} size={18} />
-                                </span>
-                                <p
-                                  className={cn(
-                                    "max-w-[200px] truncate",
-                                    isOpen === false
-                                      ? "-translate-x-96 opacity-0"
-                                      : "translate-x-0 opacity-100"
-                                  )}
-                                >
-                                  {label}
-                                </p>
-                              </Link>
-                            </Button>
-                          </TooltipTrigger>
-                          {isOpen === false && (
-                            <TooltipContent side="right">
-                              {label}
-                            </TooltipContent>
-                          )}
-                        </Tooltip>
-                      </TooltipProvider>
-                    </div>
-                  ) : (
-                    <div key={index} className="w-full">
-                      <CollapseMenuButton
-                        active={
-                          active === undefined
-                            ? pathname.startsWith(href)
-                            : active
-                        }
-                        icon={Icon}
-                        isOpen={isOpen}
-                        label={label}
-                        submenus={submenus}
-                      />
-                    </div>
-                  )
+              {menus.map(({ href, label, icon: Icon, active, submenus }) =>
+                !submenus || submenus.length === 0 ? (
+                  <div className="w-full" key={href}>
+                    <TooltipProvider disableHoverableContent>
+                      <Tooltip delayDuration={100}>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            className={cn(
+                              "w-full justify-start h-10 mb-1",
+                              ((active === undefined &&
+                                pathname.startsWith(href)) ||
+                                active) &&
+                              "bg-sidebar-accent text-sidebar-accent-foreground",
+                            )}
+                            asChild
+                          >
+                            <Link href={href}>
+                              <span
+                                className={cn(isOpen === false ? "" : "mr-4")}
+                              >
+                                <Icon className="size-5" />
+                              </span>
+                              <p
+                                className={cn(
+                                  "max-w-[200px] truncate",
+                                  isOpen === false
+                                    ? "-translate-x-96 opacity-0"
+                                    : "translate-x-0 opacity-100",
+                                )}
+                              >
+                                {label}
+                              </p>
+                            </Link>
+                          </Button>
+                        </TooltipTrigger>
+                        {isOpen === false && (
+                          <TooltipContent side="right">{label}</TooltipContent>
+                        )}
+                      </Tooltip>
+                    </TooltipProvider>
+                  </div>
+                ) : (
+                  <div className="w-full" key={href}>
+                    <CollapseMenuButton
+                      icon={Icon}
+                      label={label}
+                      active={
+                        active === undefined
+                          ? pathname.startsWith(href)
+                          : active
+                      }
+                      submenus={submenus}
+                      isOpen={isOpen}
+                    />
+                  </div>
+                ),
               )}
             </li>
           ))}
@@ -121,58 +116,26 @@ export function Menu({ isOpen }: MenuProps) {
             <TooltipProvider disableHoverableContent>
               <Tooltip delayDuration={100}>
                 <TooltipTrigger asChild>
-                  {isAuthenticated ? (
-                    <Button
-                      className="w-full justify-center h-10 mt-5"
-                      variant="outline"
-                      onClick={async () => {
-                        await authClient.signOut({
-                          fetchOptions: {
-                            onSuccess: () => {
-                              router.push("/");
-                            },
-                          },
-                        });
-                      }}
+                  <Button
+                    onClick={() => { }}
+                    variant="outline"
+                    className="w-full justify-center h-10 mt-5"
+                  >
+                    <span className={cn(isOpen === false ? "" : "mr-4")}>
+                      <LogOut size={18} />
+                    </span>
+                    <p
+                      className={cn(
+                        "whitespace-nowrap",
+                        isOpen === false ? "opacity-0 hidden" : "opacity-100",
+                      )}
                     >
-                      <span className={cn(isOpen === false ? "" : "mr-2")}>
-                        <LogOut size={18} />
-                      </span>
-                      <p
-                        className={cn(
-                          "whitespace-nowrap",
-                          isOpen === false ? "opacity-0 hidden" : "opacity-100"
-                        )}
-                      >
-                        Logout
-                      </p>
-                    </Button>
-                  ) : (
-                    <Button
-                      asChild
-                      className="w-full justify-center h-10 mt-5"
-                      variant="outline"
-                    >
-                      <Link href="/login">
-                        <span className={cn(isOpen === false ? "" : "mr-2")}>
-                          <LogIn size={18} />
-                        </span>
-                        <p
-                          className={cn(
-                            "whitespace-nowrap",
-                            isOpen === false ? "opacity-0 hidden" : "opacity-100"
-                          )}
-                        >
-                          Login
-                        </p>
-                      </Link>
-                    </Button>
-                  )}
+                      Sign out
+                    </p>
+                  </Button>
                 </TooltipTrigger>
                 {isOpen === false && (
-                  <TooltipContent side="right">
-                    {isAuthenticated ? "Logout" : "Login"}
-                  </TooltipContent>
+                  <TooltipContent side="right">Sign out</TooltipContent>
                 )}
               </Tooltip>
             </TooltipProvider>

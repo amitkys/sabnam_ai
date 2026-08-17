@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { FullPageLoader } from "@/components/ui/full-page-loader";
+import { flushAttemptAnswers } from "@/lib/attempt-client-sync";
 
 export function SubmitConfirmationDialog({
   attemptId,
@@ -29,6 +30,7 @@ export function SubmitConfirmationDialog({
 
   const { mutate, isPending, isSuccess, isError } = useSubmitTest({
     attemptId,
+    beforeSubmit: () => flushAttemptAnswers(attemptId),
     onSubmitted: () => {
       setTestStatus("submitted");
       onOpenChange(false);

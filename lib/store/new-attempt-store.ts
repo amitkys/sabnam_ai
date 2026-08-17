@@ -69,13 +69,25 @@ export const useNewTestAttemptStore = create<TestAttemptState>()(
       // set / update answer
       setAnswer: (questionId, answer) => {
         set((state) => {
+          if (state.testStatus === "submitted") {
+            return state;
+          }
+
           const newAnswers = new Map(state.answers);
           newAnswers.set(questionId, answer);
+
+          // Once answered, question should no longer stay in "review" state.
+          const newReview = new Set(state.markedForReview);
+          newReview.delete(questionId);
 
           const newPending = new Set(state.pendingSync);
           newPending.add(questionId);
 
-          return { answers: newAnswers, pendingSync: newPending }
+          return {
+            answers: newAnswers,
+            markedForReview: newReview,
+            pendingSync: newPending
+          }
         });
       },
 

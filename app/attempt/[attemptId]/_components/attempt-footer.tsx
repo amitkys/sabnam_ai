@@ -15,7 +15,6 @@ import {
   IconArrowLeft,
   IconArrowRight,
   IconBookmark,
-  IconChevronDown,
   IconDeviceFloppy,
 } from "@tabler/icons-react";
 import { ButtonGroup } from "@/components/ui/button-group";
@@ -58,16 +57,20 @@ export function AttemptFooter() {
     if (userAnswer) {
       // Fire and forget (almost)
       // We don't await this to block navigation. The user feels it's instant.
-      saveStudentResponse({
+      void saveStudentResponse({
         attemptId: params.attemptId,
         questionId: currentQuestion.questionId,
         userAnswer,
-      }).then((result) => {
-        if (result.success) {
-          markAsSynced(currentQuestion.questionId);
-        }
-        // If error, it stays in pendingSync and the background hook picks it up.
-      });
+      })
+        .then((result) => {
+          if (result.success) {
+            markAsSynced(currentQuestion.questionId);
+          }
+          // If error, it stays in pendingSync and the background hook picks it up.
+        })
+        .catch(() => {
+          // Keep it pending; background sync will retry when possible.
+        });
     }
 
     // 2. Move to next immediately

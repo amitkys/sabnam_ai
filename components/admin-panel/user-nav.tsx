@@ -1,16 +1,9 @@
 "use client";
-import Link from "next/link";
-import { LayoutGrid, LogOut } from "lucide-react";
-import { useRouter } from "next/navigation";
 
-import { Button } from "@/components/ui/button";
+import { LayoutGrid, LogOut, User } from "lucide-react";
+import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-  TooltipProvider,
-} from "@/components/ui/tooltip";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,41 +13,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
-import { useAuthStore } from "@/lib/store/auth-store";
-import { authClient } from "@/lib/auth-client";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export function UserNav() {
-  const { data: session, isPending } = authClient.useSession();
-  const { isAuthenticated } = useAuthStore();
-  const router = useRouter();
-
-  // If not authenticated, show login button
-  if (!isAuthenticated) {
-    return (
-      <Link
-        href="/login"
-        className="text-sm font-semibold bg-primary text-background px-2 md:px-3 py-1 rounded hover:bg-primary/90 transition-colors"
-      >
-        Login
-      </Link>
-    );
-  }
-
-  // Extract user information from session
-  const user = session?.user;
-  const name = user?.name || "User";
-  const email = user?.email || "No email";
-  const image = user?.image || null;
-
-  // Create initials for avatar fallback
-  const initials = name
-    .split(" ")
-    .map((n) => n[0])
-    .join("")
-    .toUpperCase()
-    .substring(0, 2);
-
   return (
     <DropdownMenu>
       <TooltipProvider disableHoverableContent>
@@ -62,15 +28,12 @@ export function UserNav() {
           <TooltipTrigger asChild>
             <DropdownMenuTrigger asChild>
               <Button
-                className="relative h-8 w-8 rounded-full"
-                disabled={isPending}
                 variant="outline"
+                className="relative h-8 w-8 rounded-full"
               >
                 <Avatar className="h-8 w-8">
-                  <AvatarImage alt={`${name}'s avatar`} src={image || ""} />
-                  <AvatarFallback className="bg-primary/10">
-                    {initials}
-                  </AvatarFallback>
+                  <AvatarImage src="#" alt="Avatar" />
+                  <AvatarFallback className="bg-transparent">JD</AvatarFallback>
                 </Avatar>
               </Button>
             </DropdownMenuTrigger>
@@ -79,49 +42,36 @@ export function UserNav() {
         </Tooltip>
       </TooltipProvider>
 
-      {session && (
-        <DropdownMenuContent forceMount align="end" className="w-56">
-          <DropdownMenuLabel className="font-normal">
-            <div className="flex flex-col space-y-1">
-              <p className="text-sm font-medium leading-none">{name}</p>
-              <p className="text-xs leading-none text-muted-foreground">
-                {email}
-              </p>
-            </div>
-          </DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          <DropdownMenuGroup>
-            <DropdownMenuItem asChild className="hover:cursor-pointer">
-              <Link className="flex items-center" href="/dashboard">
-                <LayoutGrid className="w-4 h-4 mr-3 text-muted-foreground" />
-                Dashboard
-              </Link>
-            </DropdownMenuItem>
-            {/* <DropdownMenuItem className="hover:cursor-pointer" asChild>
-              <Link href="/account" className="flex items-center">
-                <User className="w-4 h-4 mr-3 text-muted-foreground" />
-                Account
-              </Link>
-            </DropdownMenuItem> */}
-          </DropdownMenuGroup>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem
-            className="hover:cursor-pointer"
-            onClick={async () => {
-              await authClient.signOut({
-                fetchOptions: {
-                  onSuccess: () => {
-                    router.push("/");
-                  },
-                },
-              });
-            }}
-          >
-            <LogOut className="w-4 h-4 mr-3 text-muted-foreground" />
-            Logout
+      <DropdownMenuContent className="w-56" align="end" forceMount>
+        <DropdownMenuLabel className="font-normal">
+          <div className="flex flex-col space-y-1">
+            <p className="text-sm font-medium leading-none">John Doe</p>
+            <p className="text-xs leading-none text-muted-foreground">
+              johndoe@example.com
+            </p>
+          </div>
+        </DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuGroup>
+          <DropdownMenuItem className="hover:cursor-pointer" asChild>
+            <Link href="/dashboard" className="flex items-center">
+              <LayoutGrid className="w-4 h-4 mr-3 text-muted-foreground" />
+              Dashboard
+            </Link>
           </DropdownMenuItem>
-        </DropdownMenuContent>
-      )}
+          <DropdownMenuItem className="hover:cursor-pointer" asChild>
+            <Link href="/account" className="flex items-center">
+              <User className="w-4 h-4 mr-3 text-muted-foreground" />
+              Account
+            </Link>
+          </DropdownMenuItem>
+        </DropdownMenuGroup>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem className="hover:cursor-pointer" onClick={() => { }}>
+          <LogOut className="w-4 h-4 mr-3 text-muted-foreground" />
+          Sign out
+        </DropdownMenuItem>
+      </DropdownMenuContent>
     </DropdownMenu>
   );
 }

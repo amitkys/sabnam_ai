@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { FullPageLoader } from "@/components/ui/full-page-loader";
 import { useState } from "react";
 import { useCancelTest } from "@/hooks/query/mutation/use-cancel-test";
+import { flushAttemptAnswers } from "@/lib/attempt-client-sync";
 
 interface ExitConfirmationDialogProps {
   attemptId: string;
@@ -25,7 +26,10 @@ export function ExitConfirmationDialog({
   onOpenChange,
 }: ExitConfirmationDialogProps) {
   const [isExiting, setIsExiting] = useState(false);
-  const { mutateAsync: cancelTest } = useCancelTest({ attemptId });
+  const { mutateAsync: cancelTest } = useCancelTest({
+    attemptId,
+    beforeExit: () => flushAttemptAnswers(attemptId),
+  });
 
   const handleConfirmExit = async () => {
     setIsExiting(true);

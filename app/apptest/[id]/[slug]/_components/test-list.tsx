@@ -39,7 +39,7 @@ export function TestList({ tests }: TestListProps) {
 
   return (
     <section className="flex flex-col gap-4">
-      <h2 className="text-h4">Available Tests</h2>
+      <h3 className='text-h3'>Available Tests</h3>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {tests.map((test) => (
@@ -49,7 +49,7 @@ export function TestList({ tests }: TestListProps) {
           >
             <CardHeader className="pb-3 flex-1">
               <div className="flex flex-col min-w-0">
-                <CardTitle className="text-base">
+                <CardTitle className="body">
                   {test.title}
                 </CardTitle>
                 {test.description && (
@@ -62,11 +62,11 @@ export function TestList({ tests }: TestListProps) {
 
             <CardContent className="pt-0 pb-4">
               <div className="flex gap-4">
-                <span className="text-muted-foreground flex items-center gap-1.5 text-xs">
+                <span className="text-muted-foreground flex items-center gap-1.5 caption">
                   <ClockIcon className="h-3.5 w-3.5" />
                   {test.duration} min
                 </span>
-                <span className="text-muted-foreground flex items-center gap-1.5 text-xs">
+                <span className="text-muted-foreground flex items-center gap-1.5 caption">
                   <FileTextIcon className="h-3.5 w-3.5" />
                   {test.totalMarks} marks
                 </span>

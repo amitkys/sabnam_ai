@@ -3,9 +3,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { onlineManager } from "@tanstack/react-query";
 
-export function useOnlineStatus(pingUrl = "https://httpbin.org/status/200") {
+export function useOnlineStatus(pingUrl: string = "/favicon.svg") {
   const [isOnline, setIsOnline] = useState(
-    typeof navigator !== "undefined" ? navigator.onLine : true
+    typeof navigator !== "undefined" ? navigator.onLine : true,
   );
 
   // Prevent stale async updates
@@ -22,11 +22,23 @@ export function useOnlineStatus(pingUrl = "https://httpbin.org/status/200") {
       return;
     }
 
+    if (!pingUrl) {
+      if (checkId === checkIdRef.current) {
+        setIsOnline(true);
+      }
+
+      return;
+    }
+
     try {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 3000);
 
-      const response = await fetch(pingUrl, {
+      const urlWithCacheBuster = pingUrl.includes("?")
+        ? `${pingUrl}&_=${Date.now()}`
+        : `${pingUrl}?_=${Date.now()}`;
+
+      const response = await fetch(urlWithCacheBuster, {
         method: "GET", // GET is more reliable than HEAD
         cache: "no-store",
         signal: controller.signal,
@@ -38,28 +50,8 @@ export function useOnlineStatus(pingUrl = "https://httpbin.org/status/200") {
         setIsOnline(response.ok);
       }
     } catch {
-      // Fallback: lightweight image request (same-origin preferred)
-      if (typeof navigator !== "undefined" && navigator.onLine) {
-        try {
-          await new Promise<void>((resolve, reject) => {
-            const img = new Image();
-            img.onload = () => resolve();
-            img.onerror = () => reject();
-            img.src = `/favicon.ico?${Date.now()}`;
-          });
-
-          if (checkId === checkIdRef.current) {
-            setIsOnline(true);
-          }
-        } catch {
-          if (checkId === checkIdRef.current) {
-            setIsOnline(false);
-          }
-        }
-      } else {
-        if (checkId === checkIdRef.current) {
-          setIsOnline(false);
-        }
+      if (checkId === checkIdRef.current) {
+        setIsOnline(false);
       }
     }
   }, [pingUrl]);
@@ -82,11 +74,13 @@ export function useOnlineStatus(pingUrl = "https://httpbin.org/status/200") {
     window.addEventListener("online", handleOnline);
     window.addEventListener("offline", handleOffline);
 
-    const interval = setInterval(checkConnection, 15000); // 15s is safer
+    const interval = pingUrl ? setInterval(checkConnection, 15000) : null;
 
     return () => {
       clearTimeout(initialCheck);
-      clearInterval(interval);
+      if (interval) {
+        clearInterval(interval);
+      }
       window.removeEventListener("online", handleOnline);
       window.removeEventListener("offline", handleOffline);
     };

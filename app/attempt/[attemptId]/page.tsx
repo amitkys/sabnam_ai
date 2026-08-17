@@ -4,11 +4,11 @@ import { useParams } from "next/navigation";
 
 import { Header } from "./_components/header";
 import { QuestionCard } from "./_components/question-card";
-import { QuestionPalette } from "./_components/question-palette";
+import { QuestionPalette } from "./_components/question-paletee";
 import { AttemptFooter } from "./_components/attempt-footer";
 import { OfflineAlert, SyncAlert } from "./_components/offline-alert";
 import { AttemptPreflightScreen } from "./_components/attempt-preflight";
-import { FullscreenSuggestDialog } from "./_components/fullscreen-suggest-dialog";
+import { FullscreenSuggestDialog } from "./_components/full-screen-dialog";
 
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card } from "@/components/ui/card";
@@ -118,14 +118,17 @@ export default function Page() {
 
   const handleStartSession = useCallback(
     async (lang: string) => {
+      const result = await startAttemptSession({ attemptId, language: lang });
+
+      if (!result.success) {
+        throw new Error(result.error || "Failed to start test");
+      }
+
       setLanguage(lang);
       setHasStartedSession(true);
-
       if (typeof window !== "undefined") {
         localStorage.setItem(attemptStartedStorageKey, "true");
       }
-
-      await startAttemptSession({ attemptId, language: lang });
     },
     [attemptId, attemptStartedStorageKey, setLanguage],
   );

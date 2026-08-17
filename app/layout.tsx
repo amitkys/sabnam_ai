@@ -1,9 +1,19 @@
 import type { Metadata } from "next";
 
 import "./globals.css";
+import "./typography.css";
+import "./custom.css";
 import "@bprogress/core/css";
-import { GeistSans } from "geist/font/sans";
-import { GeistMono } from "geist/font/mono";
+
+import { Inter } from 'next/font/google'
+
+const inter = Inter({
+  subsets: ["latin"],
+  weight: ["500"],
+  variable: "--font-sans",
+  display: "swap",
+});
+
 
 import { ThemeProvider } from "@/components/provider/theme-provider";
 
@@ -30,15 +40,14 @@ export default function RootLayout({
   return (
     <html
       suppressHydrationWarning
-      className={`${GeistSans.variable} ${GeistMono.variable}`}
       lang="en"
     >
-      <body className="font-sans antialiased bg-background text-foreground">
+      <body className={`${inter.variable} font-sans antialiased bg-background text-foreground`}>
         <ThemeProvider
           disableTransitionOnChange
           enableSystem
           attribute="class"
-          defaultTheme="system"
+          defaultTheme="light"
         >
           <SidebarProvider>
             <ProgressBarProvider>

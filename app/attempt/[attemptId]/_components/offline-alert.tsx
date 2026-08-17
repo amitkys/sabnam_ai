@@ -21,17 +21,37 @@ import { IconMobiledataOff } from "@tabler/icons-react";
 export function OfflineAlert() {
   const isOnline = useOnlineStatus();
   const [showOfflineAlert, setShowOfflineAlert] = useState(false);
+  const [dismissedWhileOffline, setDismissedWhileOffline] = useState(false);
 
   useEffect(() => {
-    if (!isOnline) {
-      setShowOfflineAlert(true);
-    } else {
+    if (isOnline) {
       setShowOfflineAlert(false);
+      setDismissedWhileOffline(false);
+
+      return;
     }
-  }, [isOnline]);
+
+    if (dismissedWhileOffline) {
+      return;
+    }
+
+    const timer = window.setTimeout(() => {
+      setShowOfflineAlert(true);
+    }, 4000);
+
+    return () => window.clearTimeout(timer);
+  }, [dismissedWhileOffline, isOnline]);
+
+  const handleOpenChange = (open: boolean) => {
+    setShowOfflineAlert(open);
+
+    if (!open && !isOnline) {
+      setDismissedWhileOffline(true);
+    }
+  };
 
   return (
-    <AlertDialog open={showOfflineAlert} onOpenChange={setShowOfflineAlert}>
+    <AlertDialog open={showOfflineAlert} onOpenChange={handleOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Poor or lost connection</AlertDialogTitle>
@@ -41,7 +61,7 @@ export function OfflineAlert() {
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogAction onClick={() => setShowOfflineAlert(false)}>
+          <AlertDialogAction onClick={() => handleOpenChange(false)}>
             Continue without Internet
           </AlertDialogAction>
         </AlertDialogFooter>

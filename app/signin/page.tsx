@@ -46,7 +46,7 @@ export default async function SignInPage({
         <CardHeader>
           <CardTitle>Sign in</CardTitle>
           <CardDescription>
-            Continue with Google to start your test. You will return to where you left off.
+            You will return to where you left off.
           </CardDescription>
         </CardHeader>
         <CardContent>
