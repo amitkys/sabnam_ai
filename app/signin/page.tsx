@@ -6,12 +6,13 @@ import { GoogleSignInButton } from "./_components/google-signin-button";
 
 type SearchParams = {
   next?: string | string[];
+  callbackUrl?: string | string[];
 };
 
-function sanitizeNextPath(nextParam: string | string[] | undefined): string {
+function sanitizeNextPath(nextParam: string | string[] | undefined): string | null {
   const raw = Array.isArray(nextParam) ? nextParam[0] : nextParam;
 
-  if (!raw) return "/home";
+  if (!raw) return null;
 
   let decoded = raw;
   try {
@@ -21,7 +22,7 @@ function sanitizeNextPath(nextParam: string | string[] | undefined): string {
   }
 
   if (!decoded.startsWith("/") || decoded.startsWith("//")) {
-    return "/home";
+    return null;
   }
 
   return decoded;
@@ -33,10 +34,12 @@ export default async function SignInPage({
   searchParams: Promise<SearchParams>;
 }) {
   const params = await searchParams;
-  const nextPath = sanitizeNextPath(params.next);
+  const rawTarget = params.next ?? params.callbackUrl;
+  const nextPath = sanitizeNextPath(rawTarget);
   const session = await auth.api.getSession({ headers: await headers() });
 
-  if (session?.user?.id) {
+  // Only redirect logged-in users if an explicit, valid redirect target path was provided in query params
+  if (session?.user?.id && nextPath) {
     redirect(nextPath);
   }
 
@@ -45,12 +48,14 @@ export default async function SignInPage({
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle>Sign in</CardTitle>
-          <CardDescription>
-            You will return to where you left off.
-          </CardDescription>
+          {nextPath && (
+            <CardDescription>
+              You will return to where you left off.
+            </CardDescription>
+          )}
         </CardHeader>
         <CardContent>
-          <GoogleSignInButton nextPath={nextPath} />
+          <GoogleSignInButton nextPath={nextPath ?? "/home"} />
         </CardContent>
       </Card>
     </div>
