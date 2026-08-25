@@ -47,7 +47,7 @@ export function AppSidebar() {
               {/* All exams — landing page */}
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
-                  <Link href='/apptest'>
+                  <Link href='/home'>
                     <LayoutGridIcon />
                     <span>All Exams</span>
                   </Link>
@@ -56,7 +56,7 @@ export function AppSidebar() {
               {/* Board exams — BSEB, CBSE, ICSE */}
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
-                  <Link href='/apptest?domain=BOARD'>
+                  <Link href='/home?domain=BOARD'>
                     <BookOpenIcon />
                     <span>Board Exams</span>
                   </Link>
@@ -65,7 +65,7 @@ export function AppSidebar() {
               {/* Entrance exams — JEE, NEET, CUET */}
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
-                  <Link href='/apptest?domain=ENTRANCE'>
+                  <Link href='/home?domain=ENTRANCE'>
                     <GraduationCapIcon />
                     <span>Entrance Exams</span>
                   </Link>
@@ -74,7 +74,7 @@ export function AppSidebar() {
               {/* Competitive exams — SSC, UPSC, BPSC */}
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
-                  <Link href='/apptest?domain=COMPETITIVE'>
+                  <Link href='/home?domain=COMPETITIVE'>
                     <TrophyIcon />
                     <span>Competitive Exams</span>
                   </Link>
@@ -83,7 +83,7 @@ export function AppSidebar() {
               {/* Olympiads */}
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
-                  <Link href='/apptest?domain=OLYMPIAD'>
+                  <Link href='/home?domain=OLYMPIAD'>
                     <BrainCircuitIcon />
                     <span>Olympiads</span>
                   </Link>

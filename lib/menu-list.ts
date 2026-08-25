@@ -104,7 +104,51 @@ export function getMenuList(pathname: string): Group[] {
         },
       ],
     },
-
+    {
+      groupLabel: "User Voice", // Or any of the above
+      menus: [
+        {
+          href: "/feedback",
+          label: "Feedback",
+          icon: MessageCircle, // Instead of Users
+        },
+        {
+          href: "/req",
+          label: "Request a Test",
+          icon: Mail, // Instead of Settings
+        },
+      ],
+    },
+    {
+      groupLabel: "User Voice", // Or any of the above
+      menus: [
+        {
+          href: "/feedback",
+          label: "Feedback",
+          icon: MessageCircle, // Instead of Users
+        },
+        {
+          href: "/req",
+          label: "Request a Test",
+          icon: Mail, // Instead of Settings
+        },
+      ],
+    },
+    {
+      groupLabel: "User Voice", // Or any of the above
+      menus: [
+        {
+          href: "/feedback",
+          label: "Feedback",
+          icon: MessageCircle, // Instead of Users
+        },
+        {
+          href: "/req",
+          label: "Request a Test",
+          icon: Mail, // Instead of Settings
+        },
+      ],
+    },
     {
       groupLabel: "More..",
       menus: [

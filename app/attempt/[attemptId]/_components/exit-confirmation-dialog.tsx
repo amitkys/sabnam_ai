@@ -44,7 +44,7 @@ export function ExitConfirmationDialog({
 
         // Fallback just in case window.close() is blocked by the browser
         if (typeof window !== "undefined" && !window.closed) {
-          window.location.href = "/apptest";
+          window.location.href = "/home";
         }
       } else {
         setIsExiting(false);

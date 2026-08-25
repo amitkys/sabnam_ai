@@ -12,7 +12,7 @@ export function Navbar({ title }: NavbarProps) {
       <div className="mx-4 sm:mx-8 flex h-14 items-center">
         <div className="flex items-center space-x-4 lg:space-x-0">
           <SheetMenu />
-          <h5 className="text-h5">{title}</h5>
+          <h5 className="text-lg font-semibold">{title}</h5>
         </div>
         <div className="flex flex-1 gap-2 items-center justify-end">
           <ModeToggle />

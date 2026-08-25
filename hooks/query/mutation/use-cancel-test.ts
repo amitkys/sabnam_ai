@@ -1,6 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { pauseAttempt } from "@/lib/action/attempt-actions";
-import { createToast } from "vercel-toast";
 
 export function useCancelTest({
   attemptId,
@@ -25,8 +24,5 @@ export function useCancelTest({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["attempt-test", attemptId] });
     },
-    onError: (error) => {
-      createToast(error.message || "An error occurred while exiting", { type: "error", timeout: 5000 });
-    }
   });
 }

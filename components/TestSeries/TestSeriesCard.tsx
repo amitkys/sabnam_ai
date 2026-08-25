@@ -2,7 +2,6 @@
 
 import { useRouter } from "@bprogress/next/app";
 import { useState, useCallback } from "react";
-import { toast } from "sonner";
 import { Languages } from "lucide-react";
 
 import { TestHistoryDrawer } from "./TestHistoryDrawer";
@@ -53,13 +52,9 @@ export const TestSeriesCard = ({
       setLoading(true);
       const testAttemptId = await getTestAttemptId(testSeries.id);
 
-      if (testAttemptId) {
-        toast.info("Please wait, starting soon...");
-      }
-
       router.push(`/test/${testSeries.id}/${testAttemptId}`);
     } catch (error: any) {
-      toast.error("Failed to create test attempt", error);
+      console.error("Failed to create test attempt", error);
     } finally {
       setLoading(false);
     }

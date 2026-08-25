@@ -2,8 +2,9 @@
 
 import { LayoutGrid, LogOut, User } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,55 +20,109 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { authClient } from "@/lib/auth-client";
+import { cn } from "@/lib/utils";
+
+function getInitials(name?: string | null, email?: string | null): string {
+  if (name) {
+    const parts = name.trim().split(/\s+/);
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    }
+    if (parts[0]) {
+      return parts[0].substring(0, 2).toUpperCase();
+    }
+  }
+  if (email) {
+    return email.substring(0, 2).toUpperCase();
+  }
+  return "U";
+}
 
 export function UserNav() {
+  const router = useRouter();
+  const { data: session } = authClient.useSession();
+  const user = session?.user;
+
+  const handleSignOut = async () => {
+    await authClient.signOut({
+      fetchOptions: {
+        onSuccess: () => {
+          router.push("/signin");
+        },
+      },
+    });
+  };
+
+  const name = user?.name || "User";
+  const email = user?.email || "";
+  const initials = getInitials(user?.name, user?.email);
+  const imageSrc = user?.image || undefined;
+
   return (
     <DropdownMenu>
-      <TooltipProvider disableHoverableContent>
-        <Tooltip delayDuration={100}>
-          <TooltipTrigger asChild>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="outline"
-                className="relative h-8 w-8 rounded-full"
+      <TooltipProvider delay={100}>
+        <Tooltip>
+          <TooltipTrigger
+            render={
+              <DropdownMenuTrigger
+                className={cn(
+                  buttonVariants({ variant: "outline" }),
+                  "relative h-8 w-8 rounded-full p-0 flex items-center justify-center cursor-pointer"
+                )}
               >
                 <Avatar className="h-8 w-8">
-                  <AvatarImage src="#" alt="Avatar" />
-                  <AvatarFallback className="bg-transparent">JD</AvatarFallback>
+                  {imageSrc && <AvatarImage src={imageSrc} alt={name} />}
+                  <AvatarFallback className="bg-primary/10 text-primary font-semibold text-xs">
+                    {initials}
+                  </AvatarFallback>
                 </Avatar>
-              </Button>
-            </DropdownMenuTrigger>
-          </TooltipTrigger>
+              </DropdownMenuTrigger>
+            }
+          />
           <TooltipContent side="bottom">Profile</TooltipContent>
         </Tooltip>
       </TooltipProvider>
 
-      <DropdownMenuContent className="w-56" align="end" forceMount>
-        <DropdownMenuLabel className="font-normal">
-          <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">John Doe</p>
-            <p className="text-xs leading-none text-muted-foreground">
-              johndoe@example.com
-            </p>
-          </div>
-        </DropdownMenuLabel>
-        <DropdownMenuSeparator />
+      <DropdownMenuContent className="w-56" align="end">
         <DropdownMenuGroup>
-          <DropdownMenuItem className="hover:cursor-pointer" asChild>
-            <Link href="/dashboard" className="flex items-center">
-              <LayoutGrid className="w-4 h-4 mr-3 text-muted-foreground" />
-              Dashboard
-            </Link>
-          </DropdownMenuItem>
-          <DropdownMenuItem className="hover:cursor-pointer" asChild>
-            <Link href="/account" className="flex items-center">
-              <User className="w-4 h-4 mr-3 text-muted-foreground" />
-              Account
-            </Link>
-          </DropdownMenuItem>
+          <DropdownMenuLabel className="font-normal">
+            <div className="flex flex-col space-y-1">
+              <p className="text-sm font-medium leading-none">{name}</p>
+              {email && (
+                <p className="text-xs leading-none text-muted-foreground truncate">
+                  {email}
+                </p>
+              )}
+            </div>
+          </DropdownMenuLabel>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem className="hover:cursor-pointer" onClick={() => { }}>
+        <DropdownMenuGroup>
+          <DropdownMenuItem
+            className="hover:cursor-pointer"
+            render={
+              <Link href="/dashboard" className="flex items-center">
+                <LayoutGrid className="w-4 h-4 mr-3 text-muted-foreground" />
+                Dashboard
+              </Link>
+            }
+          />
+          <DropdownMenuItem
+            className="hover:cursor-pointer"
+            render={
+              <Link href="/account" className="flex items-center">
+                <User className="w-4 h-4 mr-3 text-muted-foreground" />
+                Account
+              </Link>
+            }
+          />
+        </DropdownMenuGroup>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem
+          className="hover:cursor-pointer"
+          onClick={handleSignOut}
+        >
           <LogOut className="w-4 h-4 mr-3 text-muted-foreground" />
           Sign out
         </DropdownMenuItem>

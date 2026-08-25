@@ -1,5 +1,4 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createToast } from "vercel-toast";
 import { useFullscreen } from "@/hooks/use-fullscreen";
 
 import { submitAttempt } from "@/lib/action/attempt-actions";
@@ -34,12 +33,6 @@ export function useSubmitTest({
       queryClient.invalidateQueries({ queryKey: ["attempt-test", attemptId] });
       queryClient.invalidateQueries({ queryKey: ["result", attemptId] });
       window.location.href = `/result/${attemptId}`;
-    },
-    onError: (error) => {
-      createToast(error.message || "An error occurred while submitting", {
-        type: "error",
-        timeout: 5000,
-      });
     },
   });
 }

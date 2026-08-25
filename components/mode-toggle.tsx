@@ -2,26 +2,26 @@
 // After: Using DropDrawer
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "@/components/theme-provider";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import {
   DropDrawer,
   DropDrawerContent,
   DropDrawerItem,
   DropDrawerTrigger,
 } from "@/components/ui/dropdrawer";
+import { cn } from "@/lib/utils";
 
 export function ModeToggle() {
   const { setTheme } = useTheme();
 
   return (
     <DropDrawer>
-      <DropDrawerTrigger asChild>
-        <Button variant="outline" size="icon" className="rounded-full">
-          <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-          <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-          <span className="sr-only">Toggle theme</span>
-        </Button>
+      <DropDrawerTrigger className={cn(buttonVariants({ variant: "outline", size: "icon" }), "rounded-full")}>
+        <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+        <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+        <span className="sr-only">Toggle theme</span>
       </DropDrawerTrigger>
+
       <DropDrawerContent align="end">
         <DropDrawerItem onClick={() => setTheme("light")}>Light</DropDrawerItem>
         <DropDrawerItem onClick={() => setTheme("dark")}>Dark</DropDrawerItem>

@@ -15,7 +15,6 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { toast } from "sonner";
 import { mutate } from "swr";
 
 import {
@@ -377,7 +376,9 @@ export default function DashBoardTable() {
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end" className="w-48">
-                              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                              <DropdownMenuGroup>
+                                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                              </DropdownMenuGroup>
                               <DropdownMenuSeparator />
                               <DropdownMenuItem disabled>
                                 <CirclePlus className="mr-2 h-4 w-4" />
@@ -405,25 +406,14 @@ export default function DashBoardTable() {
                               <DropdownMenuItem
                                 className="text-destructive focus:text-destructive"
                                 onClick={async () => {
-                                  const deletePromise = deleteAttempt(
-                                    test.attemptId,
-                                  );
-
-                                  toast.promise(deletePromise, {
-                                    loading: "Deleting test...",
-                                    success: () => {
-                                      mutate(
-                                        `/api/dashboardTable?filterBy=${filterby}&page=${currentPage}&pageSize=${pageSize}`,
-                                      );
-
-                                      return "Test deleted successfully";
-                                    },
-                                    error: (error) => {
-                                      console.error("Deletion error:", error);
-
-                                      return "Failed to delete test. Please try again.";
-                                    },
-                                  });
+                                  try {
+                                    await deleteAttempt(test.attemptId);
+                                    mutate(
+                                      `/api/dashboardTable?filterBy=${filterby}&page=${currentPage}&pageSize=${pageSize}`,
+                                    );
+                                  } catch (error) {
+                                    console.error("Deletion error:", error);
+                                  }
                                 }}
                               >
                                 <Trash2 className="mr-2 h-4 w-4" />

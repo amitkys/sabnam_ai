@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Menu } from "@/components/admin-panel/menu";
 import { SidebarToggle } from "@/components/admin-panel/sidebar-toggle";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import { useSidebar } from "@/hooks/use-sidebar";
 import { useStore } from "@/hooks/use-store";
 import { cn } from "@/lib/utils";
@@ -24,30 +24,28 @@ export function Sidebar() {
       <div
         onMouseEnter={() => setIsHover(true)}
         onMouseLeave={() => setIsHover(false)}
-        className="relative h-full flex flex-col px-3 py-4 overflow-y-auto shadow-md dark:shadow-sidebar-border bg-sidebar text-sidebar-foreground"
+        className="relative h-full flex flex-col px-3 py-4 overflow-hidden shadow-md dark:shadow-sidebar-border bg-sidebar text-sidebar-foreground"
       >
-        <Button
+        <Link
+          href="/dashboard"
           className={cn(
-            "transition-transform ease-in-out duration-300 mb-1",
+            buttonVariants({ variant: "link" }),
+            "flex items-center gap-2 transition-transform ease-in-out duration-300 mb-1",
             !getOpenState() ? "translate-x-1" : "translate-x-0",
           )}
-          variant="link"
-          asChild
         >
-          <Link href="/dashboard" className="flex items-center gap-2">
-            <Image src="/logo.svg" alt="Logo" width={24} height={24} className="mr-1" />
-            <h1
-              className={cn(
-                "font-bold text-lg whitespace-nowrap transition-[transform,opacity,display] ease-in-out duration-300",
-                !getOpenState()
-                  ? "-translate-x-96 opacity-0 hidden"
-                  : "translate-x-0 opacity-100",
-              )}
-            >
-              Sabnam
-            </h1>
-          </Link>
-        </Button>
+          <Image src="/logo.svg" alt="Logo" width={24} height={24} className="mr-1" />
+          <h1
+            className={cn(
+              "font-bold text-lg whitespace-nowrap transition-[transform,opacity,display] ease-in-out duration-300",
+              !getOpenState()
+                ? "-translate-x-96 opacity-0 hidden"
+                : "translate-x-0 opacity-100",
+            )}
+          >
+            Sabnam
+          </h1>
+        </Link>
         <Menu isOpen={getOpenState()} />
       </div>
     </aside>

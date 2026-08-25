@@ -5,7 +5,6 @@ import type { TestAttemptQuestionFetched } from "@/lib/type";
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "@bprogress/next/app";
-import { toast } from "sonner";
 import { CheckCircle2, Maximize, X } from "lucide-react";
 
 import { Loader } from "../ui/loader";
@@ -122,7 +121,6 @@ export default function QuizInterface({
 
     // For "solved" action, verify that an answer was selected
     if (action === "solved" && !selectedAnswer) {
-      toast.warning("Please select an option");
       setIsSaving(false);
       setActiveButton(null);
 
@@ -142,11 +140,10 @@ export default function QuizInterface({
       });
 
       if (!result.success) {
-        toast.error("Failed to save response");
+        console.error("Failed to save response:", result.error);
       }
     } catch (error) {
       console.error("Error saving question response:", error);
-      toast.error("Failed to save response");
     } finally {
       // Move to next question if available
       if (currentQuestion < testData.testSeries.questions.length - 1) {
@@ -184,28 +181,18 @@ export default function QuizInterface({
         await exitFullscreen();
       }
       if (attemptId) {
-        // used toast promise to show loading, success and error messages
-        await toast.promise(
-          async () => {
-            const result = await SubmitTest({
-              testAttemptId: attemptId,
-              totalMarks: testData.testSeries.questions.length,
-              createdAt: startTime,
-            });
+        const result = await SubmitTest({
+          testAttemptId: attemptId,
+          totalMarks: testData.testSeries.questions.length,
+          createdAt: startTime,
+        });
 
-            if (!result.success) {
-              throw new Error("Failed to submit test");
-            } else {
-              window.location.href = `/analysis/${attemptId}`;
-            }
-          },
-          {
-            error: "Failed to submit test",
-          },
-        );
+        if (result.success) {
+          window.location.href = `/analysis/${attemptId}`;
+        }
       }
     } catch (error) {
-      toast.error("Failed to submit test");
+      console.error("Failed to submit test:", error);
     }
   };
 

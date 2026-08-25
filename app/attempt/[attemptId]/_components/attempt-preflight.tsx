@@ -39,19 +39,19 @@ const LANGUAGE_LABELS: Record<string, string> = {
 
 const WARNINGS = [
   {
-    icon: <Wifi className="w-5 h-5 text-warning-color shrink-0" />,
+    icon: <Wifi className="w-5 h-5 text-amber-600 dark:text-amber-500 shrink-0" />,
     text: "Live syncing. A brief disconnection won't lose your progress, but a long one might.",
   },
   {
-    icon: <ShieldAlert className="w-5 h-5 text-warning-color shrink-0" />,
+    icon: <ShieldAlert className="w-5 h-5 text-amber-600 dark:text-amber-500 shrink-0" />,
     text: "Do not refresh or close. Your timer keeps running even if you leave the tab.",
   },
   {
-    icon: <RefreshCw className="w-5 h-5 text-warning-color shrink-0" />,
+    icon: <RefreshCw className="w-5 h-5 text-amber-600 dark:text-amber-500 shrink-0" />,
     text: "If you exit accidentally, you can resume from where you left using the same link.",
   },
   {
-    icon: <AlertTriangle className="w-5 h-5 text-warning-color shrink-0" />,
+    icon: <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-500 shrink-0" />,
     text: "Auto-সাবমিট (submits) when time runs out. Answer everything before the timer ends.",
   },
 ];
@@ -92,9 +92,9 @@ export function AttemptPreflightScreen({ test, onStart }: AttemptPreflightProps)
             {/* ── Left Side: Title, Stats, Warnings ── */}
             <div className="flex flex-col">
               <div className="space-y-3 mb-8 text-left">
-                <h1 className="text-h2 md:text-h1 text-primary leading-tight">{test.title}</h1>
+                <h1 className="text-3xl md:text-4xl font-bold text-primary leading-tight">{test.title}</h1>
                 {test.description && (
-                  <p className="text-lead">{test.description}</p>
+                  <p className="text-lg text-muted-foreground">{test.description}</p>
                 )}
               </div>
 
@@ -107,7 +107,7 @@ export function AttemptPreflightScreen({ test, onStart }: AttemptPreflightProps)
 
               {/* ── Important Warnings ── */}
               <div className="space-y-4 mt-auto">
-                <h3 className="text-h4 flex items-center gap-2 text-warning-color mb-4">
+                <h3 className="text-lg font-semibold flex items-center gap-2 text-amber-600 dark:text-amber-500 mb-4">
                   <AlertTriangle className="w-5 h-5" />
                   Before You Start
                 </h3>
@@ -117,7 +117,7 @@ export function AttemptPreflightScreen({ test, onStart }: AttemptPreflightProps)
                       <div className="mt-0.5 p-1.5 rounded-full bg-yellow-500/10 dark:bg-yellow-500/20">
                         {w.icon}
                       </div>
-                      <span className="text-small text-muted-foreground leading-relaxed">{w.text}</span>
+                      <span className="text-sm text-muted-foreground leading-relaxed">{w.text}</span>
                     </li>
                   ))}
                 </ul>
@@ -128,7 +128,7 @@ export function AttemptPreflightScreen({ test, onStart }: AttemptPreflightProps)
             <div className="flex flex-col space-y-8 bg-muted/20 p-6 lg:p-8 rounded-2xl border border-border/50 shadow-inner h-full">
               {/* ── Language Selection ── */}
               <div className="flex-1 space-y-5">
-                <h3 className="text-h4 flex items-center gap-2 mb-2">
+                <h3 className="text-lg font-semibold flex items-center gap-2 mb-2">
                   <Languages className="w-5 h-5 text-primary" />
                   Select Language
                 </h3>
@@ -215,8 +215,8 @@ function StatCard({
         {icon}
       </div>
       <div className="space-y-1">
-        <div className="text-xs-text text-muted-foreground uppercase opacity-90 tracking-widest font-semibold">{label}</div>
-        <div className="text-h2 text-foreground">{value}</div>
+        <div className="text-xs text-muted-foreground uppercase opacity-90 tracking-widest font-semibold">{label}</div>
+        <div className="text-2xl font-bold text-foreground">{value}</div>
       </div>
     </div>
   );

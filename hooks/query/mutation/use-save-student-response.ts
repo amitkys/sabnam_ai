@@ -1,5 +1,4 @@
 import { useMutation } from "@tanstack/react-query";
-import { createToast } from "vercel-toast";
 
 import { saveStudentResponse } from "@/lib/action/attempt-actions";
 
@@ -26,12 +25,6 @@ export function useSaveStudentResponse({
     },
     onSuccess: (questionId) => {
       onSynced?.(questionId);
-    },
-    onError: (error) => {
-      createToast(error.message || "Failed to save response", {
-        type: "error",
-        timeout: 5000,
-      });
     },
   });
 }

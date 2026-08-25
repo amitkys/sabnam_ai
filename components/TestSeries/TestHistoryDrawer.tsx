@@ -15,7 +15,6 @@ import {
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { toast } from "sonner";
 import { mutate } from "swr";
 
 import { VisuallyHidden } from "../ui/visually-hidden";
@@ -162,7 +161,6 @@ export const TestHistoryDrawer = ({
     console.log("handleResume called", testSeriesId);
     if (selectedAttempt && !loadingAction) {
       setLoadingAction("resume");
-      toast.info("Redirecting to test...");
       reset();
       onOpenChange(false);
       router.push(`/test/${testSeriesId}/${selectedAttempt.id}`);
@@ -172,10 +170,6 @@ export const TestHistoryDrawer = ({
   const handleAnalysis = () => {
     if (selectedAttempt && !loadingAction) {
       setLoadingAction("analysis");
-      toast.promise(Promise.resolve(), {
-        loading: "Redirecting to analysis...",
-        success: "Opening analysis...",
-      });
       reset();
       onOpenChange(false);
       router.push(`/analysis/${selectedAttempt.id}`);
@@ -192,11 +186,7 @@ export const TestHistoryDrawer = ({
       setSelectedAttempt(null);
 
       try {
-        await toast.promise(deleteAttempt(attemptToDelete.id), {
-          loading: "Deleting test...",
-          success: "Test deleted successfully",
-          error: "Failed to delete test. Please try again.",
-        });
+        await deleteAttempt(attemptToDelete.id);
 
         // ✅ Update Zustand store immediately for UI update
         removeAttempt(attemptToDelete.id);
@@ -440,10 +430,10 @@ export const TestHistoryDrawer = ({
                               </div>
                               <div
                                 className={`text-xs ${isActionLoading("delete")
-                                    ? "text-red-500"
-                                    : isAnyActionLoading
-                                      ? "text-muted-foreground"
-                                      : "text-red-600"
+                                  ? "text-red-500"
+                                  : isAnyActionLoading
+                                    ? "text-muted-foreground"
+                                    : "text-red-600"
                                   }`}
                               >
                                 {isActionLoading("delete")

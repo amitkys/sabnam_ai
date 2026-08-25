@@ -15,7 +15,6 @@ import {
   Trophy,
 } from "lucide-react";
 import Image from "next/image";
-import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { TextEffect } from "@/components/ui/text-effect";
@@ -151,7 +150,6 @@ export default function HeroSection() {
                   >
                     <Link
                       href="#link"
-                      onClick={() => toast.info("Feature is not available yet")}
                     >
                       <span className="text-nowrap">Request a Test</span>
                       <ChevronRight className="ml-1 size-4" />

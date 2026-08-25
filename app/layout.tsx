@@ -1,27 +1,22 @@
 import type { Metadata } from "next";
 
-import "./globals.css";
-import "./typography.css";
 import "./custom.css";
 import "@bprogress/core/css";
 
-import { Inter } from 'next/font/google'
+import { Inter, Space_Grotesk, Outfit, Geist } from 'next/font/google'
 
-const inter = Inter({
-  subsets: ["latin"],
-  weight: ["500"],
-  variable: "--font-sans",
-  display: "swap",
-});
+const spaceGrotesk = Space_Grotesk({subsets:['latin'],variable:'--font-sans'});
 
 
 import { ThemeProvider } from "@/components/provider/theme-provider";
 
 import ProgressBarProvider from "@/components/navigation-progress";
-import ToasterWrapper from "@/components/ToasterWrapper";
 import { SidebarProvider } from "@/components/sidebarContext";
 import QueryProviders from "@/components/provider/query-provider";
-import "vercel-toast/css";
+import { cn } from "@/lib/utils";
+import { Toaster } from "@/components/ui/toast";
+
+const outfitHeading = Outfit({subsets:['latin'],variable:'--font-heading'});
 
 export const metadata: Metadata = {
   title: "Sabnam",
@@ -40,9 +35,9 @@ export default function RootLayout({
   return (
     <html
       suppressHydrationWarning
-      lang="en"
+      lang="en" className={cn("font-sans", spaceGrotesk.variable, outfitHeading.variable)}
     >
-      <body className={`${inter.variable} font-sans antialiased bg-background text-foreground`}>
+      <body className={`${spaceGrotesk.variable} font-sans antialiased bg-background text-foreground`}>
         <ThemeProvider
           disableTransitionOnChange
           enableSystem
@@ -54,10 +49,10 @@ export default function RootLayout({
               <QueryProviders>
 
                 {children}
+                <Toaster />
               </QueryProviders>
 
             </ProgressBarProvider>
-            <ToasterWrapper />
           </SidebarProvider>
         </ThemeProvider>
       </body>
