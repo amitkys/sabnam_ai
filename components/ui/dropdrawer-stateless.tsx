@@ -75,12 +75,27 @@ function DrawerStateless({
 function DrawerStatelessTrigger({
   className,
   children,
+  render,
+  asChild,
   ...props
 }:
   | React.ComponentProps<typeof DrawerTrigger>
   | React.ComponentProps<typeof DropdownMenuTrigger>) {
   const { isMobile } = useDrawerStatelessContext();
   const TriggerComponent = isMobile ? DrawerTrigger : DropdownMenuTrigger;
+
+  const renderTarget = render || (asChild && React.isValidElement(children) ? (children as React.ReactElement) : undefined);
+
+  if (renderTarget) {
+    return (
+      <TriggerComponent
+        data-slot="drawer-stateless-trigger"
+        className={className}
+        render={renderTarget}
+        {...props}
+      />
+    );
+  }
 
   return (
     <TriggerComponent

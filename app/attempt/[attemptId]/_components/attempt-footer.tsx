@@ -109,11 +109,13 @@ export function AttemptFooter() {
             Save & Next
           </Button>
           <DrawerStateless>
-            <DrawerStatelessTrigger asChild>
-              <Button className="px-3">
-                <MoreHorizontalIcon />
-              </Button>
-            </DrawerStatelessTrigger>
+            <DrawerStatelessTrigger
+              render={
+                <Button className="px-3">
+                  <MoreHorizontalIcon />
+                </Button>
+              }
+            />
             <DrawerStatelessContent align="end">
               <DrawerStatelessItem onClick={() => toggleReview(currentQuestion.questionId)}>
                 <ReviewButtonContent />
@@ -163,11 +165,13 @@ export function AttemptFooter() {
             Save & Next
           </Button>
           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button className="">
-                <MoreHorizontalIcon />
-              </Button>
-            </DropdownMenuTrigger>
+            <DropdownMenuTrigger
+              render={
+                <Button className="">
+                  <MoreHorizontalIcon />
+                </Button>
+              }
+            />
             <DropdownMenuContent align="center">
               <DropdownMenuItem onClick={() => toggleReview(currentQuestion.questionId)}>
                 <ReviewButtonContent />

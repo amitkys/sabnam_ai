@@ -78,11 +78,13 @@ export function Header({ attemptId }: { attemptId: string }) {
             Submit
           </Button>
           <DrawerStateless>
-            <DrawerStatelessTrigger asChild>
-              <Button className="ml-2" variant="secondary" size={"icon-sm"}>
-                <EllipsisVertical />
-              </Button>
-            </DrawerStatelessTrigger>
+            <DrawerStatelessTrigger
+              render={
+                <Button className="ml-2" variant="secondary" size={"icon-sm"}>
+                  <EllipsisVertical />
+                </Button>
+              }
+            />
             <DrawerStatelessContent>
               <DrawerStatelessItem onClick={toggleFullscreen}>
                 {isFullscreen ? "Exit Fullscreen" : "Full Screen"}
