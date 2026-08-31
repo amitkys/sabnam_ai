@@ -1,6 +1,7 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
+
 import { Menu } from "@/components/admin-panel/menu";
 import { SidebarToggle } from "@/components/admin-panel/sidebar-toggle";
 import { buttonVariants } from "@/components/ui/button";
@@ -10,8 +11,10 @@ import { cn } from "@/lib/utils";
 
 export function Sidebar() {
   const sidebar = useStore(useSidebar, (x) => x);
+
   if (!sidebar) return null;
   const { isOpen, toggleOpen, getOpenState, setIsHover, settings } = sidebar;
+
   return (
     <aside
       className={cn(
@@ -22,22 +25,28 @@ export function Sidebar() {
     >
       <SidebarToggle isOpen={isOpen} setIsOpen={toggleOpen} />
       <div
+        className="relative h-full flex flex-col px-3 py-4 overflow-hidden shadow-md dark:shadow-sidebar-border bg-sidebar text-sidebar-foreground"
         onMouseEnter={() => setIsHover(true)}
         onMouseLeave={() => setIsHover(false)}
-        className="relative h-full flex flex-col px-3 py-4 overflow-hidden shadow-md dark:shadow-sidebar-border bg-sidebar text-sidebar-foreground"
       >
         <Link
-          href="/dashboard"
           className={cn(
             buttonVariants({ variant: "link" }),
             "flex items-center gap-2 transition-transform ease-in-out duration-300 mb-1",
             !getOpenState() ? "translate-x-1" : "translate-x-0",
           )}
+          href="/dashboard"
         >
-          <Image src="/logo.svg" alt="Logo" width={24} height={24} className="mr-1" />
+          <Image
+            alt="Logo"
+            className="mr-1"
+            height={24}
+            src="/logo.svg"
+            width={24}
+          />
           <h1
             className={cn(
-              "font-bold text-lg whitespace-nowrap transition-[transform,opacity,display] ease-in-out duration-300",
+              "font-brand text-2xl tracking-wide whitespace-nowrap transition-[transform,opacity,display] ease-in-out duration-300",
               !getOpenState()
                 ? "-translate-x-96 opacity-0 hidden"
                 : "translate-x-0 opacity-100",

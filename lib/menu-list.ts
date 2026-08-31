@@ -9,6 +9,7 @@ import {
   School,
   Mail,
   MessageCircle,
+  ShieldCheck,
 } from "lucide-react";
 
 type Submenu = {
@@ -150,11 +151,16 @@ export function getMenuList(pathname: string): Group[] {
       ],
     },
     {
-      groupLabel: "More..",
+      groupLabel: "Administration",
       menus: [
         {
+          href: "/admin",
+          label: "Admin Panel",
+          icon: ShieldCheck,
+        },
+        {
           href: "/create",
-          label: "Add Test",
+          label: "Add Test (Legacy)",
           icon: CirclePlus,
         },
       ],

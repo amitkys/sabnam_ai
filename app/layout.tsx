@@ -3,20 +3,30 @@ import type { Metadata } from "next";
 import "./custom.css";
 import "@bprogress/core/css";
 
-import { Inter, Space_Grotesk, Outfit, Geist } from 'next/font/google'
+import { Space_Grotesk, Outfit, Dancing_Script } from "next/font/google";
 
-const spaceGrotesk = Space_Grotesk({subsets:['latin'],variable:'--font-sans'});
-
+const spaceGrotesk = Space_Grotesk({
+  subsets: ["latin"],
+  variable: "--font-sans",
+});
+const dancingScript = Dancing_Script({
+  subsets: ["latin"],
+  weight: ["600"],
+  variable: "--font-dancing-script",
+  display: "swap",
+});
 
 import { ThemeProvider } from "@/components/provider/theme-provider";
-
 import ProgressBarProvider from "@/components/navigation-progress";
 import { SidebarProvider } from "@/components/sidebarContext";
 import QueryProviders from "@/components/provider/query-provider";
 import { cn } from "@/lib/utils";
 import { Toaster } from "@/components/ui/toast";
 
-const outfitHeading = Outfit({subsets:['latin'],variable:'--font-heading'});
+const outfitHeading = Outfit({
+  subsets: ["latin"],
+  variable: "--font-heading",
+});
 
 export const metadata: Metadata = {
   title: "Sabnam",
@@ -35,9 +45,17 @@ export default function RootLayout({
   return (
     <html
       suppressHydrationWarning
-      lang="en" className={cn("font-sans", spaceGrotesk.variable, outfitHeading.variable)}
+      className={cn(
+        "font-sans",
+        spaceGrotesk.variable,
+        outfitHeading.variable,
+        dancingScript.variable,
+      )}
+      lang="en"
     >
-      <body className={`${spaceGrotesk.variable} font-sans antialiased bg-background text-foreground`}>
+      <body
+        className={`${spaceGrotesk.variable} ${dancingScript.variable} font-sans antialiased bg-background text-foreground`}
+      >
         <ThemeProvider
           disableTransitionOnChange
           enableSystem
@@ -47,11 +65,9 @@ export default function RootLayout({
           <SidebarProvider>
             <ProgressBarProvider>
               <QueryProviders>
-
                 {children}
                 <Toaster />
               </QueryProviders>
-
             </ProgressBarProvider>
           </SidebarProvider>
         </ThemeProvider>

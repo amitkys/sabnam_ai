@@ -38,7 +38,7 @@ export const HeroHeader = () => {
           className={cn(
             "mx-auto mt-2 max-w-6xl px-6 transition-all duration-300 lg:px-12",
             isScrolled &&
-            "bg-background/50 max-w-4xl rounded-2xl border backdrop-blur-lg lg:px-5",
+              "bg-background/50 max-w-4xl rounded-2xl border backdrop-blur-lg lg:px-5",
           )}
         >
           <div className="relative flex flex-wrap items-center justify-between gap-6 py-3 lg:gap-0 lg:py-4">
@@ -51,7 +51,9 @@ export const HeroHeader = () => {
                 <div>
                   <Image alt="Logo" height={24} src="/logo.svg" width={24} />
                 </div>
-                <span className="font-bold">Sabnam AI</span>
+                <span className="font-brand text-2xl tracking-wide">
+                  Sabnam AI
+                </span>
               </Link>
 
               <button
@@ -100,8 +102,7 @@ export const HeroHeader = () => {
                   className={cn(isScrolled && "lg:hidden")}
                   size="sm"
                   variant="outline"
-                >
-                </Button>
+                />
                 <Button
                   asChild
                   className={cn(isScrolled && "lg:hidden")}

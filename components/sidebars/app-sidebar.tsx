@@ -1,15 +1,4 @@
-import Link from 'next/link'
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
-  SidebarMenu,
-  SidebarMenuBadge,
-  SidebarMenuButton,
-  SidebarMenuItem,
-} from '@/components/ui/sidebar'
+import Link from "next/link";
 import {
   BookOpenIcon,
   BrainCircuitIcon,
@@ -19,7 +8,18 @@ import {
   LayoutGridIcon,
   SquareActivityIcon,
   TrophyIcon,
-} from 'lucide-react'
+} from "lucide-react";
+
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+} from "@/components/ui/sidebar";
 
 export function AppSidebar() {
   return (
@@ -30,9 +30,11 @@ export function AppSidebar() {
             <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
-                  <a href='#'>
+                  <a href="#">
                     <ChartNoAxesCombinedIcon />
-                    <span>Sabnam AI</span>
+                    <span className="font-brand text-xl tracking-wide">
+                      Sabnam AI
+                    </span>
                   </a>
                 </SidebarMenuButton>
                 {/* <SidebarMenuBadge className='bg-primary/10 rounded-full'>5</SidebarMenuBadge> */}
@@ -47,7 +49,7 @@ export function AppSidebar() {
               {/* All exams — landing page */}
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
-                  <Link href='/home'>
+                  <Link href="/home">
                     <LayoutGridIcon />
                     <span>All Exams</span>
                   </Link>
@@ -56,7 +58,7 @@ export function AppSidebar() {
               {/* Board exams — BSEB, CBSE, ICSE */}
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
-                  <Link href='/home?domain=BOARD'>
+                  <Link href="/home?domain=BOARD">
                     <BookOpenIcon />
                     <span>Board Exams</span>
                   </Link>
@@ -65,7 +67,7 @@ export function AppSidebar() {
               {/* Entrance exams — JEE, NEET, CUET */}
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
-                  <Link href='/home?domain=ENTRANCE'>
+                  <Link href="/home?domain=ENTRANCE">
                     <GraduationCapIcon />
                     <span>Entrance Exams</span>
                   </Link>
@@ -74,7 +76,7 @@ export function AppSidebar() {
               {/* Competitive exams — SSC, UPSC, BPSC */}
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
-                  <Link href='/home?domain=COMPETITIVE'>
+                  <Link href="/home?domain=COMPETITIVE">
                     <TrophyIcon />
                     <span>Competitive Exams</span>
                   </Link>
@@ -83,7 +85,7 @@ export function AppSidebar() {
               {/* Olympiads */}
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
-                  <Link href='/home?domain=OLYMPIAD'>
+                  <Link href="/home?domain=OLYMPIAD">
                     <BrainCircuitIcon />
                     <span>Olympiads</span>
                   </Link>
@@ -98,7 +100,7 @@ export function AppSidebar() {
             <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
-                  <a href='#'>
+                  <a href="#">
                     <SquareActivityIcon />
                     <span>Pending</span>
                   </a>
@@ -106,7 +108,7 @@ export function AppSidebar() {
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
-                  <a href='#'>
+                  <a href="#">
                     <CalendarClockIcon />
                     <span>Completed</span>
                   </a>
@@ -121,7 +123,7 @@ export function AppSidebar() {
             <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
-                  <a href='#'>
+                  <a href="#">
                     <SquareActivityIcon />
                     <span>History</span>
                   </a>
@@ -129,7 +131,7 @@ export function AppSidebar() {
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
-                  <a href='#'>
+                  <a href="#">
                     <CalendarClockIcon />
                     <span>AI Usages Report</span>
                   </a>
@@ -140,5 +142,5 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
     </Sidebar>
-  )
+  );
 }

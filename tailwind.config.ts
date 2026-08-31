@@ -7,8 +7,14 @@ const config: Config = {
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        "dancing-script": ["var(--font-dancing-script)", "cursive"],
+        brand: ["var(--font-dancing-script)", "cursive"],
+      },
+    },
   },
   plugins: [],
 };
+
 export default config;

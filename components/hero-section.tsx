@@ -89,7 +89,11 @@ export default function HeroSection() {
                     href="/home"
                   >
                     <span className="text-sm font-medium">
-                      Introducing Sabnam AI v2
+                      Introducing{" "}
+                      <span className="font-brand text-base">
+                        Sabnam AI
+                      </span>{" "}
+                      v2
                     </span>
                     <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
                   </Link>
@@ -136,7 +140,9 @@ export default function HeroSection() {
                       size="lg"
                     >
                       <Link href="/home">
-                        <span className="text-nowrap">Get Started for Free</span>
+                        <span className="text-nowrap">
+                          Get Started for Free
+                        </span>
                         <Rocket className="ml-2 size-5" />
                       </Link>
                     </Button>
@@ -148,9 +154,7 @@ export default function HeroSection() {
                     size="lg"
                     variant="outline"
                   >
-                    <Link
-                      href="#link"
-                    >
+                    <Link href="#link">
                       <span className="text-nowrap">Request a Test</span>
                       <ChevronRight className="ml-1 size-4" />
                     </Link>

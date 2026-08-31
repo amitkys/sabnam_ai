@@ -23,10 +23,11 @@ export default function TypeWritter() {
     },
     {
       text: "Sabnam",
+      className: "font-brand",
     },
     {
       text: "AI",
-      className: "text-pink-500 dark:text-pink-500",
+      className: "font-brand text-pink-500 dark:text-pink-500",
     },
   ];
 
@@ -80,7 +81,9 @@ export default function TypeWritter() {
             <ModeToggle />
           </div>
           <p className="text-xs text-muted-foreground text-center">
-            © {new Date().getFullYear()} Sabnam AI. All rights reserved.
+            © {new Date().getFullYear()}{" "}
+            <span className="font-brand text-sm">Sabnam AI</span>. All
+            rights reserved.
           </p>
         </div>
       </footer>
