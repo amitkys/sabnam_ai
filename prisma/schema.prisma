@@ -241,3 +241,9 @@ enum AttemptStatus {
   PAUSED
   COMPLETED
 }
+
+model keep_alive_logs {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  source     String   @default("keep-alive-saas")
+  created_at DateTime @default(now()) @db.Timestamptz
+}
