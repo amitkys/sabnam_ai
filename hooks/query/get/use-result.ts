@@ -37,6 +37,12 @@ export interface IResultQuestion {
 }
 
 export interface IResultData {
+  user?: {
+    id?: string;
+    name?: string | null;
+    email?: string | null;
+    image?: string | null;
+  };
   attempt: {
     id: string;
     score: number | null;
@@ -46,10 +52,14 @@ export interface IResultData {
     language: string;
   };
   testPaper: {
+    id?: string;
     title: string;
+    slug?: string;
     totalMarks: number;
     duration: number;
+    category?: any;
   };
+  categoryHierarchy?: string;
   questions: IResultQuestion[];
 }
 

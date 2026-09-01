@@ -19,15 +19,60 @@ export async function getResultAction({ attemptId }: { attemptId: string }) {
         userId: session.user.id,
       },
       include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            image: true,
+          },
+        },
         testPaper: {
           select: {
+            id: true,
             title: true,
+            slug: true,
             totalMarks: true,
             duration: true,
-          }
+            category: {
+              select: {
+                id: true,
+                name: true,
+                level: true,
+                parent: {
+                  select: {
+                    id: true,
+                    name: true,
+                    level: true,
+                    parent: {
+                      select: {
+                        id: true,
+                        name: true,
+                        level: true,
+                        parent: {
+                          select: {
+                            id: true,
+                            name: true,
+                            level: true,
+                            parent: {
+                              select: {
+                                id: true,
+                                name: true,
+                                level: true,
+                              },
+                            },
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
         },
         responses: true,
-      }
+      },
     });
 
     if (!attempt) {
@@ -37,23 +82,36 @@ export async function getResultAction({ attemptId }: { attemptId: string }) {
     const testQuestions = await prisma.testQuestion.findMany({
       where: { testPaperId: attempt.testPaperId },
       include: {
-        question: true
+        question: true,
       },
       orderBy: {
-        orderIndex: "asc"
-      }
+        orderIndex: "asc",
+      },
     });
 
     // Merge questions with responses
-    const questions = testQuestions.map(tq => {
-      const studentResponse = attempt.responses.find(r => r.questionId === tq.questionId) || null;
+    const questions = testQuestions.map((tq) => {
+      const studentResponse = attempt.responses.find((r) => r.questionId === tq.questionId) || null;
       return {
         ...tq,
-        studentResponse
+        studentResponse,
       };
     });
 
+    // Build breadcrumb hierarchy string
+    const hierarchyParts: string[] = [];
+    let currentCat: any = attempt.testPaper?.category;
+    while (currentCat) {
+      hierarchyParts.unshift(currentCat.name);
+      currentCat = currentCat.parent;
+    }
+    const categoryHierarchy = hierarchyParts.join(" > ");
+
     return {
+      user: attempt.user || {
+        name: session.user.name || "Student",
+        email: session.user.email || "",
+      },
       attempt: {
         id: attempt.id,
         score: attempt.score,
@@ -63,6 +121,7 @@ export async function getResultAction({ attemptId }: { attemptId: string }) {
         language: attempt.language,
       },
       testPaper: attempt.testPaper,
+      categoryHierarchy,
       questions,
     };
   });

@@ -1,151 +1,212 @@
 "use client";
 
+import React, { useState, use } from "react";
 import { useParams } from "next/navigation";
+import Link from "next/link";
 import { useResult } from "@/hooks/query/get/use-result";
 import { ResultSummary } from "./components/ResultSummary";
 import { ResultQuestionList } from "./components/ResultQuestionList";
+import { TestReportModal } from "./components/TestReportModal";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertCircle, Clock, TrendingUp, Target, CheckCircle2, XCircle } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
+import {
+  AlertCircleIcon,
+  ArrowLeftIcon,
+  PrinterIcon,
+  LanguagesIcon,
+  UserIcon,
+  FolderTreeIcon,
+  RotateCcwIcon,
+} from "lucide-react";
 
-export default function ResultPage() {
-  const params = useParams<{ attemptId: string }>();
-  const attemptId = params.attemptId;
+interface PageProps {
+  params: Promise<{ attemptId: string }>;
+}
 
-  const { data, isLoading, error } = useResult(attemptId);
+export default function ResultPage({ params }: PageProps) {
+  const { attemptId } = use(params);
+  const { data, isLoading, error, refetch } = useResult(attemptId);
+
+  const [activeLanguage, setActiveLanguage] = useState<string>("en");
+  const [reportModalOpen, setReportModalOpen] = useState(false);
+
+  // Sync default language with attempt language when loaded
+  React.useEffect(() => {
+    if (data?.attempt?.language) {
+      setActiveLanguage(data.attempt.language);
+    }
+  }, [data?.attempt?.language]);
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900">
-        <div className="container mx-auto p-4 max-w-6xl">
-          <div className="mb-8">
-            <Skeleton className="h-10 w-64 mb-2" />
-            <Skeleton className="h-6 w-96" />
+      <div className="min-h-screen bg-muted/20 py-8 px-4 sm:px-6">
+        <div className="container mx-auto max-w-5xl space-y-6">
+          <div className="flex items-center justify-between">
+            <Skeleton className="h-9 w-32" />
+            <Skeleton className="h-9 w-36" />
           </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div className="p-6 rounded-2xl border bg-card space-y-4">
+            <Skeleton className="h-4 w-48" />
+            <Skeleton className="h-8 w-80" />
+            <Skeleton className="h-4 w-64" />
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {[...Array(4)].map((_, i) => (
-              <Card key={i} className="overflow-hidden">
-                <CardContent className="p-6">
-                  <Skeleton className="h-4 w-24 mb-3" />
-                  <Skeleton className="h-8 w-32" />
-                </CardContent>
-              </Card>
+              <Skeleton key={i} className="h-24 rounded-xl" />
             ))}
           </div>
-          
           <div className="space-y-4">
-            <Skeleton className="h-8 w-48" />
-            <Skeleton className="h-[400px] w-full rounded-xl" />
+            <Skeleton className="h-10 w-full rounded-xl" />
+            <Skeleton className="h-48 w-full rounded-xl" />
           </div>
         </div>
       </div>
     );
   }
 
-  if (error) {
+  if (error || !data) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900">
-        <div className="container mx-auto p-4 max-w-6xl flex justify-center items-center min-h-[60vh]">
-          <Alert variant="destructive" className="max-w-lg shadow-lg">
-            <AlertCircle className="h-5 w-5" />
-            <AlertTitle className="text-lg font-semibold">Error Loading Results</AlertTitle>
-            <AlertDescription className="text-base">
-              {error instanceof Error ? error.message : "Failed to load result data. Please try again later."}
-            </AlertDescription>
-          </Alert>
-        </div>
-      </div>
-    );
-  }
-
-  if (!data) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900">
-        <div className="container mx-auto p-4 max-w-6xl">
-          <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
-            <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
-              <AlertCircle className="h-8 w-8 text-muted-foreground" />
-            </div>
-            <h2 className="text-2xl font-semibold mb-2">No Result Data Available</h2>
-            <p className="text-muted-foreground max-w-md">
-              The result data for this attempt could not be found. Please check your attempt ID or contact support if the issue persists.
+      <div className="min-h-screen bg-muted/20 py-12 px-4 sm:px-6 flex items-center justify-center">
+        <div className="max-w-md w-full p-6 rounded-2xl border bg-card text-center space-y-4 shadow-sm">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-destructive/10 text-destructive mx-auto">
+            <AlertCircleIcon className="h-6 w-6" />
+          </div>
+          <div>
+            <h2 className="text-base font-bold text-foreground">Result Not Available</h2>
+            <p className="text-xs text-muted-foreground mt-1">
+              {error instanceof Error ? error.message : "Could not load test attempt result."}
             </p>
           </div>
+          <div className="flex items-center justify-center gap-2 pt-2">
+            <Link href="/home">
+              <Button variant="outline" size="sm" className="text-xs">
+                Back to Home
+              </Button>
+            </Link>
+            <Button size="sm" onClick={() => refetch()} className="text-xs gap-1.5">
+              <RotateCcwIcon className="h-3.5 w-3.5" />
+              Try Again
+            </Button>
+          </div>
         </div>
       </div>
     );
   }
 
-  const { attempt, testPaper, questions } = data;
-  const totalQuestions = questions.length;
-  const attemptedQuestions = questions.filter((q) => q.studentResponse !== null).length;
-  const correctAnswers = questions.filter(
-    (q) => q.studentResponse !== null && q.studentResponse.isCorrect
-  ).length;
-  const accuracy = attemptedQuestions > 0 ? ((correctAnswers / attemptedQuestions) * 100).toFixed(1) : 0;
-
-  let totalTimeSeconds = 0;
-  if (attempt.startedAt && attempt.submittedAt) {
-    const start = new Date(attempt.startedAt).getTime();
-    const end = new Date(attempt.submittedAt).getTime();
-    totalTimeSeconds = Math.floor((end - start) / 1000);
-  }
-
-  const formatTime = (seconds: number) => {
-    const m = Math.floor(seconds / 60);
-    const s = seconds % 60;
-    return `${m}m ${s}s`;
-  };
+  const { attempt, testPaper, user, categoryHierarchy } = data;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900">
-      <div className="container mx-auto p-4 max-w-6xl">
-        <header className="mb-10">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-              <TrendingUp className="h-5 w-5 text-primary" />
-            </div>
-            <h1 className="text-4xl font-bold tracking-tight">
-              {data.testPaper.title} - Result
-            </h1>
-          </div>
-          <p className="text-lg text-muted-foreground ml-14">
-            Review your performance and explore detailed solutions below.
-          </p>
-          <div className="flex items-center gap-6 ml-14 mt-4 text-sm text-muted-foreground">
-            <div className="flex items-center gap-2">
-              <Clock className="h-4 w-4" />
-              <span>Attempt ID: {attempt.id.slice(0, 8)}...</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Target className="h-4 w-4" />
-              <span>{testPaper.duration} minutes duration</span>
-            </div>
-            <div className="flex items-center gap-2">
-              {attempt.status === "COMPLETED" ? (
-                <CheckCircle2 className="h-4 w-4 text-green-600" />
-              ) : (
-                <XCircle className="h-4 w-4 text-red-600" />
-              )}
-              <span className="capitalize">{attempt.status.toLowerCase()}</span>
-            </div>
-          </div>
-        </header>
+    <div className="min-h-screen bg-muted/20 py-8 px-4 sm:px-6 print:bg-white print:p-0">
+      <div className="container mx-auto max-w-5xl space-y-6">
+        {/* Top Navigation & Action Bar */}
+        <div className="flex items-center justify-between gap-3 print:hidden">
+          <Link href="/home">
+            <Button variant="ghost" size="sm" className="text-xs gap-1.5 text-muted-foreground hover:text-foreground">
+              <ArrowLeftIcon className="h-3.5 w-3.5" />
+              Back to Tests
+            </Button>
+          </Link>
 
+          <div className="flex items-center gap-2">
+            {/* Language Switcher */}
+            <div className="flex items-center rounded-lg border bg-card p-0.5 text-xs">
+              <button
+                type="button"
+                onClick={() => setActiveLanguage("en")}
+                className={`px-2.5 py-1 rounded-md text-xs font-semibold transition-all ${
+                  activeLanguage === "en" ? "bg-primary text-primary-foreground shadow-xs" : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                English
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveLanguage("hi")}
+                className={`px-2.5 py-1 rounded-md text-xs font-semibold transition-all ${
+                  activeLanguage === "hi" ? "bg-primary text-primary-foreground shadow-xs" : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                हिंदी
+              </button>
+            </div>
+
+            {/* Download Test Report (PDF) Button */}
+            <Button
+              type="button"
+              variant="default"
+              size="sm"
+              onClick={() => setReportModalOpen(true)}
+              className="text-xs h-8 gap-1.5 font-bold shadow-xs bg-foreground text-background hover:bg-foreground/90"
+            >
+              <PrinterIcon className="h-3.5 w-3.5" />
+              Download Test Report (PDF)
+            </Button>
+          </div>
+        </div>
+
+        {/* Essential Header Card */}
+        <div className="p-5 rounded-2xl border bg-card shadow-sm space-y-3 print:border-none print:shadow-none">
+          {/* Breadcrumb Hierarchy */}
+          {categoryHierarchy && (
+            <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground font-medium flex-wrap">
+              <FolderTreeIcon className="h-3.5 w-3.5 text-primary shrink-0" />
+              <span>{categoryHierarchy}</span>
+            </div>
+          )}
+
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">
+                {testPaper.title}
+              </h1>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                Detailed assessment summary, solution keys, and performance evaluation.
+              </p>
+            </div>
+
+            {/* Candidate Identity Pill */}
+            {user && (
+              <div className="flex items-center gap-2 p-2 rounded-xl bg-muted/50 border shrink-0">
+                <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                  <UserIcon className="h-3.5 w-3.5" />
+                </div>
+                <div className="min-w-0 pr-1">
+                  <p className="text-xs font-bold text-foreground truncate">{user.name || "Student"}</p>
+                  <p className="text-[10px] text-muted-foreground truncate">{user.email || ""}</p>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Essential Summary Metrics */}
         <ResultSummary data={data} />
 
-        <div className="mt-12">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-3xl font-semibold tracking-tight">Detailed Analysis</h2>
-            <div className="hidden md:flex items-center gap-2 text-sm text-muted-foreground">
-              <span>Showing {attemptedQuestions} of {totalQuestions} questions attempted</span>
-            </div>
+        {/* Detailed Solutions & Question Analysis */}
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <h2 className="text-base font-bold text-foreground">
+              Questions & Mathematical Solutions
+            </h2>
+            <span className="text-xs text-muted-foreground">
+              Language: {activeLanguage === "hi" ? "हिंदी (Hindi)" : "English"}
+            </span>
           </div>
-          <ResultQuestionList data={data} />
+
+          <ResultQuestionList data={data} activeLanguage={activeLanguage} />
         </div>
       </div>
+
+      {/* Download / Print Black & White PDF Modal */}
+      {reportModalOpen && (
+        <TestReportModal
+          open={reportModalOpen}
+          onOpenChange={setReportModalOpen}
+          data={data}
+        />
+      )}
     </div>
   );
 }
