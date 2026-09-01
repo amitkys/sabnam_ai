@@ -10,20 +10,28 @@ import {
   ClockIcon,
   CheckCircle2Icon,
   EyeOffIcon,
-  ExternalLinkIcon,
-  FilterIcon,
   AlertCircleIcon,
   LayersIcon,
   SparklesIcon,
 } from "lucide-react";
+import Link from "next/link";
+
 import { TestPaperItem, TestPaperDialog } from "./test-paper-dialog";
 import { FlatCategoryItem } from "./category-dialog";
+
 import { deleteTestPaperAction } from "@/lib/action/admin/test-paper-actions";
+import { toast } from "@/components/ui/toast";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -34,7 +42,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import Link from "next/link";
 import { cn } from "@/lib/utils";
 
 interface TestPaperManagerProps {
@@ -61,9 +68,10 @@ export function TestPaperManager({
 }: TestPaperManagerProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState<string>(
-    selectedFolderFilter || "ALL"
+    selectedFolderFilter || "ALL",
   );
-  const [selectedStatusFilter, setSelectedStatusFilter] = useState<string>("ALL");
+  const [selectedStatusFilter, setSelectedStatusFilter] =
+    useState<string>("ALL");
 
   useEffect(() => {
     if (selectedFolderFilter) {
@@ -72,12 +80,17 @@ export function TestPaperManager({
   }, [selectedFolderFilter]);
 
   // Modal dialog states
-  const [dialogOpen, setDialogOpen] = useState(Boolean(initialCreateForCategory));
+  const [dialogOpen, setDialogOpen] = useState(
+    Boolean(initialCreateForCategory),
+  );
   const [testToEdit, setTestToEdit] = useState<TestPaperItem | null>(null);
-  const [defaultCategoryId, setDefaultCategoryId] = useState<string | null>(initialCreateForCategory || null);
+  const [defaultCategoryId, setDefaultCategoryId] = useState<string | null>(
+    initialCreateForCategory || null,
+  );
 
   // Delete dialog state
-  const [deleteConfirmTest, setDeleteConfirmTest] = useState<TestPaperItem | null>(null);
+  const [deleteConfirmTest, setDeleteConfirmTest] =
+    useState<TestPaperItem | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
 
@@ -95,19 +108,39 @@ export function TestPaperManager({
 
   const handleDelete = async () => {
     if (!deleteConfirmTest) return;
+    const testTitle = deleteConfirmTest.title;
+
     setDeleteLoading(true);
     setDeleteError(null);
 
     try {
       const res = await deleteTestPaperAction({ id: deleteConfirmTest.id });
+
       if (res.success) {
+        toast.add({
+          type: "success",
+          title: "Test Paper Deleted",
+          description: `Test "${testTitle}" has been permanently deleted.`,
+        });
         setDeleteConfirmTest(null);
         onRefresh();
       } else {
         setDeleteError(res.error || "Failed to delete test paper");
+        toast.add({
+          type: "error",
+          title: "Delete Failed",
+          description: res.error || "Failed to delete test paper.",
+        });
       }
     } catch (err: any) {
-      setDeleteError(err?.message || "An unexpected error occurred");
+      const msg = err?.message || "An unexpected error occurred";
+
+      setDeleteError(msg);
+      toast.add({
+        type: "error",
+        title: "Delete Error",
+        description: msg,
+      });
     } finally {
       setDeleteLoading(false);
     }
@@ -121,11 +154,15 @@ export function TestPaperManager({
       const matchTitle = test.title.toLowerCase().includes(q);
       const matchSlug = test.slug.toLowerCase().includes(q);
       const matchCategory = test.category?.name.toLowerCase().includes(q);
+
       if (!matchTitle && !matchSlug && !matchCategory) return false;
     }
 
     // Category filter
-    if (selectedCategoryFilter !== "ALL" && test.categoryId !== selectedCategoryFilter) {
+    if (
+      selectedCategoryFilter !== "ALL" &&
+      test.categoryId !== selectedCategoryFilter
+    ) {
       return false;
     }
 
@@ -146,10 +183,10 @@ export function TestPaperManager({
           <div className="relative flex-1 min-w-[200px] max-w-sm">
             <SearchIcon className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
+              className="pl-9 text-xs h-9"
               placeholder="Search tests by title or slug..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9 text-xs h-9"
             />
           </div>
 
@@ -195,8 +232,8 @@ export function TestPaperManager({
         <div className="flex items-center gap-2">
           <Link href="/admin/tests/create">
             <Button
-              size="sm"
               className="text-xs h-9 gap-1.5 font-semibold bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm"
+              size="sm"
             >
               <SparklesIcon className="h-4 w-4" />
               Create Test Series (JSON)
@@ -204,10 +241,10 @@ export function TestPaperManager({
           </Link>
 
           <Button
-            variant="outline"
-            size="sm"
-            onClick={() => handleOpenCreate()}
             className="text-xs h-9 gap-1"
+            size="sm"
+            variant="outline"
+            onClick={() => handleOpenCreate()}
           >
             <PlusIcon className="h-3.5 w-3.5" />
             Quick Test
@@ -218,18 +255,21 @@ export function TestPaperManager({
       {/* Test Papers List */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {filteredTests.map((test) => (
-          <Card key={test.id} className="flex flex-col justify-between border-border/80 hover:border-primary/40 transition-colors shadow-sm">
+          <Card
+            key={test.id}
+            className="flex flex-col justify-between border-border/80 hover:border-primary/40 transition-colors shadow-sm"
+          >
             <CardContent className="p-4.5 flex flex-col gap-3 flex-1">
               {/* Header: Status Badge & Placement Path */}
               <div className="flex items-center justify-between gap-2">
                 <Badge
-                  variant="outline"
                   className={cn(
                     "text-[10px] font-semibold px-2 py-0.5",
                     test.isPublished
                       ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30"
-                      : "bg-muted text-muted-foreground border-border"
+                      : "bg-muted text-muted-foreground border-border",
                   )}
+                  variant="outline"
                 >
                   {test.isPublished ? (
                     <span className="flex items-center gap-1">
@@ -244,7 +284,10 @@ export function TestPaperManager({
 
                 {/* Category Link */}
                 {test.category && (
-                  <span className="text-[11px] text-muted-foreground font-medium flex items-center gap-1 truncate max-w-[170px]" title={test.category.name}>
+                  <span
+                    className="text-[11px] text-muted-foreground font-medium flex items-center gap-1 truncate max-w-[170px]"
+                    title={test.category.name}
+                  >
                     <LayersIcon className="h-3 w-3 shrink-0 text-primary" />
                     <span className="truncate">{test.category.name}</span>
                   </span>
@@ -253,7 +296,10 @@ export function TestPaperManager({
 
               {/* Title & Slug */}
               <div>
-                <Link href={`/admin/tests/${test.id}`} className="hover:underline">
+                <Link
+                  className="hover:underline"
+                  href={`/admin/tests/${test.id}`}
+                >
                   <h4 className="font-bold text-sm text-foreground line-clamp-2 leading-snug hover:text-primary transition-colors">
                     {test.title}
                   </h4>
@@ -291,7 +337,11 @@ export function TestPaperManager({
             {/* Card Footer: Action Buttons */}
             <div className="flex items-center justify-between gap-2 px-4 py-2.5 bg-muted/20 border-t border-border/60">
               <Link href={`/admin/tests/${test.id}`}>
-                <Button variant="outline" size="sm" className="h-7 px-2.5 text-[11px] font-semibold gap-1 text-primary hover:text-primary">
+                <Button
+                  className="h-7 px-2.5 text-[11px] font-semibold gap-1 text-primary hover:text-primary"
+                  size="sm"
+                  variant="outline"
+                >
                   <FileTextIcon className="h-3 w-3" />
                   Manage Qs ({test._count?.questions ?? 0})
                 </Button>
@@ -299,19 +349,19 @@ export function TestPaperManager({
 
               <div className="flex items-center gap-1">
                 <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleOpenEdit(test)}
                   className="h-7 px-2 text-xs gap-1"
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => handleOpenEdit(test)}
                 >
                   <Edit2Icon className="h-3 w-3" />
                   Edit
                 </Button>
                 <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setDeleteConfirmTest(test)}
                   className="h-7 px-2 text-xs text-destructive hover:text-destructive hover:bg-destructive/10"
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => setDeleteConfirmTest(test)}
                 >
                   <Trash2Icon className="h-3 w-3" />
                 </Button>
@@ -327,11 +377,17 @@ export function TestPaperManager({
           <FileTextIcon className="h-10 w-10 stroke-1 mb-2 text-muted-foreground/60" />
           <p className="text-sm font-semibold">No Test Papers Found</p>
           <p className="text-xs max-w-sm mt-1 mb-4">
-            {searchQuery || selectedCategoryFilter !== "ALL" || selectedStatusFilter !== "ALL"
+            {searchQuery ||
+            selectedCategoryFilter !== "ALL" ||
+            selectedStatusFilter !== "ALL"
               ? "No test papers matched your filter criteria."
               : "Create your first test paper and attach it to a syllabus folder."}
           </p>
-          <Button size="sm" onClick={() => handleOpenCreate()} className="gap-1.5 text-xs bg-emerald-600 hover:bg-emerald-700 text-white">
+          <Button
+            className="gap-1.5 text-xs bg-emerald-600 hover:bg-emerald-700 text-white"
+            size="sm"
+            onClick={() => handleOpenCreate()}
+          >
             <PlusIcon className="h-3.5 w-3.5" />
             Create Test Paper
           </Button>
@@ -340,14 +396,14 @@ export function TestPaperManager({
 
       {/* Create / Edit Test Paper Modal */}
       <TestPaperDialog
+        allCategories={allCategories}
+        defaultCategoryId={defaultCategoryId}
         open={dialogOpen}
+        testToEdit={testToEdit}
         onOpenChange={(open) => {
           setDialogOpen(open);
           if (!open && onClearInitialCategory) onClearInitialCategory();
         }}
-        testToEdit={testToEdit}
-        defaultCategoryId={defaultCategoryId}
-        allCategories={allCategories}
         onSuccess={onRefresh}
       />
 
@@ -363,20 +419,25 @@ export function TestPaperManager({
               Delete &quot;{deleteConfirmTest?.title}&quot;?
             </AlertDialogTitle>
             <AlertDialogDescription className="text-xs">
-              Are you sure you want to permanently delete this test paper and its question associations? This action cannot be undone.
+              Are you sure you want to permanently delete this test paper and
+              its question associations? This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
 
           {deleteError && (
-            <div className="text-destructive font-semibold text-xs">{deleteError}</div>
+            <div className="text-destructive font-semibold text-xs">
+              {deleteError}
+            </div>
           )}
 
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={deleteLoading}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={deleteLoading}>
+              Cancel
+            </AlertDialogCancel>
             <AlertDialogAction
-              onClick={handleDelete}
-              disabled={deleteLoading}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              disabled={deleteLoading}
+              onClick={handleDelete}
             >
               {deleteLoading ? "Deleting..." : "Confirm Delete"}
             </AlertDialogAction>

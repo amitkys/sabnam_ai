@@ -2,6 +2,18 @@
 
 import React, { useState, useEffect } from "react";
 import {
+  Edit2Icon,
+  SparklesIcon,
+  PlusIcon,
+  Trash2Icon,
+  CheckIcon,
+  Loader2Icon,
+  AlertCircleIcon,
+  EyeIcon,
+  CodeIcon,
+} from "lucide-react";
+
+import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -14,20 +26,16 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import {
-  Edit2Icon,
-  SparklesIcon,
-  PlusIcon,
-  Trash2Icon,
-  CheckIcon,
-  Loader2Icon,
-  AlertCircleIcon,
-  EyeIcon,
-  CodeIcon,
-} from "lucide-react";
+import { toast } from "@/components/ui/toast";
 import { MarkdownRenderer } from "@/components/newMarkdownRender";
 import { QuestionType, Difficulty } from "@/lib/generated/prisma/enums";
 import { updateQuestionDetailAction } from "@/lib/action/admin/test-series-builder-actions";
@@ -72,11 +80,19 @@ export function QuestionEditDialog({
   // Initialize data on open
   useEffect(() => {
     if (open && q) {
-      const content = typeof q.content === "object" && q.content !== null ? q.content : { en: String(q.content || ""), hi: String(q.content || "") };
+      const content =
+        typeof q.content === "object" && q.content !== null
+          ? q.content
+          : { en: String(q.content || ""), hi: String(q.content || "") };
+
       setContentEn(content.en || "");
       setContentHi(content.hi || content.en || "");
 
-      const sol = q.solution && typeof q.solution === "object" ? q.solution : { en: String(q.solution || ""), hi: String(q.solution || "") };
+      const sol =
+        q.solution && typeof q.solution === "object"
+          ? q.solution
+          : { en: String(q.solution || ""), hi: String(q.solution || "") };
+
       setSolutionEn(sol.en || "");
       setSolutionHi(sol.hi || sol.en || "");
 
@@ -85,24 +101,33 @@ export function QuestionEditDialog({
 
       const pos = questionWrapper?.positiveMarks ?? q.positiveMarks ?? 1;
       const neg = questionWrapper?.negativeMarks ?? q.negativeMarks ?? 0;
+
       setPositiveMarks(pos);
       setNegativeMarks(neg);
 
       // Options
       const rawOpts = Array.isArray(q.options) ? q.options : [];
-      const normalizedOpts: NormalizedOption[] = rawOpts.map((opt: any, idx: number) => {
-        const id = opt.id || String.fromCharCode(65 + idx);
-        const text = typeof opt.text === "object" ? opt.text : { en: String(opt.text || opt), hi: String(opt.text || opt) };
-        const isCorrect = opt.isCorrect ?? (q.correctValue === id);
-        return {
-          id,
-          text: { en: text.en || "", hi: text.hi || text.en || "" },
-          isCorrect: Boolean(isCorrect),
-        };
-      });
+      const normalizedOpts: NormalizedOption[] = rawOpts.map(
+        (opt: any, idx: number) => {
+          const id = opt.id || String.fromCharCode(65 + idx);
+          const text =
+            typeof opt.text === "object"
+              ? opt.text
+              : { en: String(opt.text || opt), hi: String(opt.text || opt) };
+          const isCorrect = opt.isCorrect ?? q.correctValue === id;
+
+          return {
+            id,
+            text: { en: text.en || "", hi: text.hi || text.en || "" },
+            isCorrect: Boolean(isCorrect),
+          };
+        },
+      );
 
       setOptions(normalizedOpts);
-      setCorrectValue(q.correctValue || (normalizedOpts.find((o) => o.isCorrect)?.id || ""));
+      setCorrectValue(
+        q.correctValue || normalizedOpts.find((o) => o.isCorrect)?.id || "",
+      );
       setError(null);
     }
   }, [open, q, questionWrapper]);
@@ -111,10 +136,15 @@ export function QuestionEditDialog({
   const handleToggleCorrectOption = (optId: string) => {
     if (type === QuestionType.MCQ_MULTIPLE) {
       const updated = options.map((opt) =>
-        opt.id === optId ? { ...opt, isCorrect: !opt.isCorrect } : opt
+        opt.id === optId ? { ...opt, isCorrect: !opt.isCorrect } : opt,
       );
+
       setOptions(updated);
-      const corrects = updated.filter((o) => o.isCorrect).map((o) => o.id).join(",");
+      const corrects = updated
+        .filter((o) => o.isCorrect)
+        .map((o) => o.id)
+        .join(",");
+
       setCorrectValue(corrects);
     } else {
       // Single choice
@@ -122,22 +152,28 @@ export function QuestionEditDialog({
         ...opt,
         isCorrect: opt.id === optId,
       }));
+
       setOptions(updated);
       setCorrectValue(optId);
     }
   };
 
-  const handleOptionTextChange = (optId: string, lang: "en" | "hi", val: string) => {
+  const handleOptionTextChange = (
+    optId: string,
+    lang: "en" | "hi",
+    val: string,
+  ) => {
     setOptions((prev) =>
       prev.map((opt) =>
-        opt.id === optId ? { ...opt, text: { ...opt.text, [lang]: val } } : opt
-      )
+        opt.id === optId ? { ...opt, text: { ...opt.text, [lang]: val } } : opt,
+      ),
     );
   };
 
   const handleAddOption = () => {
     const letters = ["A", "B", "C", "D", "E", "F", "G", "H"];
     const nextLetter = letters[options.length] || String(options.length + 1);
+
     setOptions((prev) => [
       ...prev,
       {
@@ -152,7 +188,11 @@ export function QuestionEditDialog({
     setOptions((prev) => {
       const remaining = prev.filter((o) => o.id !== optId);
       const letters = ["A", "B", "C", "D", "E", "F", "G", "H"];
-      return remaining.map((o, idx) => ({ ...o, id: letters[idx] || String(idx + 1) }));
+
+      return remaining.map((o, idx) => ({
+        ...o,
+        id: letters[idx] || String(idx + 1),
+      }));
     });
   };
 
@@ -162,6 +202,7 @@ export function QuestionEditDialog({
 
     if (!contentEn.trim() && !contentHi.trim()) {
       setError("Question content cannot be empty.");
+
       return;
     }
 
@@ -179,7 +220,8 @@ export function QuestionEditDialog({
         type,
         difficulty,
         options,
-        correctValue: correctValue || options.find((o) => o.isCorrect)?.id || "A",
+        correctValue:
+          correctValue || options.find((o) => o.isCorrect)?.id || "A",
         solution: {
           en: solutionEn.trim(),
           hi: solutionHi.trim(),
@@ -189,13 +231,31 @@ export function QuestionEditDialog({
       });
 
       if (res.success) {
+        toast.add({
+          type: "success",
+          title: "Question Saved",
+          description:
+            "Question text, mathematical formulas, and options updated.",
+        });
         onSuccess();
         onOpenChange(false);
       } else {
         setError(res.error || "Failed to update question");
+        toast.add({
+          type: "error",
+          title: "Save Failed",
+          description: res.error || "Failed to update question.",
+        });
       }
     } catch (err: any) {
-      setError(err?.message || "An unexpected error occurred");
+      const msg = err?.message || "An unexpected error occurred";
+
+      setError(msg);
+      toast.add({
+        type: "error",
+        title: "Question Error",
+        description: msg,
+      });
     } finally {
       setSubmitting(false);
     }
@@ -212,19 +272,22 @@ export function QuestionEditDialog({
                 <Edit2Icon className="h-4 w-4" />
               </div>
               <div>
-                <DialogTitle className="text-base font-bold">Edit Question & Options</DialogTitle>
+                <DialogTitle className="text-base font-bold">
+                  Edit Question & Options
+                </DialogTitle>
                 <DialogDescription className="text-xs">
-                  Modify question markdown text, formulas, options, correct answers, and solution.
+                  Modify question markdown text, formulas, options, correct
+                  answers, and solution.
                 </DialogDescription>
               </div>
             </div>
 
             <Button
+              className="text-xs h-7 gap-1.5 font-semibold"
+              size="sm"
               type="button"
               variant="outline"
-              size="sm"
               onClick={() => setPreviewMode(!previewMode)}
-              className="text-xs h-7 gap-1.5 font-semibold"
             >
               {previewMode ? (
                 <>
@@ -240,9 +303,12 @@ export function QuestionEditDialog({
         </DialogHeader>
 
         {/* Scrollable Form Content */}
-        <form onSubmit={handleSave} className="flex-1 overflow-y-auto p-4 space-y-4">
+        <form
+          className="flex-1 overflow-y-auto p-4 space-y-4"
+          onSubmit={handleSave}
+        >
           {error && (
-            <Alert variant="destructive" className="py-2">
+            <Alert className="py-2" variant="destructive">
               <AlertCircleIcon className="h-4 w-4" />
               <AlertDescription className="text-xs">{error}</AlertDescription>
             </Alert>
@@ -252,22 +318,36 @@ export function QuestionEditDialog({
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-3 rounded-lg bg-muted/20 border">
             <div className="space-y-1">
               <Label className="text-[11px] font-semibold">Question Type</Label>
-              <Select value={type} onValueChange={(val) => setType(val as QuestionType)}>
+              <Select
+                value={type}
+                onValueChange={(val) => setType(val as QuestionType)}
+              >
                 <SelectTrigger className="text-xs h-8">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent className="text-xs">
-                  <SelectItem value={QuestionType.MCQ_SINGLE}>Single Choice (MCQ)</SelectItem>
-                  <SelectItem value={QuestionType.MCQ_MULTIPLE}>Multiple Choice (MCQ)</SelectItem>
-                  <SelectItem value={QuestionType.NUMERICAL}>Numerical Answer</SelectItem>
-                  <SelectItem value={QuestionType.INTEGER}>Integer Answer</SelectItem>
+                  <SelectItem value={QuestionType.MCQ_SINGLE}>
+                    Single Choice (MCQ)
+                  </SelectItem>
+                  <SelectItem value={QuestionType.MCQ_MULTIPLE}>
+                    Multiple Choice (MCQ)
+                  </SelectItem>
+                  <SelectItem value={QuestionType.NUMERICAL}>
+                    Numerical Answer
+                  </SelectItem>
+                  <SelectItem value={QuestionType.INTEGER}>
+                    Integer Answer
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             <div className="space-y-1">
               <Label className="text-[11px] font-semibold">Difficulty</Label>
-              <Select value={difficulty} onValueChange={(val) => setDifficulty(val as Difficulty)}>
+              <Select
+                value={difficulty}
+                onValueChange={(val) => setDifficulty(val as Difficulty)}
+              >
                 <SelectTrigger className="text-xs h-8">
                   <SelectValue />
                 </SelectTrigger>
@@ -280,26 +360,34 @@ export function QuestionEditDialog({
             </div>
 
             <div className="space-y-1">
-              <Label className="text-[11px] font-semibold">Positive Marks (+)</Label>
+              <Label className="text-[11px] font-semibold">
+                Positive Marks (+)
+              </Label>
               <Input
-                type="number"
-                step="any"
-                min={0}
-                value={positiveMarks}
-                onChange={(e) => setPositiveMarks(parseFloat(e.target.value) || 0)}
                 className="text-xs h-8"
+                min={0}
+                step="any"
+                type="number"
+                value={positiveMarks}
+                onChange={(e) =>
+                  setPositiveMarks(parseFloat(e.target.value) || 0)
+                }
               />
             </div>
 
             <div className="space-y-1">
-              <Label className="text-[11px] font-semibold">Negative Marks (-)</Label>
+              <Label className="text-[11px] font-semibold">
+                Negative Marks (-)
+              </Label>
               <Input
-                type="number"
-                step="any"
-                min={0}
-                value={negativeMarks}
-                onChange={(e) => setNegativeMarks(parseFloat(e.target.value) || 0)}
                 className="text-xs h-8"
+                min={0}
+                step="any"
+                type="number"
+                value={negativeMarks}
+                onChange={(e) =>
+                  setNegativeMarks(parseFloat(e.target.value) || 0)
+                }
               />
             </div>
           </div>
@@ -308,25 +396,31 @@ export function QuestionEditDialog({
           {previewMode ? (
             <div className="space-y-4 p-4 rounded-xl border bg-card">
               <div className="flex items-center justify-between pb-2 border-b">
-                <span className="text-xs font-bold text-foreground">Rendered KaTeX Preview</span>
+                <span className="text-xs font-bold text-foreground">
+                  Rendered KaTeX Preview
+                </span>
                 <div className="flex items-center gap-1 bg-muted p-0.5 rounded-lg text-xs">
                   <button
-                    type="button"
-                    onClick={() => setActiveLangTab("en")}
                     className={cn(
                       "px-2 py-0.5 rounded font-medium",
-                      activeLangTab === "en" ? "bg-background shadow-xs font-semibold" : "text-muted-foreground"
+                      activeLangTab === "en"
+                        ? "bg-background shadow-xs font-semibold"
+                        : "text-muted-foreground",
                     )}
+                    type="button"
+                    onClick={() => setActiveLangTab("en")}
                   >
                     English
                   </button>
                   <button
-                    type="button"
-                    onClick={() => setActiveLangTab("hi")}
                     className={cn(
                       "px-2 py-0.5 rounded font-medium",
-                      activeLangTab === "hi" ? "bg-background shadow-xs font-semibold" : "text-muted-foreground"
+                      activeLangTab === "hi"
+                        ? "bg-background shadow-xs font-semibold"
+                        : "text-muted-foreground",
                     )}
+                    type="button"
+                    onClick={() => setActiveLangTab("hi")}
                   >
                     Hindi
                   </button>
@@ -344,7 +438,9 @@ export function QuestionEditDialog({
               {/* Options */}
               {options.length > 0 && (
                 <div className="space-y-2 pt-2">
-                  <p className="text-[11px] font-semibold text-muted-foreground uppercase">Options</p>
+                  <p className="text-[11px] font-semibold text-muted-foreground uppercase">
+                    Options
+                  </p>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     {options.map((opt) => (
                       <div
@@ -353,13 +449,15 @@ export function QuestionEditDialog({
                           "flex items-start gap-2.5 p-3 rounded-lg border text-xs",
                           opt.isCorrect
                             ? "bg-emerald-500/10 border-emerald-500/60 font-medium text-foreground ring-1 ring-emerald-500/20"
-                            : "bg-background border-border text-muted-foreground"
+                            : "bg-background border-border text-muted-foreground",
                         )}
                       >
                         <span
                           className={cn(
                             "flex h-5 w-5 shrink-0 items-center justify-center rounded-md font-bold text-[11px]",
-                            opt.isCorrect ? "bg-emerald-600 text-white" : "bg-muted text-foreground"
+                            opt.isCorrect
+                              ? "bg-emerald-600 text-white"
+                              : "bg-muted text-foreground",
                           )}
                         >
                           {opt.id}
@@ -371,7 +469,10 @@ export function QuestionEditDialog({
                           />
                         </div>
                         {opt.isCorrect && (
-                          <Badge variant="outline" className="text-[9px] uppercase px-1 py-0 text-emerald-600 border-emerald-500/40 bg-emerald-500/10 font-bold shrink-0">
+                          <Badge
+                            className="text-[9px] uppercase px-1 py-0 text-emerald-600 border-emerald-500/40 bg-emerald-500/10 font-bold shrink-0"
+                            variant="outline"
+                          >
                             Correct
                           </Badge>
                         )}
@@ -385,7 +486,8 @@ export function QuestionEditDialog({
               {(solutionEn || solutionHi) && (
                 <div className="p-3 rounded-lg bg-muted/40 border text-xs space-y-1">
                   <p className="font-semibold text-xs text-foreground flex items-center gap-1">
-                    <SparklesIcon className="h-3.5 w-3.5 text-primary" /> Solution:
+                    <SparklesIcon className="h-3.5 w-3.5 text-primary" />{" "}
+                    Solution:
                   </p>
                   <MarkdownRenderer
                     content={activeLangTab === "en" ? solutionEn : solutionHi}
@@ -400,54 +502,64 @@ export function QuestionEditDialog({
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
                   <Label className="text-xs font-semibold">
-                    Question Text (Markdown + LaTeX) <span className="text-destructive">*</span>
+                    Question Text (Markdown + LaTeX){" "}
+                    <span className="text-destructive">*</span>
                   </Label>
                   <span className="text-[10px] text-muted-foreground">
                     Must start with ##### prefix
                   </span>
                 </div>
 
-                <Tabs value={activeLangTab} onValueChange={(val) => setActiveLangTab(val as "en" | "hi")} className="w-full">
+                <Tabs
+                  className="w-full"
+                  value={activeLangTab}
+                  onValueChange={(val) => setActiveLangTab(val as "en" | "hi")}
+                >
                   <TabsList className="grid grid-cols-2 h-8 w-48 text-xs">
-                    <TabsTrigger value="en" className="text-xs">English (EN)</TabsTrigger>
-                    <TabsTrigger value="hi" className="text-xs">हिंदी (HI)</TabsTrigger>
+                    <TabsTrigger className="text-xs" value="en">
+                      English (EN)
+                    </TabsTrigger>
+                    <TabsTrigger className="text-xs" value="hi">
+                      हिंदी (HI)
+                    </TabsTrigger>
                   </TabsList>
 
-                  <TabsContent value="en" className="mt-1.5">
+                  <TabsContent className="mt-1.5" value="en">
                     <Textarea
-                      value={contentEn}
-                      onChange={(e) => setContentEn(e.target.value)}
+                      className="font-mono text-xs p-2.5 bg-muted/20"
                       placeholder="##### What is the value of $\sin(90^\circ)$?"
                       rows={4}
-                      className="font-mono text-xs p-2.5 bg-muted/20"
+                      value={contentEn}
+                      onChange={(e) => setContentEn(e.target.value)}
                     />
                   </TabsContent>
 
-                  <TabsContent value="hi" className="mt-1.5">
+                  <TabsContent className="mt-1.5" value="hi">
                     <Textarea
-                      value={contentHi}
-                      onChange={(e) => setContentHi(e.target.value)}
+                      className="font-mono text-xs p-2.5 bg-muted/20"
                       placeholder="##### $\sin(90^\circ)$ का मान क्या है?"
                       rows={4}
-                      className="font-mono text-xs p-2.5 bg-muted/20"
+                      value={contentHi}
+                      onChange={(e) => setContentHi(e.target.value)}
                     />
                   </TabsContent>
                 </Tabs>
               </div>
 
               {/* Options Editor for MCQ */}
-              {(type === QuestionType.MCQ_SINGLE || type === QuestionType.MCQ_MULTIPLE) && (
+              {(type === QuestionType.MCQ_SINGLE ||
+                type === QuestionType.MCQ_MULTIPLE) && (
                 <div className="space-y-2.5 pt-2 border-t">
                   <div className="flex items-center justify-between">
                     <Label className="text-xs font-semibold">
                       Options & Correct Answer Selection
                     </Label>
                     <Button
+                      className="text-[11px] h-7 gap-1"
+                      size="sm"
                       type="button"
                       variant="outline"
-                      size="sm"
                       onClick={handleAddOption}
-                      className="text-[11px] h-7 gap-1"
                     >
                       <PlusIcon className="h-3 w-3" /> Add Option
                     </Button>
@@ -461,7 +573,7 @@ export function QuestionEditDialog({
                           "flex flex-col gap-2 p-3 rounded-lg border transition-colors",
                           opt.isCorrect
                             ? "border-emerald-500/60 bg-emerald-500/5 ring-1 ring-emerald-500/20"
-                            : "border-border bg-card"
+                            : "border-border bg-card",
                         )}
                       >
                         <div className="flex items-center justify-between gap-2">
@@ -470,25 +582,27 @@ export function QuestionEditDialog({
                               {opt.id}
                             </span>
                             <button
-                              type="button"
-                              onClick={() => handleToggleCorrectOption(opt.id)}
                               className={cn(
                                 "text-xs font-semibold px-2 py-0.5 rounded-full border transition-colors flex items-center gap-1",
                                 opt.isCorrect
                                   ? "bg-emerald-600 text-white border-emerald-600"
-                                  : "bg-background text-muted-foreground border-border hover:border-emerald-500"
+                                  : "bg-background text-muted-foreground border-border hover:border-emerald-500",
                               )}
+                              type="button"
+                              onClick={() => handleToggleCorrectOption(opt.id)}
                             >
                               <CheckIcon className="h-3 w-3" />
-                              {opt.isCorrect ? "Correct Answer" : "Mark as Correct"}
+                              {opt.isCorrect
+                                ? "Correct Answer"
+                                : "Mark as Correct"}
                             </button>
                           </div>
 
                           {options.length > 2 && (
                             <button
+                              className="text-muted-foreground hover:text-destructive p-1 rounded"
                               type="button"
                               onClick={() => handleRemoveOption(opt.id)}
-                              className="text-muted-foreground hover:text-destructive p-1 rounded"
                             >
                               <Trash2Icon className="h-3.5 w-3.5" />
                             </button>
@@ -498,16 +612,28 @@ export function QuestionEditDialog({
                         {/* Bilingual inputs for option text */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                           <Input
+                            className="text-xs h-8 font-mono"
                             placeholder={`Option ${opt.id} text (EN) e.g. $\\sqrt{2}$`}
                             value={opt.text.en}
-                            onChange={(e) => handleOptionTextChange(opt.id, "en", e.target.value)}
-                            className="text-xs h-8 font-mono"
+                            onChange={(e) =>
+                              handleOptionTextChange(
+                                opt.id,
+                                "en",
+                                e.target.value,
+                              )
+                            }
                           />
                           <Input
+                            className="text-xs h-8 font-mono"
                             placeholder={`Option ${opt.id} text (HI)`}
                             value={opt.text.hi}
-                            onChange={(e) => handleOptionTextChange(opt.id, "hi", e.target.value)}
-                            className="text-xs h-8 font-mono"
+                            onChange={(e) =>
+                              handleOptionTextChange(
+                                opt.id,
+                                "hi",
+                                e.target.value,
+                              )
+                            }
                           />
                         </div>
                       </div>
@@ -517,14 +643,17 @@ export function QuestionEditDialog({
               )}
 
               {/* Numerical / Integer Answer */}
-              {(type === QuestionType.NUMERICAL || type === QuestionType.INTEGER) && (
+              {(type === QuestionType.NUMERICAL ||
+                type === QuestionType.INTEGER) && (
                 <div className="space-y-1.5 pt-2 border-t">
-                  <Label className="text-xs font-semibold">Expected Correct Answer Value</Label>
+                  <Label className="text-xs font-semibold">
+                    Expected Correct Answer Value
+                  </Label>
                   <Input
+                    className="text-xs font-mono"
                     placeholder="e.g. 45 or 3.14"
                     value={correctValue}
                     onChange={(e) => setCorrectValue(e.target.value)}
-                    className="text-xs font-mono"
                   />
                 </div>
               )}
@@ -536,29 +665,33 @@ export function QuestionEditDialog({
                   Solution & Explanation (Markdown + LaTeX)
                 </Label>
 
-                <Tabs defaultValue="en" className="w-full">
+                <Tabs className="w-full" defaultValue="en">
                   <TabsList className="grid grid-cols-2 h-8 w-48 text-xs">
-                    <TabsTrigger value="en" className="text-xs">English (EN)</TabsTrigger>
-                    <TabsTrigger value="hi" className="text-xs">हिंदी (HI)</TabsTrigger>
+                    <TabsTrigger className="text-xs" value="en">
+                      English (EN)
+                    </TabsTrigger>
+                    <TabsTrigger className="text-xs" value="hi">
+                      हिंदी (HI)
+                    </TabsTrigger>
                   </TabsList>
 
-                  <TabsContent value="en" className="mt-1.5">
+                  <TabsContent className="mt-1.5" value="en">
                     <Textarea
-                      value={solutionEn}
-                      onChange={(e) => setSolutionEn(e.target.value)}
+                      className="font-mono text-xs p-2.5 bg-muted/20"
                       placeholder="Step-by-step mathematical solution..."
                       rows={3}
-                      className="font-mono text-xs p-2.5 bg-muted/20"
+                      value={solutionEn}
+                      onChange={(e) => setSolutionEn(e.target.value)}
                     />
                   </TabsContent>
 
-                  <TabsContent value="hi" className="mt-1.5">
+                  <TabsContent className="mt-1.5" value="hi">
                     <Textarea
-                      value={solutionHi}
-                      onChange={(e) => setSolutionHi(e.target.value)}
+                      className="font-mono text-xs p-2.5 bg-muted/20"
                       placeholder="चरणबद्ध गणितीय समाधान..."
                       rows={3}
-                      className="font-mono text-xs p-2.5 bg-muted/20"
+                      value={solutionHi}
+                      onChange={(e) => setSolutionHi(e.target.value)}
                     />
                   </TabsContent>
                 </Tabs>
@@ -569,14 +702,18 @@ export function QuestionEditDialog({
           {/* Dialog Footer */}
           <DialogFooter className="pt-3 border-t">
             <Button
+              disabled={submitting}
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
-              disabled={submitting}
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={submitting} className="gap-1.5 font-semibold">
+            <Button
+              className="gap-1.5 font-semibold"
+              disabled={submitting}
+              type="submit"
+            >
               {submitting ? (
                 <>
                   <Loader2Icon className="h-3.5 w-3.5 animate-spin" />

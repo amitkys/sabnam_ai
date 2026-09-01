@@ -49,7 +49,9 @@ interface MarkdownRendererProps {
   variant?: MarkdownVariant;
   className?: string;
   codeStyle?: CodeStyle;
-  customComponents?: Partial<React.ComponentProps<typeof Markdown>["components"]>;
+  customComponents?: Partial<
+    React.ComponentProps<typeof Markdown>["components"]
+  >;
 }
 
 // Code block styling constants
@@ -80,25 +82,45 @@ const hasBlockLevelChild = (children: React.ReactNode): boolean => {
       const type = child.type;
 
       // Check if it's a component or HTML element
-      if (typeof type === 'string') {
-        const blockElements = ['div', 'p', 'pre', 'table', 'blockquote', 'ul', 'ol', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
+      if (typeof type === "string") {
+        const blockElements = [
+          "div",
+          "p",
+          "pre",
+          "table",
+          "blockquote",
+          "ul",
+          "ol",
+          "h1",
+          "h2",
+          "h3",
+          "h4",
+          "h5",
+          "h6",
+        ];
+
         if (blockElements.includes(type)) {
           hasBlock = true;
         }
-      } else if (typeof type === 'function' || typeof type === 'object') {
+      } else if (typeof type === "function" || typeof type === "object") {
         // For components, check the displayName or name
         const componentType = type as any;
-        const componentName = componentType.displayName || componentType.name || '';
-        if (componentName.includes('CodeBlock') ||
-          componentName.includes('Image') ||
-          componentName.includes('Table')) {
+        const componentName =
+          componentType.displayName || componentType.name || "";
+
+        if (
+          componentName.includes("CodeBlock") ||
+          componentName.includes("Image") ||
+          componentName.includes("Table")
+        ) {
           hasBlock = true;
         }
       }
 
       // Check node prop if available
       if ((child.props as any)?.node?.tagName) {
-        const blockTags = ['div', 'pre', 'code', 'table', 'img'];
+        const blockTags = ["div", "pre", "code", "table", "img"];
+
         if (blockTags.includes((child.props as any).node.tagName)) {
           hasBlock = true;
         }
@@ -116,77 +138,82 @@ const hasBlockLevelChild = (children: React.ReactNode): boolean => {
 /**
  * Safe Image component with proper blob URL cleanup and error handling
  */
-const SafeMarkdownImage = React.memo(({ src, alt = "", ...rest }: ImageComponentProps) => {
-  const [imageUrl, setImageUrl] = React.useState<string>("");
-  const [error, setError] = React.useState(false);
+const SafeMarkdownImage = React.memo(
+  ({ src, alt = "", ...rest }: ImageComponentProps) => {
+    const [imageUrl, setImageUrl] = React.useState<string>("");
+    const [error, setError] = React.useState(false);
 
-  React.useEffect(() => {
-    if (!src) {
-      setImageUrl("");
-      return;
+    React.useEffect(() => {
+      if (!src) {
+        setImageUrl("");
+
+        return;
+      }
+
+      if (typeof src === "string") {
+        setImageUrl(src);
+
+        return;
+      }
+
+      // Handle Blob URLs with proper cleanup
+      if (typeof window !== "undefined" && src instanceof Blob) {
+        const blobUrl = URL.createObjectURL(src);
+
+        setImageUrl(blobUrl);
+
+        return () => {
+          URL.revokeObjectURL(blobUrl);
+        };
+      }
+
+      setImageUrl(String(src));
+    }, [src]);
+
+    if (!imageUrl || error) {
+      return (
+        <div className="my-8 p-8 bg-muted/50 rounded-lg border border-border text-center">
+          <p className="text-sm text-muted-foreground">
+            {error ? "Failed to load image" : "No image source provided"}
+          </p>
+          {alt && <p className="text-xs text-muted-foreground mt-1">{alt}</p>}
+        </div>
+      );
     }
 
-    if (typeof src === "string") {
-      setImageUrl(src);
-      return;
-    }
+    const isExternal = imageUrl.startsWith("http");
+    const validSrc = isExternal ? imageUrl : `/${imageUrl.replace(/^\/+/, "")}`;
 
-    // Handle Blob URLs with proper cleanup
-    if (typeof window !== "undefined" && src instanceof Blob) {
-      const blobUrl = URL.createObjectURL(src);
-      setImageUrl(blobUrl);
+    // Filter out Next.js Image incompatible props
+    const safeProps = Object.fromEntries(
+      Object.entries(rest).filter(
+        ([key]) => !["width", "height", "style", "loading"].includes(key),
+      ),
+    );
 
-      return () => {
-        URL.revokeObjectURL(blobUrl);
-      };
-    }
-
-    setImageUrl(String(src));
-  }, [src]);
-
-  if (!imageUrl || error) {
     return (
-      <div className="my-8 p-8 bg-muted/50 rounded-lg border border-border text-center">
-        <p className="text-sm text-muted-foreground">
-          {error ? "Failed to load image" : "No image source provided"}
-        </p>
-        {alt && <p className="text-xs text-muted-foreground mt-1">{alt}</p>}
+      <div className="my-8">
+        <div className="relative w-full aspect-video overflow-hidden rounded-lg border border-border bg-muted/30">
+          <Image
+            fill
+            alt={alt}
+            className="object-cover"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 800px"
+            src={validSrc}
+            unoptimized={isExternal}
+            onError={() => setError(true)}
+            {...safeProps}
+          />
+        </div>
+        {alt && (
+          <p className="text-sm text-muted-foreground text-center mt-2 italic">
+            {alt}
+          </p>
+        )}
       </div>
     );
-  }
-
-  const isExternal = imageUrl.startsWith("http");
-  const validSrc = isExternal ? imageUrl : `/${imageUrl.replace(/^\/+/, "")}`;
-
-  // Filter out Next.js Image incompatible props
-  const safeProps = Object.fromEntries(
-    Object.entries(rest).filter(
-      ([key]) => !["width", "height", "style", "loading"].includes(key)
-    )
-  );
-
-  return (
-    <div className="my-8">
-      <div className="relative w-full aspect-video overflow-hidden rounded-lg border border-border bg-muted/30">
-        <Image
-          fill
-          alt={alt}
-          className="object-cover"
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 800px"
-          src={validSrc}
-          unoptimized={isExternal}
-          onError={() => setError(true)}
-          {...safeProps}
-        />
-      </div>
-      {alt && (
-        <p className="text-sm text-muted-foreground text-center mt-2 italic">
-          {alt}
-        </p>
-      )}
-    </div>
-  );
-});
+  },
+);
 
 SafeMarkdownImage.displayName = "SafeMarkdownImage";
 
@@ -202,102 +229,58 @@ interface CodeBlockProps {
   codeStyle: any;
 }
 
-const CodeBlock = React.memo(({
-  children,
-  language,
-  inline,
-  variant,
-  isDarkMode,
-  codeStyle,
-}: CodeBlockProps) => {
-  const [copySuccess, setCopySuccess] = React.useState(false);
+const CodeBlock = React.memo(
+  ({
+    children,
+    language,
+    inline,
+    variant,
+    isDarkMode,
+    codeStyle,
+  }: CodeBlockProps) => {
+    const [copySuccess, setCopySuccess] = React.useState(false);
 
-  const handleCopy = useCallback(() => {
-    const code = String(children).replace(/\n$/, "");
-    navigator.clipboard.writeText(code).then(() => {
-      setCopySuccess(true);
-      setTimeout(() => setCopySuccess(false), 2000);
-    });
-  }, [children]);
+    const handleCopy = useCallback(() => {
+      const code = String(children).replace(/\n$/, "");
 
-  if (inline) {
-    const inlineClass = variant === "option"
-      ? "px-1 py-0.5 text-xs"
-      : "px-2 py-1 text-sm";
+      navigator.clipboard.writeText(code).then(() => {
+        setCopySuccess(true);
+        setTimeout(() => setCopySuccess(false), 2000);
+      });
+    }, [children]);
 
-    return (
-      <code
-        className={cn(
-          inlineClass,
-          isDarkMode ? "bg-muted" : "bg-muted/50",
-          "rounded font-mono text-foreground border border-border/50 break-words"
-        )}
-      >
-        {children}
-      </code>
-    );
-  }
+    if (inline) {
+      const inlineClass =
+        variant === "option" ? "px-1 py-0.5 text-xs" : "px-2 py-1 text-sm";
 
-  // For option and analysis variants, use compact code blocks
-  if (variant === "option" || variant === "analysis") {
-    return (
-      <div className={variant === "option" ? "mt-2" : "my-2 overflow-x-auto"}>
-        <SyntaxHighlighter
-          PreTag="div"
-          codeTagProps={{ className: "font-mono" }}
-          customStyle={{
-            margin: 0,
-            borderRadius: "0.375rem",
-            background: isDarkMode ? "#1e1e1e" : "#f5f5f5",
-            fontSize: CODE_BLOCK_STYLES.fontSize[variant],
-            lineHeight: CODE_BLOCK_STYLES.lineHeight,
-            whiteSpace: variant === "option" ? "pre-wrap" : "pre",
-            wordBreak: variant === "option" ? "break-word" : "normal",
-          }}
-          language={language || "text"}
-          style={codeStyle}
+      return (
+        <code
+          className={cn(
+            inlineClass,
+            isDarkMode ? "bg-muted" : "bg-muted/50",
+            "rounded font-mono text-foreground border border-border/50 break-words",
+          )}
         >
-          {String(children).replace(/\n$/, "")}
-        </SyntaxHighlighter>
-      </div>
-    );
-  }
+          {children}
+        </code>
+      );
+    }
 
-  // Full-featured code block with header
-  return (
-    <div className="my-6">
-      <div className="relative">
-        <div className="flex items-center justify-between bg-muted/50 px-4 py-2 border-t border-l border-r border-border rounded-t-lg">
-          <div className="flex items-center gap-2">
-            <div className="flex gap-1.5" role="presentation">
-              <div className="w-3 h-3 rounded-full bg-red-400" />
-              <div className="w-3 h-3 rounded-full bg-yellow-400" />
-              <div className="w-3 h-3 rounded-full bg-green-400" />
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <span className="text-sm font-medium text-muted-foreground">
-              {language || "text"}
-            </span>
-            <button
-              onClick={handleCopy}
-              className="text-xs px-2 py-1 rounded bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground transition-colors"
-              aria-label="Copy code"
-            >
-              {copySuccess ? "Copied!" : "Copy"}
-            </button>
-          </div>
-        </div>
-        <div className="custom-scrollbar border-b border-l border-r border-border rounded-b-lg overflow-x-auto">
+    // For option and analysis variants, use compact code blocks
+    if (variant === "option" || variant === "analysis") {
+      return (
+        <div className={variant === "option" ? "mt-2" : "my-2 overflow-x-auto"}>
           <SyntaxHighlighter
             PreTag="div"
             codeTagProps={{ className: "font-mono" }}
             customStyle={{
               margin: 0,
-              borderRadius: 0,
+              borderRadius: "0.375rem",
               background: isDarkMode ? "#1e1e1e" : "#f5f5f5",
-              fontSize: CODE_BLOCK_STYLES.fontSize.default,
+              fontSize: CODE_BLOCK_STYLES.fontSize[variant],
               lineHeight: CODE_BLOCK_STYLES.lineHeight,
+              whiteSpace: variant === "option" ? "pre-wrap" : "pre",
+              wordBreak: variant === "option" ? "break-word" : "normal",
             }}
             language={language || "text"}
             style={codeStyle}
@@ -305,10 +288,56 @@ const CodeBlock = React.memo(({
             {String(children).replace(/\n$/, "")}
           </SyntaxHighlighter>
         </div>
+      );
+    }
+
+    // Full-featured code block with header
+    return (
+      <div className="my-6">
+        <div className="relative">
+          <div className="flex items-center justify-between bg-muted/50 px-4 py-2 border-t border-l border-r border-border rounded-t-lg">
+            <div className="flex items-center gap-2">
+              <div className="flex gap-1.5" role="presentation">
+                <div className="w-3 h-3 rounded-full bg-red-400" />
+                <div className="w-3 h-3 rounded-full bg-yellow-400" />
+                <div className="w-3 h-3 rounded-full bg-green-400" />
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <span className="text-sm font-medium text-muted-foreground">
+                {language || "text"}
+              </span>
+              <button
+                aria-label="Copy code"
+                className="text-xs px-2 py-1 rounded bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground transition-colors"
+                onClick={handleCopy}
+              >
+                {copySuccess ? "Copied!" : "Copy"}
+              </button>
+            </div>
+          </div>
+          <div className="custom-scrollbar border-b border-l border-r border-border rounded-b-lg overflow-x-auto">
+            <SyntaxHighlighter
+              PreTag="div"
+              codeTagProps={{ className: "font-mono" }}
+              customStyle={{
+                margin: 0,
+                borderRadius: 0,
+                background: isDarkMode ? "#1e1e1e" : "#f5f5f5",
+                fontSize: CODE_BLOCK_STYLES.fontSize.default,
+                lineHeight: CODE_BLOCK_STYLES.lineHeight,
+              }}
+              language={language || "text"}
+              style={codeStyle}
+            >
+              {String(children).replace(/\n$/, "")}
+            </SyntaxHighlighter>
+          </div>
+        </div>
       </div>
-    </div>
-  );
-});
+    );
+  },
+);
 
 CodeBlock.displayName = "CodeBlock";
 
@@ -335,6 +364,7 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
   const isDarkMode = useMemo(() => {
     if (!mounted) return false; // Return false during SSR
     const effectiveTheme = theme === "system" ? resolvedTheme : theme;
+
     return effectiveTheme === "dark";
   }, [theme, resolvedTheme, mounted]);
 
@@ -342,6 +372,7 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
   const selectedCodeStyle = useMemo(() => {
     if (codeStyle) {
       const styles = { vscDarkPlus, oneLight, oneDark };
+
       return styles[codeStyle] || (isDarkMode ? vscDarkPlus : oneLight);
     }
 
@@ -354,43 +385,48 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
   }, [codeStyle, variant, isDarkMode]);
 
   // Memoized component factories
-  const createHeading = useCallback((level: 1 | 2 | 3 | 4 | 5 | 6) => {
-    const Component = ({ children }: BaseComponentProps) => {
-      const Tag = `h${level}` as const;
+  const createHeading = useCallback(
+    (level: 1 | 2 | 3 | 4 | 5 | 6) => {
+      const Component = ({ children }: BaseComponentProps) => {
+        const Tag = `h${level}` as const;
 
-      const sizeClasses = {
-        minimal: [
-          "text-xl md:text-2xl",
-          "text-lg md:text-xl",
-          "text-base md:text-lg",
-          "text-sm md:text-base",
-          "text-xs md:text-sm",
-          "text-xs"
-        ],
-        default: [
-          "text-2xl md:text-4xl",
-          "text-xl md:text-3xl",
-          "text-lg md:text-2xl",
-          "text-base md:text-xl",
-          "text-sm md:text-lg",
-          "text-xs md:text-base"
-        ],
-      }[variant === "minimal" ? "minimal" : "default"];
+        const sizeClasses = {
+          minimal: [
+            "text-xl md:text-2xl",
+            "text-lg md:text-xl",
+            "text-base md:text-lg",
+            "text-sm md:text-base",
+            "text-xs md:text-sm",
+            "text-xs",
+          ],
+          default: [
+            "text-2xl md:text-4xl",
+            "text-xl md:text-3xl",
+            "text-lg md:text-2xl",
+            "text-base md:text-xl",
+            "text-sm md:text-lg",
+            "text-xs md:text-base",
+          ],
+        }[variant === "minimal" ? "minimal" : "default"];
 
-      const baseClass = level <= 2
-        ? "font-bold mb-6 text-foreground border-b border-border pb-3"
-        : "font-semibold mb-1.5 mt-3 text-foreground";
+        const baseClass =
+          level <= 2
+            ? "font-bold mb-6 text-foreground border-b border-border pb-3"
+            : "font-semibold mb-1.5 mt-3 text-foreground";
 
-      return (
-        <Tag className={cn(baseClass, sizeClasses[level - 1])}>
-          {children}
-        </Tag>
-      );
-    };
+        return (
+          <Tag className={cn(baseClass, sizeClasses[level - 1])}>
+            {children}
+          </Tag>
+        );
+      };
 
-    Component.displayName = `Heading${level}`;
-    return Component;
-  }, [variant]);
+      Component.displayName = `Heading${level}`;
+
+      return Component;
+    },
+    [variant],
+  );
 
   // Build components object with memoization
   const components = useMemo(() => {
@@ -402,32 +438,38 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
       h5: createHeading(5),
       h6: createHeading(6),
 
-      p: ({ children, node }: BaseComponentProps & { node?: any }) => {
+      p: ({ children, _node }: BaseComponentProps & { _node?: any }) => {
         // FIX: Check if children contain block-level elements
         const hasBlock = hasBlockLevelChild(children);
 
         // If it has block elements, use a div instead of p
         if (hasBlock) {
-          const textClass = variant === "minimal"
-            ? "mb-2 text-sm text-foreground/90 break-words"
-            : variant === "analysis"
-              ? "mb-2 leading-relaxed text-foreground/75 break-words"
-              : "mb-4 leading-relaxed text-foreground/90 break-words";
+          const textClass =
+            variant === "minimal"
+              ? "mb-2 text-sm text-foreground/90 break-words"
+              : variant === "analysis"
+                ? "mb-2 leading-relaxed text-foreground/75 break-words"
+                : "mb-4 leading-relaxed text-foreground/90 break-words";
 
           return <div className={textClass}>{children}</div>;
         }
 
         // Handle option variant specially - use span for true inline
         if (variant === "option") {
-          return <span className="text-foreground inline break-words">{children}</span>;
+          return (
+            <span className="text-foreground inline break-words">
+              {children}
+            </span>
+          );
         }
 
         // Safe to use <p> tag
-        const textClass = variant === "minimal"
-          ? "mb-2 text-sm text-foreground/90 break-words"
-          : variant === "analysis"
-            ? "mb-2 leading-relaxed text-foreground/75 break-words"
-            : "mb-4 leading-relaxed text-foreground/90 break-words";
+        const textClass =
+          variant === "minimal"
+            ? "mb-2 text-sm text-foreground/90 break-words"
+            : variant === "analysis"
+              ? "mb-2 leading-relaxed text-foreground/75 break-words"
+              : "mb-4 leading-relaxed text-foreground/90 break-words";
 
         return <p className={textClass}>{children}</p>;
       },
@@ -448,11 +490,11 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
 
         return (
           <CodeBlock
-            language={language}
-            inline={inline}
-            variant={variant}
-            isDarkMode={isDarkMode}
             codeStyle={selectedCodeStyle}
+            inline={inline}
+            isDarkMode={isDarkMode}
+            language={language}
+            variant={variant}
           >
             {children}
           </CodeBlock>
@@ -471,9 +513,7 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
       ),
 
       thead: ({ children }: BaseComponentProps) => (
-        <thead className="bg-muted/50 border-b border-border">
-          {children}
-        </thead>
+        <thead className="bg-muted/50 border-b border-border">{children}</thead>
       ),
 
       th: ({ children }: BaseComponentProps) => (
@@ -500,13 +540,23 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
 
       // List components
       ul: ({ children }: BaseComponentProps) => (
-        <ul className={cn("my-4 space-y-2", variant === "minimal" && "my-2 space-y-1")}>
+        <ul
+          className={cn(
+            "my-4 space-y-2",
+            variant === "minimal" && "my-2 space-y-1",
+          )}
+        >
           {children}
         </ul>
       ),
 
       ol: ({ children }: BaseComponentProps) => (
-        <ol className={cn("my-4 space-y-2 list-decimal list-inside", variant === "minimal" && "my-2 space-y-1")}>
+        <ol
+          className={cn(
+            "my-4 space-y-2 list-decimal list-inside",
+            variant === "minimal" && "my-2 space-y-1",
+          )}
+        >
           {children}
         </ol>
       ),
@@ -516,7 +566,9 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
 
         return (
           <li className="flex items-start gap-2 text-foreground/90">
-            <span className={cn("bg-primary rounded-full mt-2 shrink-0", dotSize)} />
+            <span
+              className={cn("bg-primary rounded-full mt-2 shrink-0", dotSize)}
+            />
             <span className="flex-1">{children}</span>
           </li>
         );
@@ -532,10 +584,10 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
 
       a: ({ children, href }: BaseComponentProps & { href?: string }) => (
         <a
-          href={href}
           className="text-primary hover:text-primary/80 underline underline-offset-2 transition-colors"
-          target={href?.startsWith("http") ? "_blank" : undefined}
+          href={href}
           rel={href?.startsWith("http") ? "noopener noreferrer" : undefined}
+          target={href?.startsWith("http") ? "_blank" : undefined}
         >
           {children}
         </a>
@@ -556,6 +608,7 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
 
   // Wrapper classes based on variant
   const wrapperClasses = useMemo(() => {
+    const isHindi = /[\u0900-\u097F]/.test(content || "");
     const base = "prose prose-neutral dark:prose-invert max-w-none";
     const variantClass = {
       default: "prose-base md:prose-lg",
@@ -565,8 +618,13 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
       minimal: "prose-xs md:prose-sm",
     }[variant];
 
-    return cn(base, variantClass, className);
-  }, [variant, className]);
+    return cn(
+      base,
+      variantClass,
+      isHindi && "font-hindi leading-relaxed",
+      className,
+    );
+  }, [variant, className, content]);
 
   // Prevent hydration mismatch by not rendering theme-dependent content until mounted
   if (!mounted) {

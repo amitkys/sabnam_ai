@@ -12,8 +12,13 @@ import { FullscreenSuggestDialog } from "./_components/full-screen-dialog";
 
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card } from "@/components/ui/card";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useSyncAnswers } from "@/hooks/use-sync-answers";
-import { useNewTestAttemptStore } from "@/lib/store/new-attempt-store";
+import { useAttemptTimers } from "@/hooks/use-attempt-timers";
+import {
+  clearAttemptLocalStorage,
+  useNewTestAttemptStore,
+} from "@/lib/store/new-attempt-store";
 import { useAttemptTest } from "@/hooks/get-attemp-test";
 import { startAttemptSession } from "@/lib/action/attempt-actions";
 
@@ -43,31 +48,57 @@ export default function Page() {
   const setLanguage = useNewTestAttemptStore((s) => s.setLanguage);
   const testStatus = useNewTestAttemptStore((s) => s.testStatus);
   const setTestStatus = useNewTestAttemptStore((s) => s.setTestStatus);
+  const activeQuestionIndex = useNewTestAttemptStore(
+    (s) => s.activeQuestionIndex,
+  );
 
-  // Clear store if the tab was loaded with a different test's storage,
-  // or if explicitly starting a brand new one.
+  // Active question ID for active question timer
+  const safeIndex =
+    data && data.testPaper.questions.length > 0
+      ? activeQuestionIndex >= data.testPaper.questions.length
+        ? 0
+        : activeQuestionIndex
+      : 0;
+  const activeQuestionId =
+    data?.testPaper.questions[safeIndex]?.question.id ?? null;
+
+  // Start dual timers engine (overall countdown + per-question tracker)
+  useAttemptTimers({
+    attemptId,
+    durationMinutes: data?.testPaper.duration ?? 0,
+    startedAt: data?.startedAt,
+    activeQuestionId,
+    enabled: hasStartedSession && testStatus !== "submitted",
+  });
+
+  // Clear store only if the tab was loaded with a DIFFERENT test's storage
   useEffect(() => {
-    if (storeAttemptId !== attemptId) {
+    if (storeAttemptId && storeAttemptId !== attemptId) {
       resetStore();
-      setStoreAttemptId(attemptId);
     }
+    setStoreAttemptId(attemptId);
   }, [attemptId, storeAttemptId, resetStore, setStoreAttemptId]);
 
   // Track which attempt has already hydrated answers into the client store.
   // This avoids duplicate hydrate work on refetch while still rehydrating when attemptId changes.
   const hydratedAttemptIdRef = useRef<string | null>(null);
 
-  // Hydrate previously saved answers once per attempt.
+  // Hydrate previously saved answers and question times once per attempt.
   // We intentionally keep this idempotent because query data can refetch during the session.
   useEffect(() => {
     if (!data?.responses) return;
     if (hydratedAttemptIdRef.current === attemptId) return;
 
     const validResponses = data.responses
-      .filter((r) => r.userAnswer !== null)
+      .filter(
+        (r) =>
+          r.userAnswer !== null ||
+          (typeof r.timeTaken === "number" && r.timeTaken > 0),
+      )
       .map((r) => ({
         questionId: r.questionId,
-        userAnswer: r.userAnswer as string,
+        userAnswer: (r.userAnswer as string) || "",
+        timeTaken: r.timeTaken,
       }));
 
     hydrateFromServer(validResponses);
@@ -80,6 +111,16 @@ export default function Page() {
     if (isLoading) return;
     if (!data) {
       setIsCheckingSession(false);
+
+      return;
+    }
+
+    // If this attempt was already completed, wipe local attempt state and redirect to result
+    if ((data.status as string) === "COMPLETED") {
+      clearAttemptLocalStorage(attemptId);
+      if (typeof window !== "undefined") {
+        window.location.href = `/result/${attemptId}`;
+      }
 
       return;
     }
@@ -103,11 +144,12 @@ export default function Page() {
     }
 
     if (testStatus === null && data.status) {
-      setTestStatus(data.status === "COMPLETED" ? "submitted" : "active");
+      setTestStatus("active");
     }
 
     setIsCheckingSession(false);
   }, [
+    attemptId,
     attemptStartedStorageKey,
     data,
     isLoading,
@@ -138,24 +180,42 @@ export default function Page() {
   // we keep the loading skeleton active to avoid flashing the preflight.
   if (isLoading || isCheckingSession) {
     return (
-      <div className="flex h-screen items-center justify-center">
-        Loading test environment...
+      <div className="flex h-screen items-center justify-center p-4">
+        <div className="flex flex-col items-center gap-3 text-muted-foreground animate-pulse">
+          <div className="h-8 w-8 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+          <p className="text-sm font-medium">Loading test environment...</p>
+        </div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="flex h-screen items-center justify-center text-red-500">
-        Error: {error.message}
+      <div className="flex h-screen items-center justify-center p-4">
+        <div className="w-full max-w-md">
+          <Alert variant="red">
+            <AlertTitle>Unable to Load Test</AlertTitle>
+            <AlertDescription>
+              {error.message ||
+                "An unexpected error occurred while loading this test paper."}
+            </AlertDescription>
+          </Alert>
+        </div>
       </div>
     );
   }
 
   if (!data) {
     return (
-      <div className="flex h-screen items-center justify-center">
-        Test data not found
+      <div className="flex h-screen items-center justify-center p-4">
+        <div className="w-full max-w-md">
+          <Alert variant="yellow">
+            <AlertTitle>Test Paper Not Found</AlertTitle>
+            <AlertDescription>
+              This test paper could not be found or may have been deleted.
+            </AlertDescription>
+          </Alert>
+        </div>
       </div>
     );
   }

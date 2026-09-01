@@ -377,3 +377,12 @@
 .font-brand {
   font-family: var(--font-dancing-script), cursive;
 }
+
+.font-hindi {
+  font-family: var(--font-tiro-hindi), "Tiro Devanagari Hindi", serif;
+}
+
+[lang="hi"],
+.lang-hi {
+  font-family: var(--font-tiro-hindi), "Tiro Devanagari Hindi", serif;
+}

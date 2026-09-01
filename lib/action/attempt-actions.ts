@@ -32,7 +32,29 @@ export async function saveStudentResponse({
   questionId: string;
   userAnswer: string;
 }) {
+  return saveBatchStudentResponses({
+    attemptId,
+    responses: [{ questionId, userAnswer }],
+  });
+}
+
+/**
+ * Saves multiple student responses in a single database transaction.
+ */
+export async function saveBatchStudentResponses({
+  attemptId,
+  responses,
+}: {
+  attemptId: string;
+  responses: Array<{
+    questionId: string;
+    userAnswer: string;
+    timeTaken?: number;
+  }>;
+}) {
   return actionWrapper(async () => {
+    if (!responses || responses.length === 0) return true;
+
     const userId = await getSessionUserId();
 
     await prisma.$transaction(
@@ -41,19 +63,7 @@ export async function saveStudentResponse({
           where: { id: attemptId, userId },
           select: {
             status: true,
-            testPaper: {
-              select: {
-                questions: {
-                  where: { questionId },
-                  select: {
-                    question: {
-                      select: { correctValue: true },
-                    },
-                  },
-                  take: 1,
-                },
-              },
-            },
+            testPaperId: true,
           },
         });
 
@@ -67,17 +77,6 @@ export async function saveStudentResponse({
             ErrorTypes.BAD_REQUEST,
           );
         }
-
-        const testQuestion = attempt.testPaper.questions[0];
-
-        if (!testQuestion) {
-          throw new ActionError(
-            "Question does not belong to this attempt",
-            ErrorTypes.BAD_REQUEST,
-          );
-        }
-
-        const isCorrect = testQuestion.question.correctValue === userAnswer;
 
         // Re-check status right before write to avoid late writes after submit/cancel race.
         const liveAttempt = await tx.testAttempt.findFirst({
@@ -96,25 +95,55 @@ export async function saveStudentResponse({
           );
         }
 
-        await tx.studentResponse.upsert({
+        const testQuestions = await tx.testQuestion.findMany({
           where: {
-            attemptId_questionId: {
-              attemptId,
-              questionId,
+            testPaperId: attempt.testPaperId,
+            questionId: { in: responses.map((r) => r.questionId) },
+          },
+          select: {
+            questionId: true,
+            question: {
+              select: { correctValue: true },
             },
           },
-          update: {
-            userAnswer,
-            isCorrect,
-          },
-          create: {
-            attemptId,
-            questionId,
-            userAnswer,
-            isCorrect,
-            timeTaken: 0,
-          },
         });
+
+        const questionMap = new Map(
+          testQuestions.map((tq) => [tq.questionId, tq.question.correctValue]),
+        );
+
+        for (const resp of responses) {
+          const correctValue = questionMap.get(resp.questionId);
+
+          if (correctValue === undefined) continue;
+
+          const isCorrect = correctValue === resp.userAnswer;
+          const timeTaken =
+            typeof resp.timeTaken === "number"
+              ? Math.max(0, Math.floor(resp.timeTaken))
+              : 0;
+
+          await tx.studentResponse.upsert({
+            where: {
+              attemptId_questionId: {
+                attemptId,
+                questionId: resp.questionId,
+              },
+            },
+            update: {
+              userAnswer: resp.userAnswer,
+              isCorrect,
+              ...(typeof resp.timeTaken === "number" ? { timeTaken } : {}),
+            },
+            create: {
+              attemptId,
+              questionId: resp.questionId,
+              userAnswer: resp.userAnswer,
+              isCorrect,
+              timeTaken,
+            },
+          });
+        }
       },
       { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
     );
@@ -179,7 +208,17 @@ async function calculateScore(
  * Finalizes the attempt.
  * Calculates final score and updates status.
  */
-export async function submitAttempt({ attemptId }: { attemptId: string }) {
+export async function submitAttempt({
+  attemptId,
+  responses,
+}: {
+  attemptId: string;
+  responses?: Array<{
+    questionId: string;
+    userAnswer: string;
+    timeTaken?: number;
+  }>;
+}) {
   return actionWrapper(async () => {
     const userId = await getSessionUserId();
     const now = new Date();
@@ -188,7 +227,10 @@ export async function submitAttempt({ attemptId }: { attemptId: string }) {
       async (tx) => {
         const attempt = await tx.testAttempt.findFirst({
           where: { id: attemptId, userId },
-          select: { status: true },
+          select: {
+            status: true,
+            testPaperId: true,
+          },
         });
 
         if (!attempt) {
@@ -200,6 +242,62 @@ export async function submitAttempt({ attemptId }: { attemptId: string }) {
             "Test is already submitted",
             ErrorTypes.BAD_REQUEST,
           );
+        }
+
+        // If there are pending responses provided at submit time, upsert them first!
+        if (responses && responses.length > 0) {
+          const testQuestions = await tx.testQuestion.findMany({
+            where: {
+              testPaperId: attempt.testPaperId,
+              questionId: { in: responses.map((r) => r.questionId) },
+            },
+            select: {
+              questionId: true,
+              question: {
+                select: { correctValue: true },
+              },
+            },
+          });
+
+          const questionMap = new Map(
+            testQuestions.map((tq) => [
+              tq.questionId,
+              tq.question.correctValue,
+            ]),
+          );
+
+          for (const resp of responses) {
+            const correctValue = questionMap.get(resp.questionId);
+
+            if (correctValue === undefined) continue;
+
+            const isCorrect = correctValue === resp.userAnswer;
+            const timeTaken =
+              typeof resp.timeTaken === "number"
+                ? Math.max(0, Math.floor(resp.timeTaken))
+                : 0;
+
+            await tx.studentResponse.upsert({
+              where: {
+                attemptId_questionId: {
+                  attemptId,
+                  questionId: resp.questionId,
+                },
+              },
+              update: {
+                userAnswer: resp.userAnswer,
+                isCorrect,
+                ...(typeof resp.timeTaken === "number" ? { timeTaken } : {}),
+              },
+              create: {
+                attemptId,
+                questionId: resp.questionId,
+                userAnswer: resp.userAnswer,
+                isCorrect,
+                timeTaken,
+              },
+            });
+          }
         }
 
         const totalScore = await calculateScore(tx, attemptId, userId);

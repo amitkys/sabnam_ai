@@ -3,7 +3,12 @@ import type { Metadata } from "next";
 import "./custom.css";
 import "@bprogress/core/css";
 
-import { Space_Grotesk, Outfit, Dancing_Script } from "next/font/google";
+import {
+  Space_Grotesk,
+  Outfit,
+  Dancing_Script,
+  Tiro_Devanagari_Hindi,
+} from "next/font/google";
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
@@ -13,6 +18,12 @@ const dancingScript = Dancing_Script({
   subsets: ["latin"],
   weight: ["600"],
   variable: "--font-dancing-script",
+  display: "swap",
+});
+const tiroHindi = Tiro_Devanagari_Hindi({
+  weight: "400",
+  subsets: ["devanagari", "latin"],
+  variable: "--font-tiro-hindi",
   display: "swap",
 });
 
@@ -50,11 +61,12 @@ export default function RootLayout({
         spaceGrotesk.variable,
         outfitHeading.variable,
         dancingScript.variable,
+        tiroHindi.variable,
       )}
       lang="en"
     >
       <body
-        className={`${spaceGrotesk.variable} ${dancingScript.variable} font-sans antialiased bg-background text-foreground`}
+        className={`${spaceGrotesk.variable} ${dancingScript.variable} ${tiroHindi.variable} font-sans antialiased bg-background text-foreground`}
       >
         <ThemeProvider
           disableTransitionOnChange

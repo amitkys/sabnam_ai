@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { IconMobiledataOff } from "@tabler/icons-react";
+
 import { useOnlineStatus } from "@/hooks/use-online-status";
 import {
   AlertDialog,
@@ -12,7 +14,6 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { IconMobiledataOff } from "@tabler/icons-react";
 
 /**
  * Displays a blocking popup when the user loses internet connection.
@@ -76,17 +77,17 @@ export function OfflineAlert() {
  */
 export function SyncAlert() {
   const isOnline = useOnlineStatus();
-  return (
-    !isOnline ? (
-      <Alert className="border-amber-500/50 bg-card">
-        <AlertTitle className="flex items-center gap-2 text-amber-500">
-          <IconMobiledataOff stroke={2} className="h-4 w-4" />
-          <p>Sync Paused: Waiting for Connection</p>
-        </AlertTitle>
+
+  return !isOnline ? (
+    <div className="w-full mb-2 animate-in fade-in slide-in-from-top-2 duration-300 flex-none">
+      <Alert className="shadow-md" variant="yellow">
+        <IconMobiledataOff className="h-4 w-4" stroke={2} />
+        <AlertTitle>Sync Paused (Offline)</AlertTitle>
         <AlertDescription>
-          You can proceed with the test, but do not close the tab or browser.
+          You are currently offline. Answers are safely stored on this device.
+          Sync will resume once you are reconnected.
         </AlertDescription>
       </Alert>
-    ) : null
-  )
+    </div>
+  ) : null;
 }

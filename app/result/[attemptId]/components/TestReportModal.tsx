@@ -1,11 +1,20 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 import { PrinterIcon, QrCodeIcon } from "lucide-react";
-import { IResultData } from "@/hooks/query/get/use-result";
 import QRCode from "qrcode";
+
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { toast } from "@/components/ui/toast";
+import { IResultData } from "@/hooks/query/get/use-result";
 
 interface TestReportModalProps {
   open: boolean;
@@ -139,46 +148,67 @@ function buildPrintHTML({
 </html>`;
 }
 
-export function TestReportModal({ open, onOpenChange, data }: TestReportModalProps) {
+export function TestReportModal({
+  open,
+  onOpenChange,
+  data,
+}: TestReportModalProps) {
   const [qrCodeUrl, setQrCodeUrl] = useState<string>("");
 
   const { attempt, testPaper, questions, user, categoryHierarchy } = data;
 
   const totalQuestions = questions.length;
-  const attemptedQuestions = questions.filter((q) => q.studentResponse !== null).length;
-  const correctAnswers = questions.filter((q) => q.studentResponse?.isCorrect).length;
+  const attemptedQuestions = questions.filter(
+    (q) => q.studentResponse !== null,
+  ).length;
+  const correctAnswers = questions.filter(
+    (q) => q.studentResponse?.isCorrect,
+  ).length;
   const incorrectAnswers = attemptedQuestions - correctAnswers;
   const skippedQuestions = totalQuestions - attemptedQuestions;
 
-  const accuracy = attemptedQuestions > 0 ? ((correctAnswers / attemptedQuestions) * 100).toFixed(1) : "0.0";
-  const percentage = testPaper.totalMarks > 0 ? (((attempt.score || 0) / testPaper.totalMarks) * 100).toFixed(1) : "0.0";
+  const accuracy =
+    attemptedQuestions > 0
+      ? ((correctAnswers / attemptedQuestions) * 100).toFixed(1)
+      : "0.0";
+  const percentage =
+    testPaper.totalMarks > 0
+      ? (((attempt.score || 0) / testPaper.totalMarks) * 100).toFixed(1)
+      : "0.0";
 
   let timeSpentStr = "0 min";
+
   if (attempt.startedAt && attempt.submittedAt) {
-    const diffSec = Math.floor((new Date(attempt.submittedAt).getTime() - new Date(attempt.startedAt).getTime()) / 1000);
+    const diffSec = Math.floor(
+      (new Date(attempt.submittedAt).getTime() -
+        new Date(attempt.startedAt).getTime()) /
+        1000,
+    );
     const m = Math.floor(diffSec / 60);
     const s = diffSec % 60;
+
     timeSpentStr = `${m}m ${s}s`;
   }
 
   const attemptDateStr = attempt.submittedAt
     ? new Date(attempt.submittedAt).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    })
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      })
     : new Date(attempt.startedAt).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
 
   // Generate QR code for the current result URL
   useEffect(() => {
     if (typeof window !== "undefined") {
       const url = window.location.href;
+
       QRCode.toDataURL(url, {
         width: 140,
         margin: 1,
@@ -212,7 +242,15 @@ export function TestReportModal({ open, onOpenChange, data }: TestReportModalPro
       qrCodeUrl,
     });
 
+    toast.add({
+      type: "info",
+      title: "Generating Test Report",
+      description:
+        "Preparing single-page PDF certificate with official QR seal...",
+    });
+
     const printWin = window.open("", "_blank");
+
     if (printWin) {
       printWin.document.open();
       printWin.document.write(html);
@@ -223,6 +261,13 @@ export function TestReportModal({ open, onOpenChange, data }: TestReportModalPro
           printWin.print();
         }, 500);
       };
+    } else {
+      toast.add({
+        type: "warning",
+        title: "Pop-up Blocked",
+        description:
+          "Please allow pop-ups for this site to print/save the test report.",
+      });
     }
   };
 
@@ -232,19 +277,22 @@ export function TestReportModal({ open, onOpenChange, data }: TestReportModalPro
         {/* Header with Print Action */}
         <DialogHeader className="p-3.5 border-b flex flex-row items-center justify-between space-y-0">
           <div>
-            <DialogTitle className="text-base font-bold">Official Test Performance Report</DialogTitle>
+            <DialogTitle className="text-base font-bold">
+              Official Test Performance Report
+            </DialogTitle>
             <DialogDescription className="text-xs">
-              Single-page official examination certificate &amp; summary with QR verification.
+              Single-page official examination certificate &amp; summary with QR
+              verification.
             </DialogDescription>
           </div>
 
           <div className="flex items-center gap-2">
             <Button
+              className="h-8 text-xs gap-1.5 font-bold"
+              size="sm"
               type="button"
               variant="default"
-              size="sm"
               onClick={handlePrint}
-              className="h-8 text-xs gap-1.5 font-bold"
             >
               <PrinterIcon className="h-3.5 w-3.5" />
               Print / Save as PDF
@@ -279,33 +327,53 @@ export function TestReportModal({ open, onOpenChange, data }: TestReportModalPro
           <div className="grid grid-cols-2 gap-4 border border-black p-3.5 text-xs bg-gray-50/50">
             <div className="space-y-1.5">
               <div>
-                <span className="font-bold text-gray-600 block text-[10px] uppercase">Candidate Name</span>
-                <span className="font-semibold text-black text-sm">{user?.name || "Student"}</span>
+                <span className="font-bold text-gray-600 block text-[10px] uppercase">
+                  Candidate Name
+                </span>
+                <span className="font-semibold text-black text-sm">
+                  {user?.name || "Student"}
+                </span>
               </div>
               <div>
-                <span className="font-bold text-gray-600 block text-[10px] uppercase">Email Address</span>
-                <span className="font-mono text-gray-900">{user?.email || "N/A"}</span>
+                <span className="font-bold text-gray-600 block text-[10px] uppercase">
+                  Email Address
+                </span>
+                <span className="font-mono text-gray-900">
+                  {user?.email || "N/A"}
+                </span>
               </div>
               <div>
-                <span className="font-bold text-gray-600 block text-[10px] uppercase">Date of Examination</span>
+                <span className="font-bold text-gray-600 block text-[10px] uppercase">
+                  Date of Examination
+                </span>
                 <span className="text-gray-900">{attemptDateStr}</span>
               </div>
             </div>
 
             <div className="space-y-1.5 border-l border-gray-300 pl-4">
               <div>
-                <span className="font-bold text-gray-600 block text-[10px] uppercase">Test Series Title</span>
-                <span className="font-bold text-black text-sm">{testPaper.title}</span>
+                <span className="font-bold text-gray-600 block text-[10px] uppercase">
+                  Test Series Title
+                </span>
+                <span className="font-bold text-black text-sm">
+                  {testPaper.title}
+                </span>
               </div>
               <div>
-                <span className="font-bold text-gray-600 block text-[10px] uppercase">Exam Hierarchy</span>
+                <span className="font-bold text-gray-600 block text-[10px] uppercase">
+                  Exam Hierarchy
+                </span>
                 <span className="text-gray-900 font-medium">
                   {categoryHierarchy || "General Assessment"}
                 </span>
               </div>
               <div>
-                <span className="font-bold text-gray-600 block text-[10px] uppercase">Time Duration</span>
-                <span className="text-gray-900">{testPaper.duration} minutes (Spent: {timeSpentStr})</span>
+                <span className="font-bold text-gray-600 block text-[10px] uppercase">
+                  Time Duration
+                </span>
+                <span className="text-gray-900">
+                  {testPaper.duration} minutes (Spent: {timeSpentStr})
+                </span>
               </div>
             </div>
           </div>
@@ -328,14 +396,24 @@ export function TestReportModal({ open, onOpenChange, data }: TestReportModalPro
               </thead>
               <tbody className="font-medium text-black">
                 <tr className="border-b border-black">
-                  <td className="p-2 border border-black font-mono">{testPaper.totalMarks}</td>
+                  <td className="p-2 border border-black font-mono">
+                    {testPaper.totalMarks}
+                  </td>
                   <td className="p-2 border border-black font-bold font-mono text-sm">
                     {attempt.score !== null ? attempt.score : 0}
                   </td>
-                  <td className="p-2 border border-black font-bold font-mono">{percentage}%</td>
-                  <td className="p-2 border border-black font-bold font-mono">{accuracy}%</td>
-                  <td className="p-2 border border-black font-mono">{totalQuestions}</td>
-                  <td className="p-2 border border-black font-mono">{attemptedQuestions}</td>
+                  <td className="p-2 border border-black font-bold font-mono">
+                    {percentage}%
+                  </td>
+                  <td className="p-2 border border-black font-bold font-mono">
+                    {accuracy}%
+                  </td>
+                  <td className="p-2 border border-black font-mono">
+                    {totalQuestions}
+                  </td>
+                  <td className="p-2 border border-black font-mono">
+                    {attemptedQuestions}
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -344,16 +422,28 @@ export function TestReportModal({ open, onOpenChange, data }: TestReportModalPro
           {/* Section 3: Attempt Breakdown Summary */}
           <div className="grid grid-cols-3 gap-3 text-center text-xs">
             <div className="border border-black p-3 bg-gray-50/40">
-              <span className="block text-[10px] uppercase font-bold text-gray-600">Correct Answers</span>
-              <span className="text-xl font-black text-black font-mono mt-0.5 block">{correctAnswers}</span>
+              <span className="block text-[10px] uppercase font-bold text-gray-600">
+                Correct Answers
+              </span>
+              <span className="text-xl font-black text-black font-mono mt-0.5 block">
+                {correctAnswers}
+              </span>
             </div>
             <div className="border border-black p-3 bg-gray-50/40">
-              <span className="block text-[10px] uppercase font-bold text-gray-600">Incorrect Answers</span>
-              <span className="text-xl font-black text-black font-mono mt-0.5 block">{incorrectAnswers}</span>
+              <span className="block text-[10px] uppercase font-bold text-gray-600">
+                Incorrect Answers
+              </span>
+              <span className="text-xl font-black text-black font-mono mt-0.5 block">
+                {incorrectAnswers}
+              </span>
             </div>
             <div className="border border-black p-3 bg-gray-50/40">
-              <span className="block text-[10px] uppercase font-bold text-gray-600">Skipped / Unattempted</span>
-              <span className="text-xl font-black text-black font-mono mt-0.5 block">{skippedQuestions}</span>
+              <span className="block text-[10px] uppercase font-bold text-gray-600">
+                Skipped / Unattempted
+              </span>
+              <span className="text-xl font-black text-black font-mono mt-0.5 block">
+                {skippedQuestions}
+              </span>
             </div>
           </div>
 
@@ -371,7 +461,11 @@ export function TestReportModal({ open, onOpenChange, data }: TestReportModalPro
 
             {qrCodeUrl && (
               <div className="shrink-0 p-1 border border-black bg-white">
-                <img src={qrCodeUrl} alt="Result QR Code" className="w-24 h-24 block" />
+                <img
+                  alt="Result QR Code"
+                  className="w-24 h-24 block"
+                  src={qrCodeUrl}
+                />
               </div>
             )}
           </div>
@@ -384,11 +478,21 @@ export function TestReportModal({ open, onOpenChange, data }: TestReportModalPro
         </div>
 
         <DialogFooter className="p-3 border-t bg-muted/20 flex items-center justify-between">
-          <Button type="button" variant="outline" size="sm" onClick={() => onOpenChange(false)}>
+          <Button
+            size="sm"
+            type="button"
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+          >
             Close
           </Button>
 
-          <Button type="button" size="sm" onClick={handlePrint} className="gap-1.5 font-bold">
+          <Button
+            className="gap-1.5 font-bold"
+            size="sm"
+            type="button"
+            onClick={handlePrint}
+          >
             <PrinterIcon className="h-3.5 w-3.5" />
             Print / Save as PDF
           </Button>
@@ -397,4 +501,3 @@ export function TestReportModal({ open, onOpenChange, data }: TestReportModalPro
     </Dialog>
   );
 }
-

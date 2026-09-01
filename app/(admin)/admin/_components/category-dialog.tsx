@@ -1,15 +1,33 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Loader2Icon, AlertCircleIcon, SparklesIcon } from "lucide-react";
+
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { CategoryLevel, ExamDomain } from "@/lib/generated/prisma/enums";
-import { createCategoryAction, updateCategoryAction } from "@/lib/action/admin/category-actions";
-import { Loader2Icon, AlertCircleIcon, SparklesIcon } from "lucide-react";
+import {
+  createCategoryAction,
+  updateCategoryAction,
+} from "@/lib/action/admin/category-actions";
+import { toast } from "@/components/ui/toast";
 
 export interface FlatCategoryItem {
   id: string;
@@ -36,24 +54,57 @@ interface CategoryDialogProps {
 }
 
 const LEVEL_OPTIONS: { value: CategoryLevel; label: string; desc: string }[] = [
-  { value: CategoryLevel.ROOT, label: "ROOT (Exam Board / Org)", desc: "Top-level board, e.g. BSEB, CBSE, JEE" },
-  { value: CategoryLevel.EXAM, label: "EXAM (Exam Name)", desc: "Intermediary exam level" },
-  { value: CategoryLevel.STANDARD, label: "STANDARD (Class / Grade)", desc: "Class 10, Class 12, etc." },
-  { value: CategoryLevel.SUBJECT, label: "SUBJECT (Subject)", desc: "Mathematics, Physics, etc." },
-  { value: CategoryLevel.CHAPTER, label: "CHAPTER (Chapter / Topic)", desc: "Trigonometry, Calculus, etc." },
-  { value: CategoryLevel.PYQ, label: "PYQ (Previous Year Papers)", desc: "Previous year question sets" },
+  {
+    value: CategoryLevel.ROOT,
+    label: "ROOT (Exam Board / Org)",
+    desc: "Top-level board, e.g. BSEB, CBSE, JEE",
+  },
+  {
+    value: CategoryLevel.EXAM,
+    label: "EXAM (Exam Name)",
+    desc: "Intermediary exam level",
+  },
+  {
+    value: CategoryLevel.STANDARD,
+    label: "STANDARD (Class / Grade)",
+    desc: "Class 10, Class 12, etc.",
+  },
+  {
+    value: CategoryLevel.SUBJECT,
+    label: "SUBJECT (Subject)",
+    desc: "Mathematics, Physics, etc.",
+  },
+  {
+    value: CategoryLevel.CHAPTER,
+    label: "CHAPTER (Chapter / Topic)",
+    desc: "Trigonometry, Calculus, etc.",
+  },
+  {
+    value: CategoryLevel.PYQ,
+    label: "PYQ (Previous Year Papers)",
+    desc: "Previous year question sets",
+  },
 ];
 
 const DOMAIN_OPTIONS: { value: ExamDomain; label: string }[] = [
   { value: ExamDomain.BOARD, label: "Board Exams (BSEB, CBSE, ICSE)" },
   { value: ExamDomain.ENTRANCE, label: "Entrance Exams (JEE, NEET, CUET)" },
-  { value: ExamDomain.COMPETITIVE, label: "Competitive Exams (SSC, RRB, UPSC)" },
+  {
+    value: ExamDomain.COMPETITIVE,
+    label: "Competitive Exams (SSC, RRB, UPSC)",
+  },
   { value: ExamDomain.OLYMPIAD, label: "Olympiad (IMO, NSO, NTSE)" },
-  { value: ExamDomain.LANGUAGE, label: "Language Certification (IELTS, TOEFL)" },
+  {
+    value: ExamDomain.LANGUAGE,
+    label: "Language Certification (IELTS, TOEFL)",
+  },
   { value: ExamDomain.UNIVERSITY, label: "University Exams" },
   { value: ExamDomain.RECRUITMENT, label: "Govt Recruitment (Police, PSC)" },
   { value: ExamDomain.SCHOLARSHIP, label: "Scholarships (NMMS, INSPIRE)" },
-  { value: ExamDomain.VOCATIONAL, label: "Vocational / Skill (ITI, Polytechnic)" },
+  {
+    value: ExamDomain.VOCATIONAL,
+    label: "Vocational / Skill (ITI, Polytechnic)",
+  },
 ];
 
 function generateSlug(text: string): string {
@@ -122,6 +173,7 @@ export function CategoryDialog({
 
   const handleAutoSlug = () => {
     const s = generateSlug(name);
+
     setSlug(s);
     setIsSlugManual(false);
   };
@@ -131,6 +183,7 @@ export function CategoryDialog({
     if (isEditing && categoryToEdit) {
       return c.id !== categoryToEdit.id;
     }
+
     return true;
   });
 
@@ -138,12 +191,15 @@ export function CategoryDialog({
     e.preventDefault();
     if (!name.trim()) {
       setError("Please provide a category name.");
+
       return;
     }
 
     const finalSlug = (slug || generateSlug(name)).trim();
+
     if (!finalSlug) {
       setError("Please provide a category slug.");
+
       return;
     }
 
@@ -166,8 +222,20 @@ export function CategoryDialog({
 
         if (!res.success) {
           setError(res.error || "Failed to update category");
+          toast.add({
+            type: "error",
+            title: "Update Failed",
+            description: res.error || "Failed to update category.",
+          });
+
           return;
         }
+
+        toast.add({
+          type: "success",
+          title: "Category Updated",
+          description: `Folder "${name.trim()}" has been updated.`,
+        });
       } else {
         const res = await createCategoryAction({
           name: name.trim(),
@@ -179,14 +247,33 @@ export function CategoryDialog({
 
         if (!res.success) {
           setError(res.error || "Failed to create category");
+          toast.add({
+            type: "error",
+            title: "Creation Failed",
+            description: res.error || "Failed to create category.",
+          });
+
           return;
         }
+
+        toast.add({
+          type: "success",
+          title: "Category Created",
+          description: `Folder "${name.trim()}" created successfully.`,
+        });
       }
 
       onSuccess();
       onOpenChange(false);
     } catch (err: any) {
-      setError(err?.message || "An unexpected error occurred.");
+      const msg = err?.message || "An unexpected error occurred.";
+
+      setError(msg);
+      toast.add({
+        type: "error",
+        title: "Category Error",
+        description: msg,
+      });
     } finally {
       setLoading(false);
     }
@@ -197,7 +284,9 @@ export function CategoryDialog({
       <DialogContent className="sm:max-w-[550px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-xl font-bold">
-            {isEditing ? `Edit Category: ${categoryToEdit?.name}` : "Create New Exam Folder / Category"}
+            {isEditing
+              ? `Edit Category: ${categoryToEdit?.name}`
+              : "Create New Exam Folder / Category"}
           </DialogTitle>
           <DialogDescription className="text-xs text-muted-foreground">
             {isEditing
@@ -206,9 +295,9 @@ export function CategoryDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4 pt-2">
+        <form className="space-y-4 pt-2" onSubmit={handleSubmit}>
           {error && (
-            <Alert variant="destructive" className="py-2">
+            <Alert className="py-2" variant="destructive">
               <AlertCircleIcon className="h-4 w-4" />
               <AlertDescription className="text-xs">{error}</AlertDescription>
             </Alert>
@@ -216,57 +305,60 @@ export function CategoryDialog({
 
           {/* Name & Auto Slug */}
           <div className="space-y-1.5">
-            <Label htmlFor="cat-name" className="text-xs font-semibold">
+            <Label className="text-xs font-semibold" htmlFor="cat-name">
               Category Name <span className="text-destructive">*</span>
             </Label>
             <Input
+              autoFocus
+              disabled={loading}
               id="cat-name"
               placeholder="e.g. Mathematics, Class 10, Bihar Board (BSEB)"
               value={name}
               onChange={(e) => handleNameChange(e.target.value)}
-              disabled={loading}
-              autoFocus
             />
           </div>
 
           {/* Slug */}
           <div className="space-y-1.5">
             <div className="flex items-center justify-between">
-              <Label htmlFor="cat-slug" className="text-xs font-semibold">
+              <Label className="text-xs font-semibold" htmlFor="cat-slug">
                 URL Slug <span className="text-destructive">*</span>
               </Label>
               <button
+                className="text-[11px] text-primary hover:underline flex items-center gap-1"
                 type="button"
                 onClick={handleAutoSlug}
-                className="text-[11px] text-primary hover:underline flex items-center gap-1"
               >
                 <SparklesIcon className="h-3 w-3" />
                 Regenerate from Name
               </button>
             </div>
             <Input
+              disabled={loading}
               id="cat-slug"
               placeholder="e.g. mathematics, class-10, bseb"
               value={slug}
               onChange={(e) => handleSlugChange(e.target.value)}
-              disabled={loading}
             />
             <p className="text-[11px] text-muted-foreground">
-              Unique identifier used in web URLs (letters, numbers, hyphens only).
+              Unique identifier used in web URLs (letters, numbers, hyphens
+              only).
             </p>
           </div>
 
           {/* Hierarchy Level */}
           <div className="space-y-1.5">
-            <Label htmlFor="cat-level" className="text-xs font-semibold">
+            <Label className="text-xs font-semibold" htmlFor="cat-level">
               Category Level Depth <span className="text-destructive">*</span>
             </Label>
             <Select
-              value={level}
-              onValueChange={(val) => setLevel((val as CategoryLevel) || CategoryLevel.ROOT)}
               disabled={loading}
+              value={level}
+              onValueChange={(val) =>
+                setLevel((val as CategoryLevel) || CategoryLevel.ROOT)
+              }
             >
-              <SelectTrigger id="cat-level" className="w-full">
+              <SelectTrigger className="w-full" id="cat-level">
                 <SelectValue placeholder="Select level" />
               </SelectTrigger>
               <SelectContent>
@@ -274,7 +366,9 @@ export function CategoryDialog({
                   <SelectItem key={opt.value} value={opt.value}>
                     <div className="flex flex-col">
                       <span className="font-medium text-xs">{opt.label}</span>
-                      <span className="text-[10px] text-muted-foreground">{opt.desc}</span>
+                      <span className="text-[10px] text-muted-foreground">
+                        {opt.desc}
+                      </span>
                     </div>
                   </SelectItem>
                 ))}
@@ -285,20 +379,29 @@ export function CategoryDialog({
           {/* Exam Domain (Only for ROOT Level) */}
           {level === CategoryLevel.ROOT && (
             <div className="space-y-1.5 p-3 rounded-lg border bg-primary/5 border-primary/20">
-              <Label htmlFor="cat-domain" className="text-xs font-semibold text-primary">
+              <Label
+                className="text-xs font-semibold text-primary"
+                htmlFor="cat-domain"
+              >
                 Top-Level Exam Domain
               </Label>
               <Select
-                value={domain}
-                onValueChange={(val) => setDomain((val as ExamDomain) || ExamDomain.BOARD)}
                 disabled={loading}
+                value={domain}
+                onValueChange={(val) =>
+                  setDomain((val as ExamDomain) || ExamDomain.BOARD)
+                }
               >
-                <SelectTrigger id="cat-domain" className="w-full bg-background">
+                <SelectTrigger className="w-full bg-background" id="cat-domain">
                   <SelectValue placeholder="Select domain" />
                 </SelectTrigger>
                 <SelectContent>
                   {DOMAIN_OPTIONS.map((opt) => (
-                    <SelectItem key={opt.value} value={opt.value} className="text-xs">
+                    <SelectItem
+                      key={opt.value}
+                      className="text-xs"
+                      value={opt.value}
+                    >
                       {opt.label}
                     </SelectItem>
                   ))}
@@ -312,46 +415,53 @@ export function CategoryDialog({
 
           {/* Parent Category Picker (Placement / Re-parenting) */}
           <div className="space-y-1.5">
-            <Label htmlFor="cat-parent" className="text-xs font-semibold">
+            <Label className="text-xs font-semibold" htmlFor="cat-parent">
               Parent Folder / Category (Placement)
             </Label>
             <Select
+              disabled={loading}
               value={parentId}
               onValueChange={(val) => setParentId(val || "none")}
-              disabled={loading}
             >
-              <SelectTrigger id="cat-parent" className="w-full">
+              <SelectTrigger className="w-full" id="cat-parent">
                 <SelectValue placeholder="None (Root Level)" />
               </SelectTrigger>
               <SelectContent className="max-h-60">
-                <SelectItem value="none" className="text-xs font-semibold text-primary">
+                <SelectItem
+                  className="text-xs font-semibold text-primary"
+                  value="none"
+                >
                   [None / Top-Level Folder]
                 </SelectItem>
                 {parentOptions.map((c) => (
-                  <SelectItem key={c.id} value={c.id} className="text-xs">
-                    <span className="font-semibold text-foreground">{c.name}</span>{" "}
+                  <SelectItem key={c.id} className="text-xs" value={c.id}>
+                    <span className="font-semibold text-foreground">
+                      {c.name}
+                    </span>{" "}
                     <span className="text-muted-foreground text-[10px]">
-                      ({c.level}{c.parent ? ` ↳ under ${c.parent.name}` : ""})
+                      ({c.level}
+                      {c.parent ? ` ↳ under ${c.parent.name}` : ""})
                     </span>
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
             <p className="text-[11px] text-muted-foreground">
-              Select which folder contains this item. Change this to move this category anywhere in the tree.
+              Select which folder contains this item. Change this to move this
+              category anywhere in the tree.
             </p>
           </div>
 
           <DialogFooter className="pt-4">
             <Button
+              disabled={loading}
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
-              disabled={loading}
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={loading} className="gap-1.5">
+            <Button className="gap-1.5" disabled={loading} type="submit">
               {loading && <Loader2Icon className="h-3.5 w-3.5 animate-spin" />}
               {isEditing ? "Save Changes" : "Create Folder"}
             </Button>

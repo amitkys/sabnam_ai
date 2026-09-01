@@ -1,41 +1,120 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Toast as ToastPrimitive } from "@base-ui/react/toast"
+import * as React from "react";
+import { Toast as ToastPrimitive } from "@base-ui/react/toast";
+import {
+  XIcon,
+  CircleCheckIcon,
+  InfoIcon,
+  TriangleAlertIcon,
+  OctagonXIcon,
+  Loader2Icon,
+} from "lucide-react";
 
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { XIcon, CircleCheckIcon, InfoIcon, TriangleAlertIcon, OctagonXIcon, Loader2Icon } from "lucide-react"
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
-const toast = ToastPrimitive.createToastManager()
+const baseToast = ToastPrimitive.createToastManager();
+
+type ToastAddInput = Parameters<typeof baseToast.add>[0];
+
+export const toast = Object.assign(baseToast, {
+  success: (
+    titleOrDescription: React.ReactNode,
+    options?: Omit<ToastAddInput, "description" | "type" | "title"> & {
+      title?: React.ReactNode;
+      description?: React.ReactNode;
+    },
+  ) => {
+    if (options?.title || options?.description) {
+      return baseToast.add({ ...options, type: "success" });
+    }
+
+    return baseToast.add({
+      ...options,
+      description: titleOrDescription,
+      type: "success",
+    });
+  },
+  error: (
+    titleOrDescription: React.ReactNode,
+    options?: Omit<ToastAddInput, "description" | "type" | "title"> & {
+      title?: React.ReactNode;
+      description?: React.ReactNode;
+    },
+  ) => {
+    if (options?.title || options?.description) {
+      return baseToast.add({ ...options, type: "error" });
+    }
+
+    return baseToast.add({
+      ...options,
+      description: titleOrDescription,
+      type: "error",
+    });
+  },
+  info: (
+    titleOrDescription: React.ReactNode,
+    options?: Omit<ToastAddInput, "description" | "type" | "title"> & {
+      title?: React.ReactNode;
+      description?: React.ReactNode;
+    },
+  ) => {
+    if (options?.title || options?.description) {
+      return baseToast.add({ ...options, type: "info" });
+    }
+
+    return baseToast.add({
+      ...options,
+      description: titleOrDescription,
+      type: "info",
+    });
+  },
+  warning: (
+    titleOrDescription: React.ReactNode,
+    options?: Omit<ToastAddInput, "description" | "type" | "title"> & {
+      title?: React.ReactNode;
+      description?: React.ReactNode;
+    },
+  ) => {
+    if (options?.title || options?.description) {
+      return baseToast.add({ ...options, type: "warning" });
+    }
+
+    return baseToast.add({
+      ...options,
+      description: titleOrDescription,
+      type: "warning",
+    });
+  },
+});
 
 function ToastProvider({ ...props }: ToastPrimitive.Provider.Props) {
-  return <ToastPrimitive.Provider {...props} />
+  return <ToastPrimitive.Provider {...props} />;
 }
 
 function ToastPortal({ ...props }: ToastPrimitive.Portal.Props) {
-  return <ToastPrimitive.Portal data-slot="toast-portal" {...props} />
+  return <ToastPrimitive.Portal data-slot="toast-portal" {...props} />;
 }
 
 function ToastViewport({ className, ...props }: ToastPrimitive.Viewport.Props) {
   return (
     <ToastPrimitive.Viewport
-      data-slot="toast-viewport"
       className={cn(
-        "pointer-events-none fixed inset-x-4 bottom-4 z-50 mx-auto w-auto max-w-sm outline-none sm:right-4 sm:left-auto sm:mx-0 sm:w-full",
-        className
+        "pointer-events-none fixed inset-x-4 bottom-4 z-50 mx-auto w-auto max-w-md outline-none sm:right-4 sm:left-auto sm:mx-0 sm:w-full",
+        className,
       )}
+      data-slot="toast-viewport"
       {...props}
     />
-  )
+  );
 }
 
 function Toast({ className, ...props }: ToastPrimitive.Root.Props) {
   return (
     <ToastPrimitive.Root
-      data-slot="toast"
       className={cn(
-        "group/toast pointer-events-auto absolute right-0 bottom-0 z-[calc(1000-var(--toast-index))] w-full origin-bottom rounded-2xl border bg-popover text-popover-foreground shadow-lg will-change-transform outline-none select-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50",
+        "group/toast pointer-events-auto absolute right-0 bottom-0 z-[calc(1000-var(--toast-index))] w-full origin-bottom rounded-2xl border shadow-xl will-change-transform outline-none select-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50",
         "[--gap:0.75rem] [--height:var(--toast-frontmost-height,var(--toast-height))] [--offset-y:calc(var(--toast-offset-y)*-1+calc(var(--toast-index)*var(--gap)*-1)+var(--toast-swipe-movement-y))] [--peek:0.75rem] [--scale:calc(max(0,1-(var(--toast-index)*0.1)))] [--shrink:calc(1-var(--scale))]",
         "h-(--height) [transform:translateX(var(--toast-swipe-movement-x))_translateY(calc(var(--toast-swipe-movement-y)-(var(--toast-index)*var(--peek))-(var(--shrink)*var(--height))))_scale(var(--scale))] [transition:transform_500ms_cubic-bezier(0.22,1,0.36,1),opacity_500ms,height_150ms]",
         "after:absolute after:top-full after:left-0 after:h-[calc(var(--gap)+1px)] after:w-full after:content-['']",
@@ -50,34 +129,35 @@ function Toast({ className, ...props }: ToastPrimitive.Root.Props) {
         "data-expanded:data-ending-style:data-[swipe-direction=left]:[transform:translateX(calc(var(--toast-swipe-movement-x)-150%))_translateY(var(--offset-y))]",
         "data-expanded:data-ending-style:data-[swipe-direction=right]:[transform:translateX(calc(var(--toast-swipe-movement-x)+150%))_translateY(var(--offset-y))]",
         "data-expanded:data-ending-style:data-[swipe-direction=up]:[transform:translateY(calc(var(--toast-swipe-movement-y)-150%))]",
-        className
+        className,
       )}
+      data-slot="toast"
       {...props}
     />
-  )
+  );
 }
 
 function ToastContent({ className, ...props }: ToastPrimitive.Content.Props) {
   return (
     <ToastPrimitive.Content
-      data-slot="toast-content"
       className={cn(
-        "flex h-full items-center gap-3 overflow-hidden p-4 transition-opacity duration-250 ease-[cubic-bezier(0.22,1,0.36,1)] data-behind:opacity-0 data-expanded:opacity-100",
-        className
+        "flex h-full items-start gap-3 overflow-hidden p-4 transition-opacity duration-250 ease-[cubic-bezier(0.22,1,0.36,1)] data-behind:opacity-0 data-expanded:opacity-100",
+        className,
       )}
+      data-slot="toast-content"
       {...props}
     />
-  )
+  );
 }
 
 function ToastTitle({ className, ...props }: ToastPrimitive.Title.Props) {
   return (
     <ToastPrimitive.Title
+      className={cn("text-sm font-semibold leading-snug", className)}
       data-slot="toast-title"
-      className={cn("text-sm font-medium", className)}
       {...props}
     />
-  )
+  );
 }
 
 function ToastDescription({
@@ -86,115 +166,170 @@ function ToastDescription({
 }: ToastPrimitive.Description.Props) {
   return (
     <ToastPrimitive.Description
+      className={cn("text-xs leading-relaxed", className)}
       data-slot="toast-description"
-      className={cn("text-sm text-muted-foreground", className)}
       {...props}
     />
-  )
+  );
 }
 
 function ToastAction({
   className,
-  render = <Button variant="outline" size="sm" />,
+  render = <Button size="sm" variant="secondary" />,
   ...props
 }: ToastPrimitive.Action.Props) {
   return (
     <ToastPrimitive.Action
+      className={cn("shrink-0", className)}
       data-slot="toast-action"
       render={render}
-      className={cn("shrink-0", className)}
       {...props}
     />
-  )
+  );
 }
 
 function ToastClose({
   className,
   children,
-  render = <Button variant="ghost" size="icon-sm" />,
+  render = <Button size="icon-sm" variant="ghost" />,
   ...props
 }: ToastPrimitive.Close.Props) {
   return (
     <ToastPrimitive.Close
-      data-slot="toast-close"
       aria-label="Close toast"
-      render={render}
       className={cn(
-        "relative shrink-0 text-muted-foreground after:absolute after:-inset-2 after:content-[''] hover:text-foreground",
-        className
+        "relative shrink-0 rounded-lg p-1 transition-colors after:absolute after:-inset-2 after:content-['']",
+        className,
       )}
+      data-slot="toast-close"
+      render={render}
       {...props}
     >
-      {children ?? (
-        <XIcon aria-hidden="true" />
-      )}
+      {children ?? <XIcon aria-hidden="true" className="size-4" />}
     </ToastPrimitive.Close>
-  )
+  );
 }
 
 function ToastIcon({ type }: { type: string | undefined }) {
-  let icon: React.ReactNode = null
-
   if (type === "success") {
-    icon = (
-      <CircleCheckIcon aria-hidden="true" />
-    )
-  }
-
-  if (type === "info") {
-    icon = (
-      <InfoIcon aria-hidden="true" />
-    )
+    return (
+      <span className="shrink-0 text-white mt-0.5" data-slot="toast-icon">
+        <CircleCheckIcon aria-hidden="true" className="size-5" />
+      </span>
+    );
   }
 
   if (type === "warning") {
-    icon = (
-      <TriangleAlertIcon aria-hidden="true" />
-    )
+    return (
+      <span className="shrink-0 text-amber-950 mt-0.5" data-slot="toast-icon">
+        <TriangleAlertIcon aria-hidden="true" className="size-5" />
+      </span>
+    );
+  }
+
+  if (type === "info") {
+    return (
+      <span className="shrink-0 text-white mt-0.5" data-slot="toast-icon">
+        <InfoIcon aria-hidden="true" className="size-5" />
+      </span>
+    );
   }
 
   if (type === "error") {
-    icon = (
-      <OctagonXIcon className="text-destructive" aria-hidden="true" />
-    )
+    return (
+      <span className="shrink-0 text-white mt-0.5" data-slot="toast-icon">
+        <OctagonXIcon aria-hidden="true" className="size-5" />
+      </span>
+    );
   }
 
   if (type === "loading") {
-    icon = (
-      <Loader2Icon className="animate-spin" aria-hidden="true" />
-    )
+    return (
+      <span className="shrink-0 text-primary mt-0.5" data-slot="toast-icon">
+        <Loader2Icon aria-hidden="true" className="size-5 animate-spin" />
+      </span>
+    );
   }
 
-  if (!icon) {
-    return null
-  }
-
-  return (
-    <span
-      data-slot="toast-icon"
-      className="shrink-0 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4"
-    >
-      {icon}
-    </span>
-  )
+  return null;
 }
 
 function ToastList() {
-  const { toasts } = ToastPrimitive.useToastManager()
+  const { toasts } = ToastPrimitive.useToastManager();
 
-  return toasts.map((toastItem) => (
-    <Toast key={toastItem.id} toast={toastItem}>
-      <ToastContent>
-        <ToastIcon type={toastItem.type} />
-        <div className="flex min-w-0 flex-1 flex-col gap-1">
-          <ToastTitle />
-          <ToastDescription />
-        </div>
-        <ToastAction />
-        <ToastClose />
-      </ToastContent>
-    </Toast>
-  ))
+  return toasts.map((toastItem) => {
+    const isSuccess = toastItem.type === "success";
+    const isWarning = toastItem.type === "warning";
+    const isInfo = toastItem.type === "info";
+    const isError = toastItem.type === "error";
+    const isColored = isSuccess || isWarning || isInfo || isError;
+
+    return (
+      <Toast
+        key={toastItem.id}
+        className={cn(
+          isSuccess &&
+            "bg-emerald-600 dark:bg-emerald-600 text-white border-emerald-700 dark:border-emerald-500 shadow-xl shadow-emerald-950/25",
+          isWarning &&
+            "bg-amber-400 dark:bg-amber-500 text-amber-950 border-amber-500 dark:border-amber-400 shadow-xl shadow-amber-950/20",
+          isInfo &&
+            "bg-blue-600 dark:bg-blue-600 text-white border-blue-700 dark:border-blue-500 shadow-xl shadow-blue-950/25",
+          isError &&
+            "bg-rose-600 dark:bg-rose-600 text-white border-rose-700 dark:border-rose-500 shadow-xl shadow-rose-950/25",
+          !isColored &&
+            "bg-popover text-popover-foreground border-border shadow-xl",
+        )}
+        toast={toastItem}
+      >
+        <ToastContent>
+          <ToastIcon type={toastItem.type} />
+          <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+            <ToastTitle
+              className={cn(
+                isSuccess && "text-white",
+                isWarning && "text-amber-950 font-bold",
+                isInfo && "text-white",
+                isError && "text-white",
+                !isColored && "text-foreground",
+              )}
+            />
+            <ToastDescription
+              className={cn(
+                isSuccess && "text-emerald-50",
+                isWarning && "text-amber-950/90 font-medium",
+                isInfo && "text-blue-50",
+                isError && "text-rose-50",
+                !isColored && "text-muted-foreground",
+              )}
+            />
+          </div>
+          <ToastAction
+            className={cn(
+              isSuccess &&
+                "bg-white text-emerald-900 hover:bg-white/90 border-0 font-medium shadow-xs",
+              isWarning &&
+                "bg-amber-950 text-amber-50 hover:bg-amber-900 border-0 font-medium shadow-xs",
+              isInfo &&
+                "bg-white text-blue-900 hover:bg-white/90 border-0 font-medium shadow-xs",
+              isError &&
+                "bg-white text-rose-900 hover:bg-white/90 border-0 font-medium shadow-xs",
+            )}
+          />
+          <ToastClose
+            className={cn(
+              isSuccess && "text-white/80 hover:text-white hover:bg-white/15",
+              isWarning &&
+                "text-amber-950/70 hover:text-amber-950 hover:bg-black/10",
+              isInfo && "text-white/80 hover:text-white hover:bg-white/15",
+              isError && "text-white/80 hover:text-white hover:bg-white/15",
+              !isColored &&
+                "text-muted-foreground hover:text-foreground hover:bg-muted",
+            )}
+          />
+        </ToastContent>
+      </Toast>
+    );
+  });
 }
 
 function Toaster({
@@ -211,11 +346,11 @@ function Toaster({
         </ToastViewport>
       </ToastPortal>
     </ToastProvider>
-  )
+  );
 }
 
-const createToastManager = ToastPrimitive.createToastManager
-const useToastManager = ToastPrimitive.useToastManager
+const createToastManager = ToastPrimitive.createToastManager;
+const useToastManager = ToastPrimitive.useToastManager;
 
 export {
   Toaster,
@@ -229,6 +364,5 @@ export {
   ToastTitle,
   ToastViewport,
   createToastManager,
-  toast,
   useToastManager,
-}
+};
