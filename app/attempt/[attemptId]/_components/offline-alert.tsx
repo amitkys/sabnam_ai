@@ -78,8 +78,8 @@ export function SyncAlert() {
   const isOnline = useOnlineStatus();
   return (
     !isOnline ? (
-      <Alert size="sm" variant="warning">
-        <AlertTitle className="flex items-center gap-2">
+      <Alert className="border-amber-500/50 bg-card">
+        <AlertTitle className="flex items-center gap-2 text-amber-500">
           <IconMobiledataOff stroke={2} className="h-4 w-4" />
           <p>Sync Paused: Waiting for Connection</p>
         </AlertTitle>

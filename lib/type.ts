@@ -131,25 +131,6 @@ export interface ISubject {
   subjectName: string | string[] | undefined;
 }
 
-export interface Answer {
-  questionId: string;
-  optionId: string;
-  selectedAnswer: string;
-  answer: string;
-}
-
-export interface TestAttemptSubmission {
-  testSeriesId: string;
-  userId: string;
-  startedAt: string;
-  completedAt: string;
-  answers: {
-    questionId: string;
-    optionId: string;
-    isCorrect: boolean;
-  }[];
-}
-
 export interface SaveQuestionResponseResult {
   success: boolean;
   error?: string;

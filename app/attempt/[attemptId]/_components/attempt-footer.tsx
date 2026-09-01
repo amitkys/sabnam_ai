@@ -19,7 +19,6 @@ import {
 } from "@tabler/icons-react";
 import { ButtonGroup } from "@/components/ui/button-group";
 import { MoreHorizontalIcon } from "lucide-react";
-import { DrawerStateless, DrawerStatelessContent, DrawerStatelessItem, DrawerStatelessTrigger } from "@/components/ui/dropdrawer-stateless";
 
 /**
  * Action bar displayed at the bottom of the test page. 
@@ -108,20 +107,20 @@ export function AttemptFooter() {
             <IconDeviceFloppy size={18} className="mr-2" />
             Save & Next
           </Button>
-          <DrawerStateless>
-            <DrawerStatelessTrigger
+          <DropdownMenu>
+            <DropdownMenuTrigger
               render={
                 <Button className="px-3">
                   <MoreHorizontalIcon />
                 </Button>
               }
             />
-            <DrawerStatelessContent align="end">
-              <DrawerStatelessItem onClick={() => toggleReview(currentQuestion.questionId)}>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => toggleReview(currentQuestion.questionId)}>
                 <ReviewButtonContent />
-              </DrawerStatelessItem>
-            </DrawerStatelessContent>
-          </DrawerStateless>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </ButtonGroup>
 
         {/* Row 2: Navigation Buttons */}

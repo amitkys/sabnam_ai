@@ -102,9 +102,9 @@ export function UserNav() {
           <DropdownMenuItem
             className="hover:cursor-pointer"
             render={
-              <Link href="/dashboard" className="flex items-center">
+              <Link href="/home" className="flex items-center">
                 <LayoutGrid className="w-4 h-4 mr-3 text-muted-foreground" />
-                Dashboard
+                Home
               </Link>
             }
           />

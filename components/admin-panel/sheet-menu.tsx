@@ -34,7 +34,7 @@ export function SheetMenu() {
               buttonVariants({ variant: "link" }),
               "flex justify-start items-center gap-2 pb-2 pt-1 px-4",
             )}
-            href="/dashboard"
+            href="/home"
           >
             <Image
               alt="Logo"

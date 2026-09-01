@@ -1,34 +1,36 @@
 "use client"
-// After: Using DropDrawer
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "@/components/theme-provider";
-import { buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import {
-  DropDrawer,
-  DropDrawerContent,
-  DropDrawerItem,
-  DropDrawerTrigger,
-} from "@/components/ui/dropdrawer";
-import { cn } from "@/lib/utils";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export function ModeToggle() {
   const { setTheme } = useTheme();
 
   return (
-    <DropDrawer>
-      <DropDrawerTrigger className={cn(buttonVariants({ variant: "outline", size: "icon" }), "rounded-full")}>
+    <DropdownMenu>
+      <DropdownMenuTrigger
+        render={
+          <Button variant="outline" size="icon" className="rounded-full" />
+        }
+      >
         <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
         <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
         <span className="sr-only">Toggle theme</span>
-      </DropDrawerTrigger>
+      </DropdownMenuTrigger>
 
-      <DropDrawerContent align="end">
-        <DropDrawerItem onClick={() => setTheme("light")}>Light</DropDrawerItem>
-        <DropDrawerItem onClick={() => setTheme("dark")}>Dark</DropDrawerItem>
-        <DropDrawerItem onClick={() => setTheme("system")}>
+      <DropdownMenuContent align="end">
+        <DropdownMenuItem onClick={() => setTheme("light")}>Light</DropdownMenuItem>
+        <DropdownMenuItem onClick={() => setTheme("dark")}>Dark</DropdownMenuItem>
+        <DropdownMenuItem onClick={() => setTheme("system")}>
           System
-        </DropDrawerItem>
-      </DropDrawerContent>
-    </DropDrawer>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }

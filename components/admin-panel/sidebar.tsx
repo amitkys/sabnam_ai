@@ -35,7 +35,7 @@ export function Sidebar() {
             "flex items-center gap-2 transition-transform ease-in-out duration-300 mb-1",
             !getOpenState() ? "translate-x-1" : "translate-x-0",
           )}
-          href="/dashboard"
+          href="/home"
         >
           <Image
             alt="Logo"

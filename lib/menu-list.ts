@@ -37,116 +37,10 @@ export function getMenuList(pathname: string): Group[] {
       groupLabel: "",
       menus: [
         {
-          href: "/dashboard",
-          label: "Dashboard",
+          href: "/home",
+          label: "Home",
           icon: LayoutGrid,
           submenus: [],
-        },
-      ],
-    },
-    {
-      groupLabel: "Test Series for:",
-      menus: [
-        {
-          href: "/board",
-          label: "Board Exams",
-          icon: School,
-          // submenus: [
-          //   {
-          //     href: "/bseb/10th",
-          //     label: "10th",
-          //   },
-          //   {
-          //     href: "/bseb/12th",
-          //     label: "12th",
-          //   },
-          // ],
-        },
-        {
-          href: "/exams",
-          label: "Competi. & Other",
-          icon: Trophy,
-          // submenus: [
-          //   {
-          //     href: "/CBSE/10th",
-          //     label: "10th",
-          //   },
-          //   {
-          //     href: "/CBSE/12th",
-          //     label: "12th",
-          //   },
-          // ],
-        },
-        {
-          href: "/subjects",
-          label: "Individual Subjects",
-          icon: Book,
-          // submenus: [
-          //   {
-          //     href: "/comingsoon",
-          //     label: "Coming Soon",
-          //   },
-          // ],
-        },
-      ],
-    },
-    {
-      groupLabel: "User Voice", // Or any of the above
-      menus: [
-        {
-          href: "/feedback",
-          label: "Feedback",
-          icon: MessageCircle, // Instead of Users
-        },
-        {
-          href: "/req",
-          label: "Request a Test",
-          icon: Mail, // Instead of Settings
-        },
-      ],
-    },
-    {
-      groupLabel: "User Voice", // Or any of the above
-      menus: [
-        {
-          href: "/feedback",
-          label: "Feedback",
-          icon: MessageCircle, // Instead of Users
-        },
-        {
-          href: "/req",
-          label: "Request a Test",
-          icon: Mail, // Instead of Settings
-        },
-      ],
-    },
-    {
-      groupLabel: "User Voice", // Or any of the above
-      menus: [
-        {
-          href: "/feedback",
-          label: "Feedback",
-          icon: MessageCircle, // Instead of Users
-        },
-        {
-          href: "/req",
-          label: "Request a Test",
-          icon: Mail, // Instead of Settings
-        },
-      ],
-    },
-    {
-      groupLabel: "User Voice", // Or any of the above
-      menus: [
-        {
-          href: "/feedback",
-          label: "Feedback",
-          icon: MessageCircle, // Instead of Users
-        },
-        {
-          href: "/req",
-          label: "Request a Test",
-          icon: Mail, // Instead of Settings
         },
       ],
     },
@@ -157,11 +51,6 @@ export function getMenuList(pathname: string): Group[] {
           href: "/admin",
           label: "Admin Panel",
           icon: ShieldCheck,
-        },
-        {
-          href: "/create",
-          label: "Add Test (Legacy)",
-          icon: CirclePlus,
         },
       ],
     },

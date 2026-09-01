@@ -56,7 +56,7 @@ function generateSlug(text: string): string {
     .replace(/^-+|-+$/g, "");
 }
 
-export default function CreateTestSeriesPage() {
+function CreateTestSeriesContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const urlCategoryId = searchParams.get("categoryId");
@@ -807,5 +807,20 @@ export default function CreateTestSeriesPage() {
         onSelectCategory={handleCategorySelected}
       />
     </div>
+  );
+}
+
+export default function CreateTestSeriesPage() {
+  return (
+    <React.Suspense
+      fallback={
+        <div className="flex items-center justify-center p-12 text-sm text-muted-foreground">
+          <Loader2Icon className="h-5 w-5 animate-spin mr-2" />
+          Loading creator...
+        </div>
+      }
+    >
+      <CreateTestSeriesContent />
+    </React.Suspense>
   );
 }

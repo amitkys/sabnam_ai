@@ -58,8 +58,8 @@ export function FullscreenSuggestDialog() {
 
   return (
     <div className="fixed left-1/2 top-4 z-50 w-[calc(100%-2rem)] max-w-2xl -translate-x-1/2">
-      <Alert variant="warning" shadow="lg" className="pr-4">
-        <Maximize className="h-4 w-4" />
+      <Alert className="border-amber-500/50 bg-card pr-4 shadow-lg">
+        <Maximize className="h-4 w-4 text-amber-500" />
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <AlertTitle>Resume Fullscreen</AlertTitle>

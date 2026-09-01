@@ -135,29 +135,25 @@ export default function HeroSection() {
                 >
                   <div key={1} className="">
                     <Button
-                      asChild
+                      render={<Link href="/home" />}
                       className="rounded-full px-6 text-base shadow-lg transition-transform duration-300 hover:scale-105"
                       size="lg"
                     >
-                      <Link href="/home">
-                        <span className="text-nowrap">
-                          Get Started for Free
-                        </span>
-                        <Rocket className="ml-2 size-5" />
-                      </Link>
+                      <span className="text-nowrap">
+                        Get Started for Free
+                      </span>
+                      <Rocket className="ml-2 size-5" />
                     </Button>
                   </div>
                   <Button
                     key={2}
-                    asChild
+                    render={<Link href="#link" />}
                     className="rounded-full px-6"
                     size="lg"
                     variant="outline"
                   >
-                    <Link href="#link">
-                      <span className="text-nowrap">Request a Test</span>
-                      <ChevronRight className="ml-1 size-4" />
-                    </Link>
+                    <span className="text-nowrap">Request a Test</span>
+                    <ChevronRight className="ml-1 size-4" />
                   </Button>
                 </AnimatedGroup>
               </div>

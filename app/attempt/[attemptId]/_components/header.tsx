@@ -1,14 +1,14 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
-  DrawerStateless,
-  DrawerStatelessContent,
-  DrawerStatelessItem,
-  DrawerStatelessSub,
-  DrawerStatelessSubContent,
-  DrawerStatelessSubTrigger,
-  DrawerStatelessTrigger,
-} from "@/components/ui/dropdrawer-stateless";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useAttemptTest } from "@/hooks/get-attemp-test";
 import { useFullscreen } from "@/hooks/use-fullscreen";
 import { EllipsisVertical } from "lucide-react";
@@ -56,7 +56,7 @@ export function Header({ attemptId }: { attemptId: string }) {
           {/* small screen timer  */}
           <p className="text-sm text-muted-foreground md:hidden">{data?.testPaper.duration} min</p>
         </div>
-        {/* lare screen timer  */}
+        {/* large screen timer  */}
         <p className="hidden text-muted-foreground md:absolute md:left-1/2 md:top-1/2 md:block md:-translate-x-1/2 md:-translate-y-1/2">
           {data?.testPaper.duration} min
         </p>
@@ -77,33 +77,30 @@ export function Header({ attemptId }: { attemptId: string }) {
           >
             Submit
           </Button>
-          <DrawerStateless>
-            <DrawerStatelessTrigger
+          <DropdownMenu>
+            <DropdownMenuTrigger
               render={
                 <Button className="ml-2" variant="secondary" size={"icon-sm"}>
                   <EllipsisVertical />
                 </Button>
               }
             />
-            <DrawerStatelessContent>
-              <DrawerStatelessItem onClick={toggleFullscreen}>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={toggleFullscreen}>
                 {isFullscreen ? "Exit Fullscreen" : "Full Screen"}
-              </DrawerStatelessItem>
-              <DrawerStatelessSub>
-                <DrawerStatelessSubTrigger>
-                  Appearance
-                </DrawerStatelessSubTrigger>
-                <DrawerStatelessSubContent>
-                  <DrawerStatelessItem onClick={() => setTheme("light")}>
-                    Light
-                  </DrawerStatelessItem>
-                  <DrawerStatelessItem onClick={() => setTheme("dark")}>
-                    Dark
-                  </DrawerStatelessItem>
-                </DrawerStatelessSubContent>
-              </DrawerStatelessSub>
-            </DrawerStatelessContent>
-          </DrawerStateless>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuGroup>
+                <DropdownMenuLabel>Appearance</DropdownMenuLabel>
+                <DropdownMenuItem onClick={() => setTheme("light")}>
+                  Light
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setTheme("dark")}>
+                  Dark
+                </DropdownMenuItem>
+              </DropdownMenuGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </Card>
     </>

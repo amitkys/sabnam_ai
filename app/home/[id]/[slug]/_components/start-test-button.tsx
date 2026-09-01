@@ -2,17 +2,11 @@
 
 import { Button } from "@/components/ui/button";
 import { useStartTest } from "@/hooks/query/mutation/use-start-test";
-import { usePathname, useSearchParams } from "next/navigation";
-
 export function StartTestButton({ testId }: { testId: string }) {
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const query = searchParams.toString();
-  const nextPath = `${pathname}${query ? `?${query}` : ""}`;
-
   const { mutateAsync: startTest, isPending } = useStartTest({
     testId,
     onUnauthorized: () => {
+      const nextPath = window.location.pathname + window.location.search;
       window.location.href = `/signin?next=${encodeURIComponent(nextPath)}`;
     },
   });
