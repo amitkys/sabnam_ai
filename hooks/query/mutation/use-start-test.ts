@@ -18,11 +18,7 @@ export function useStartTest({
     onSuccess: (res) => {
       if (!res.success) {
         if (res.errorCode === ErrorTypes.UNAUTHORIZED) {
-          toast.add({
-            type: "warning",
-            title: "Sign-in Required",
-            description: "Please sign in to start or resume this test.",
-          });
+
           if (onUnauthorized) {
             onUnauthorized();
           }
