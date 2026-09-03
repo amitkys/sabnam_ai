@@ -9,16 +9,19 @@ import {
   BookOpenIcon,
   CheckCircle2Icon,
   RefreshCwIcon,
-  ShieldCheckIcon,
+  UserCheckIcon,
 } from "lucide-react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { CategoryTreeNode } from "@/lib/action/admin/category-actions";
+
 import { FlatCategoryItem } from "./category-dialog";
 import { TestPaperItem } from "./test-paper-dialog";
 import { CategoryManager } from "./category-manager";
 import { TestPaperManager } from "./test-paper-manager";
+import { AttemptManager } from "./attempt-manager";
+
+import { CategoryTreeNode } from "@/lib/action/admin/category-actions";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { adminLogoutAction } from "@/lib/action/admin/admin-auth-actions";
 
 interface AdminDashboardProps {
@@ -39,12 +42,17 @@ export function AdminDashboard({
   isRefreshing,
 }: AdminDashboardProps) {
   const [activeTab, setActiveTab] = useState<string>("categories");
-  const [createTestCategoryId, setCreateTestCategoryId] = useState<string | null>(null);
-  const [selectedCategoryFilterForTests, setSelectedCategoryFilterForTests] = useState<string | null>(null);
+  const [createTestCategoryId, setCreateTestCategoryId] = useState<
+    string | null
+  >(null);
+  const [selectedCategoryFilterForTests, setSelectedCategoryFilterForTests] =
+    useState<string | null>(null);
 
   // Quick summary statistics
   const totalCategories = initialFlatCategories.length;
-  const rootBoards = initialFlatCategories.filter((c) => c.level === "ROOT").length;
+  const rootBoards = initialFlatCategories.filter(
+    (c) => c.level === "ROOT",
+  ).length;
   const totalTests = initialTestPapers.length;
   const publishedTests = initialTestPapers.filter((t) => t.isPublished).length;
 
@@ -69,30 +77,33 @@ export function AdminDashboard({
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-2 border-b">
         <div>
           <h1 className="text-2xl font-black tracking-tight text-foreground flex items-center gap-2">
-            Exam Structure & Test Manager
+            Exam &amp; Candidate Management Portal
           </h1>
           <p className="text-xs text-muted-foreground mt-0.5">
-            Organize exam boards, classes, subjects, chapters, and manage test paper placements.
+            Organize exam boards, subjects, tests, track live candidate
+            attempts, and generate official reports.
           </p>
         </div>
 
         <div className="flex items-center gap-2">
           <Button
-            variant="outline"
-            size="sm"
-            onClick={onRefreshData}
-            disabled={isRefreshing}
             className="text-xs h-8 gap-1.5"
+            disabled={isRefreshing}
+            size="sm"
+            variant="outline"
+            onClick={onRefreshData}
           >
-            <RefreshCwIcon className={`h-3.5 w-3.5 ${isRefreshing ? "animate-spin" : ""}`} />
+            <RefreshCwIcon
+              className={`h-3.5 w-3.5 ${isRefreshing ? "animate-spin" : ""}`}
+            />
             Refresh
           </Button>
 
           <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleLogout}
             className="text-xs h-8 gap-1.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+            size="sm"
+            variant="ghost"
+            onClick={handleLogout}
           >
             <LogOutIcon className="h-3.5 w-3.5" />
             Sign Out
@@ -109,7 +120,9 @@ export function AdminDashboard({
               <BookOpenIcon className="h-5 w-5" />
             </div>
             <div>
-              <p className="text-xs text-muted-foreground font-medium">Root Exam Boards</p>
+              <p className="text-xs text-muted-foreground font-medium">
+                Root Exam Boards
+              </p>
               <p className="text-xl font-bold text-foreground">{rootBoards}</p>
             </div>
           </CardContent>
@@ -122,8 +135,12 @@ export function AdminDashboard({
               <LayersIcon className="h-5 w-5" />
             </div>
             <div>
-              <p className="text-xs text-muted-foreground font-medium">Total Folders / Nodes</p>
-              <p className="text-xl font-bold text-foreground">{totalCategories}</p>
+              <p className="text-xs text-muted-foreground font-medium">
+                Total Folders / Nodes
+              </p>
+              <p className="text-xl font-bold text-foreground">
+                {totalCategories}
+              </p>
             </div>
           </CardContent>
         </Card>
@@ -135,7 +152,9 @@ export function AdminDashboard({
               <FileTextIcon className="h-5 w-5" />
             </div>
             <div>
-              <p className="text-xs text-muted-foreground font-medium">Total Test Papers</p>
+              <p className="text-xs text-muted-foreground font-medium">
+                Total Test Papers
+              </p>
               <p className="text-xl font-bold text-foreground">{totalTests}</p>
             </div>
           </CardContent>
@@ -148,46 +167,68 @@ export function AdminDashboard({
               <CheckCircle2Icon className="h-5 w-5" />
             </div>
             <div>
-              <p className="text-xs text-muted-foreground font-medium">Live (Published)</p>
-              <p className="text-xl font-bold text-foreground">{publishedTests}</p>
+              <p className="text-xs text-muted-foreground font-medium">
+                Live (Published)
+              </p>
+              <p className="text-xl font-bold text-foreground">
+                {publishedTests}
+              </p>
             </div>
           </CardContent>
         </Card>
       </div>
 
       {/* Main Feature Tabs */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full sm:w-[420px] grid-cols-2 p-1 h-10 bg-muted/60">
-          <TabsTrigger value="categories" className="text-xs font-semibold gap-1.5">
+      <Tabs className="w-full" value={activeTab} onValueChange={setActiveTab}>
+        <TabsList className="grid w-full sm:w-[620px] grid-cols-3 p-1 h-10 bg-muted/60">
+          <TabsTrigger
+            className="text-xs font-semibold gap-1.5"
+            value="categories"
+          >
             <FolderTreeIcon className="h-4 w-4" />
-            Folder & Category Tree
+            <span className="hidden sm:inline">Folder &amp; Category</span> Tree
           </TabsTrigger>
-          <TabsTrigger value="tests" className="text-xs font-semibold gap-1.5">
+          <TabsTrigger className="text-xs font-semibold gap-1.5" value="tests">
             <FileTextIcon className="h-4 w-4" />
-            Test Papers & Placement
+            Test Papers
+          </TabsTrigger>
+          <TabsTrigger
+            className="text-xs font-semibold gap-1.5"
+            value="attempts"
+          >
+            <UserCheckIcon className="h-4 w-4" />
+            Candidate Attempts
           </TabsTrigger>
         </TabsList>
 
         {/* Tab 1: Category Tree Manager */}
-        <TabsContent value="categories" className="mt-4">
+        <TabsContent className="mt-4" value="categories">
           <CategoryManager
-            treeData={initialTree}
             flatCategories={initialFlatCategories}
-            onRefresh={onRefreshData}
+            treeData={initialTree}
             onOpenCreateTestForCategory={handleOpenCreateTestForCategory}
+            onRefresh={onRefreshData}
             onViewTestsForCategory={handleViewTestsForCategory}
           />
         </TabsContent>
 
         {/* Tab 2: Test Paper Manager */}
-        <TabsContent value="tests" className="mt-4">
+        <TabsContent className="mt-4" value="tests">
           <TestPaperManager
-            testPapers={initialTestPapers}
             allCategories={initialFlatCategories}
-            onRefresh={onRefreshData}
             initialCreateForCategory={createTestCategoryId}
-            onClearInitialCategory={() => setCreateTestCategoryId(null)}
             selectedFolderFilter={selectedCategoryFilterForTests}
+            testPapers={initialTestPapers}
+            onClearInitialCategory={() => setCreateTestCategoryId(null)}
+            onRefresh={onRefreshData}
+          />
+        </TabsContent>
+
+        {/* Tab 3: Attempt Manager */}
+        <TabsContent className="mt-4" value="attempts">
+          <AttemptManager
+            allCategories={initialFlatCategories}
+            testPapers={initialTestPapers}
           />
         </TabsContent>
       </Tabs>
