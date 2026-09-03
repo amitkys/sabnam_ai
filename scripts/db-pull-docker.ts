@@ -36,7 +36,7 @@ try {
 
   // 3. Dump remote database and import into Docker DB
   console.log(`\n3️⃣  Dumping remote database and restoring into Docker '${dbName}'...`);
-  const dumpRestoreCmd = `pg_dump --no-owner --no-acl "${databaseUrl}" | docker exec -i ${containerName} psql -U ${dbUser} -d ${dbName}`;
+  const dumpRestoreCmd = `docker exec -i ${containerName} pg_dump --no-owner --no-acl "${databaseUrl}" | docker exec -i ${containerName} psql -U ${dbUser} -d ${dbName}`;
   execSync(dumpRestoreCmd, { stdio: "inherit" });
 
   console.log(`\n✅ Database successfully imported into Docker container DB '${dbName}'!`);
