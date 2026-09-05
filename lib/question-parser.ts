@@ -464,3 +464,380 @@ export const SAMPLE_SINGLE_LANG_JSON = JSON.stringify(
 
 export const SAMPLE_QUESTION_JSON = SAMPLE_BILINGUAL_JSON;
 
+export interface QuestionJsonLocation {
+  startIndex: number;
+  endIndex: number;
+  targetIndex: number;
+  line: number;
+}
+
+/**
+ * Accurately finds the character offset and line number of the N-th question in a JSON string.
+ * Uses structural bracket scanning (immune to LaTeX/markdown formatting differences)
+ * to count question objects directly in the JSON.
+ */
+export function findQuestionRangeInJson(
+  json: string,
+  questionIndex: number
+): QuestionJsonLocation | null {
+  if (!json || questionIndex < 0) return null;
+
+  // 1. Locate the questions array start if wrapped in { questions: [ ... ] } or { testseries: { questions: [ ... ] } }
+  let arrayStart = -1;
+  const qMatch = /"questions"\s*:\s*\[/.exec(json);
+  if (qMatch) {
+    arrayStart = qMatch.index + qMatch[0].length - 1;
+  } else {
+    // Check if JSON root starts with [ (e.g. array of questions)
+    let idx = 0;
+    while (idx < json.length && /\s/.test(json[idx])) idx++;
+    if (json[idx] === "[") {
+      arrayStart = idx;
+    }
+  }
+
+  const scanStart = arrayStart !== -1 ? arrayStart + 1 : 0;
+  let inString = false;
+  let isEscaped = false;
+  let depth = 0;
+  let currentStart = -1;
+  let currentIdx = 0;
+
+  for (let i = scanStart; i < json.length; i++) {
+    const char = json[i];
+
+    if (inString) {
+      if (isEscaped) {
+        isEscaped = false;
+      } else if (char === "\\") {
+        isEscaped = true;
+      } else if (char === '"') {
+        inString = false;
+      }
+      continue;
+    }
+
+    if (char === '"') {
+      inString = true;
+      continue;
+    }
+
+    if (char === "{") {
+      if (depth === 0) {
+        currentStart = i;
+      }
+      depth++;
+    } else if (char === "}") {
+      depth--;
+      if (depth === 0 && currentStart !== -1) {
+        if (currentIdx === questionIndex) {
+          const end = i + 1;
+          const qSlice = json.slice(currentStart, end);
+          // Look for "text" or "content" or "question" property start
+          const textMatch = /"(?:text|content|question)"\s*:\s*/.exec(qSlice);
+          const textPropIndex = textMatch ? currentStart + textMatch.index : currentStart;
+          const line = json.substring(0, textPropIndex).split("\n").length;
+          return {
+            startIndex: currentStart,
+            endIndex: end,
+            targetIndex: textPropIndex,
+            line,
+          };
+        }
+        currentIdx++;
+        currentStart = -1;
+      }
+    } else if (char === "]" && depth === 0 && arrayStart !== -1) {
+      // Reached the end of questions array
+      break;
+    }
+  }
+
+  return null;
+}
+
+/**
+ * Computes the distribution of correct answers (A, B, C, D) across all questions in JSON.
+ */
+export function getAnswerDistributionInJson(json: string): {
+  A: number;
+  B: number;
+  C: number;
+  D: number;
+  other: number;
+  total: number;
+} {
+  const empty = { A: 0, B: 0, C: 0, D: 0, other: 0, total: 0 };
+  if (!json || !json.trim()) return empty;
+
+  try {
+    const parsed = JSON.parse(json);
+    let questionsList: any[] = [];
+
+    if (Array.isArray(parsed)) {
+      questionsList = parsed;
+    } else if (parsed && typeof parsed === "object") {
+      if (Array.isArray(parsed.questions)) {
+        questionsList = parsed.questions;
+      } else if (parsed.testseries && Array.isArray(parsed.testseries.questions)) {
+        questionsList = parsed.testseries.questions;
+      }
+    }
+
+    questionsList.forEach((q) => {
+      if (!q || typeof q !== "object") return;
+      empty.total++;
+
+      let correctLetter: string | null = null;
+      if (Array.isArray(q.options) && q.options.length > 0) {
+        const correctOpt = q.options.find((o: any) => o && o.isCorrect === true);
+        if (correctOpt && correctOpt.id) {
+          correctLetter = String(correctOpt.id).toUpperCase();
+        }
+      }
+
+      if (!correctLetter && q.correctValue) {
+        correctLetter = String(q.correctValue).toUpperCase();
+      }
+
+      if (!correctLetter && typeof q.answerIndex === "number") {
+        correctLetter = String.fromCharCode(65 + q.answerIndex);
+      }
+
+      if (correctLetter === "A") empty.A++;
+      else if (correctLetter === "B") empty.B++;
+      else if (correctLetter === "C") empty.C++;
+      else if (correctLetter === "D") empty.D++;
+      else empty.other++;
+    });
+
+    return empty;
+  } catch {
+    return empty;
+  }
+}
+
+/**
+ * Fisher-Yates shuffle array helper
+ */
+function shuffleArray<T>(array: T[]): T[] {
+  const arr = [...array];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+/**
+ * Shuffles MCQ answer options in JSON according to target distribution percentages
+ * while strictly preserving question and option text content integrity.
+ */
+export function shuffleAnswersInJson(
+  json: string,
+  weights: { A?: number; B?: number; C?: number; D?: number } = { A: 25, B: 25, C: 25, D: 25 }
+): {
+  success: boolean;
+  newJson?: string;
+  stats?: { A: number; B: number; C: number; D: number; total: number };
+  error?: string;
+} {
+  if (!json || !json.trim()) {
+    return { success: false, error: "JSON input is empty" };
+  }
+
+  try {
+    const parsed = JSON.parse(json);
+    let questionsList: any[] = [];
+
+    if (Array.isArray(parsed)) {
+      questionsList = parsed;
+    } else if (parsed && typeof parsed === "object") {
+      if (Array.isArray(parsed.questions)) {
+        questionsList = parsed.questions;
+      } else if (parsed.testseries && Array.isArray(parsed.testseries.questions)) {
+        questionsList = parsed.testseries.questions;
+      }
+    }
+
+    if (questionsList.length === 0) {
+      return { success: false, error: "No questions found in JSON" };
+    }
+
+    // Filter eligible MCQ questions with at least 2 options
+    const mcqIndices: number[] = [];
+    questionsList.forEach((q, idx) => {
+      if (q && Array.isArray(q.options) && q.options.length >= 2) {
+        mcqIndices.push(idx);
+      }
+    });
+
+    const N = mcqIndices.length;
+    if (N === 0) {
+      return { success: false, error: "No multiple choice questions with options found to shuffle" };
+    }
+
+    // Calculate distribution targets
+    const wA = Math.max(0, weights.A ?? 25);
+    const wB = Math.max(0, weights.B ?? 25);
+    const wC = Math.max(0, weights.C ?? 25);
+    const wD = Math.max(0, weights.D ?? 25);
+    const totalWeight = wA + wB + wC + wD || 100;
+
+    let countA = Math.round((wA / totalWeight) * N);
+    let countB = Math.round((wB / totalWeight) * N);
+    let countC = Math.round((wC / totalWeight) * N);
+    let countD = N - (countA + countB + countC);
+
+    if (countD < 0) {
+      countD = 0;
+      const rem = N - (countA + countB);
+      countC = Math.max(0, rem);
+    }
+
+    const letterPool: string[] = [];
+    for (let i = 0; i < countA; i++) letterPool.push("A");
+    for (let i = 0; i < countB; i++) letterPool.push("B");
+    for (let i = 0; i < countC; i++) letterPool.push("C");
+    for (let i = 0; i < countD; i++) letterPool.push("D");
+
+    const shuffledPool = shuffleArray(letterPool);
+    const stats = { A: 0, B: 0, C: 0, D: 0, total: N };
+
+    mcqIndices.forEach((qIdx, poolIdx) => {
+      const q = questionsList[qIdx];
+      const options = q.options;
+
+      // Identify currently correct option
+      let correctOptIdx = options.findIndex((o: any) => o && o.isCorrect === true);
+      if (correctOptIdx === -1 && q.correctValue) {
+        correctOptIdx = options.findIndex((o: any) => o && String(o.id).toUpperCase() === String(q.correctValue).toUpperCase());
+      }
+      if (correctOptIdx === -1 && typeof q.answerIndex === "number") {
+        correctOptIdx = q.answerIndex;
+      }
+      if (correctOptIdx === -1) {
+        correctOptIdx = 0;
+      }
+
+      const correctOpt = options[correctOptIdx];
+      const incorrectOpts = shuffleArray(options.filter((_: any, i: number) => i !== correctOptIdx));
+
+      // Determine new target position
+      let targetLetter = shuffledPool[poolIdx] || "A";
+      let targetLetterIndex = targetLetter.charCodeAt(0) - 65;
+
+      if (targetLetterIndex >= options.length) {
+        targetLetterIndex = targetLetterIndex % options.length;
+        targetLetter = String.fromCharCode(65 + targetLetterIndex);
+      }
+
+      const buildOptionObj = (opt: any, letter: string, isCorrect: boolean) => {
+        if (typeof opt === "object" && opt !== null) {
+          return {
+            ...opt,
+            id: letter,
+            isCorrect,
+          };
+        }
+        return {
+          id: letter,
+          text: opt,
+          isCorrect,
+        };
+      };
+
+      const newOptions = new Array(options.length);
+
+      // Place correct option at new target index
+      newOptions[targetLetterIndex] = buildOptionObj(correctOpt, targetLetter, true);
+
+      // Distribute incorrect options across remaining indices
+      let incIdx = 0;
+      for (let i = 0; i < options.length; i++) {
+        if (i !== targetLetterIndex) {
+          const letter = String.fromCharCode(65 + i);
+          newOptions[i] = buildOptionObj(incorrectOpts[incIdx], letter, false);
+          incIdx++;
+        }
+      }
+
+      q.options = newOptions;
+      q.correctValue = targetLetter;
+      if (q.answerIndex !== undefined) {
+        q.answerIndex = targetLetterIndex;
+      }
+
+      if (stats[targetLetter as keyof typeof stats] !== undefined) {
+        (stats as any)[targetLetter]++;
+      }
+    });
+
+    const newJson = JSON.stringify(parsed, null, 2);
+    return { success: true, newJson, stats };
+  } catch (err: any) {
+    return { success: false, error: err.message || "Failed to parse JSON" };
+  }
+}
+
+/**
+ * Bulk updates positive and negative marks for all questions in JSON.
+ * Negative marks are calculated as a percentage of positive marks.
+ */
+export function applyBulkMarksInJson(
+  json: string,
+  positiveMarks: number,
+  negativePercentage: number
+): {
+  success: boolean;
+  newJson?: string;
+  updatedCount?: number;
+  negativeMarks?: number;
+  error?: string;
+} {
+  if (!json || !json.trim()) {
+    return { success: false, error: "JSON input is empty" };
+  }
+
+  try {
+    const parsed = JSON.parse(json);
+    let questionsList: any[] = [];
+
+    if (Array.isArray(parsed)) {
+      questionsList = parsed;
+    } else if (parsed && typeof parsed === "object") {
+      if (Array.isArray(parsed.questions)) {
+        questionsList = parsed.questions;
+      } else if (parsed.testseries && Array.isArray(parsed.testseries.questions)) {
+        questionsList = parsed.testseries.questions;
+      }
+    }
+
+    if (questionsList.length === 0) {
+      return { success: false, error: "No questions found in JSON" };
+    }
+
+    const pos = Math.max(0, positiveMarks);
+    const penaltyRatio = Math.max(0, negativePercentage) / 100;
+    const neg = Math.round(pos * penaltyRatio * 100) / 100;
+
+    let updatedCount = 0;
+    questionsList.forEach((q) => {
+      if (!q || typeof q !== "object") return;
+      q.positiveMarks = pos;
+      q.negativeMarks = neg;
+      if (q.marks !== undefined) q.marks = pos;
+      updatedCount++;
+    });
+
+    const newJson = JSON.stringify(parsed, null, 2);
+    return {
+      success: true,
+      newJson,
+      updatedCount,
+      negativeMarks: neg,
+    };
+  } catch (err: any) {
+    return { success: false, error: err.message || "Failed to parse JSON" };
+  }
+}

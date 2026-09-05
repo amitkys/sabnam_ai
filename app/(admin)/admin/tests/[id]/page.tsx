@@ -52,6 +52,7 @@ import { deleteTestPaperAction } from "@/lib/action/admin/test-paper-actions";
 import { getAllCategoriesFlatAction } from "@/lib/action/admin/category-actions";
 import {
   parseMarkdownJSON,
+  findQuestionRangeInJson,
   NormalizedQuestion,
   SAMPLE_SINGLE_LANG_JSON,
   SAMPLE_BILINGUAL_JSON,
@@ -59,6 +60,7 @@ import {
 import { TestPaperDialog, TestPaperItem } from "../../_components/test-paper-dialog";
 import { FlatCategoryItem } from "../../_components/category-dialog";
 import { QuestionEditDialog } from "../../_components/question-edit-dialog";
+import { ShuffleMarksDialog } from "../../_components/shuffle-marks-dialog";
 import { cn } from "@/lib/utils";
 
 interface PageProps {
@@ -99,11 +101,62 @@ function convertQuestionsToJSON(testQuestions: any[]): string {
 
   return JSON.stringify({ questions: formatted }, null, 2);
 }
+/**
+ * Accurately measures the pixel Y-offset of a character index in a textarea,
+ * accounting for word wrapping, padding, fonts, and zoom with ZERO cumulative drift.
+ */
+function getTextareaCaretPixelTop(textarea: HTMLTextAreaElement, targetIndex: number): number {
+  if (typeof window === "undefined" || !textarea) return 0;
+  try {
+    const mirror = document.createElement("div");
+    const computed = window.getComputedStyle(textarea);
+
+    mirror.style.position = "absolute";
+    mirror.style.visibility = "hidden";
+    mirror.style.pointerEvents = "none";
+    mirror.style.top = "0";
+    mirror.style.left = "-9999px";
+    mirror.style.width = `${textarea.clientWidth}px`;
+    mirror.style.font = computed.font;
+    mirror.style.fontSize = computed.fontSize;
+    mirror.style.fontFamily = computed.fontFamily;
+    mirror.style.fontWeight = computed.fontWeight;
+    mirror.style.lineHeight = computed.lineHeight;
+    mirror.style.letterSpacing = computed.letterSpacing;
+    mirror.style.paddingTop = computed.paddingTop;
+    mirror.style.paddingRight = computed.paddingRight;
+    mirror.style.paddingBottom = computed.paddingBottom;
+    mirror.style.paddingLeft = computed.paddingLeft;
+    mirror.style.borderTopWidth = computed.borderTopWidth;
+    mirror.style.borderStyle = computed.borderStyle;
+    mirror.style.boxSizing = computed.boxSizing;
+    mirror.style.whiteSpace = computed.whiteSpace || "pre-wrap";
+    mirror.style.wordBreak = computed.wordBreak || "break-word";
+    mirror.style.overflowWrap = computed.overflowWrap || "break-word";
+
+    mirror.textContent = textarea.value.substring(0, targetIndex);
+    const marker = document.createElement("span");
+    marker.textContent = "\u200b";
+    mirror.appendChild(marker);
+
+    document.body.appendChild(mirror);
+    const top = marker.offsetTop;
+    document.body.removeChild(mirror);
+
+    return top;
+  } catch {
+    const totalLines = Math.max(1, textarea.value.split("\n").length);
+    const approxLine = textarea.value.substring(0, targetIndex).split("\n").length;
+    return (approxLine / totalLines) * textarea.scrollHeight;
+  }
+}
 
 export default function TestDetailPage({ params }: PageProps) {
   const { id: testId } = use(params);
   const router = useRouter();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const previewContainerRef = useRef<HTMLDivElement>(null);
 
   const [testData, setTestData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -119,9 +172,11 @@ export default function TestDetailPage({ params }: PageProps) {
   const [savingAll, setSavingAll] = useState(false);
   const [saveStatus, setSaveStatus] = useState<{ success: boolean; message: string } | null>(null);
   const [highlightedQuestionIdx, setHighlightedQuestionIdx] = useState<number | null>(null);
+  const [focusedLocation, setFocusedLocation] = useState<{ qNum: number; line: number } | null>(null);
 
   // Edit test paper dialog state
   const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [shuffleMarksDialogOpen, setShuffleMarksDialogOpen] = useState(false);
 
   // Add questions JSON modal state
   const [addJsonModalOpen, setAddJsonModalOpen] = useState(false);
@@ -209,7 +264,8 @@ export default function TestDetailPage({ params }: PageProps) {
   }, [importJsonInput]);
 
   /**
-   * Jump to corresponding line / cursor in JSON when clicking on a question in the preview
+   * Jump to corresponding line / cursor in JSON when clicking on a question in the preview.
+   * Uses structural count/index-based question lookup in the JSON for 100% precision.
    */
   const handleJumpToJsonQuestion = (qIndex: number) => {
     setHighlightedQuestionIdx(qIndex);
@@ -217,47 +273,77 @@ export default function TestDetailPage({ params }: PageProps) {
     if (!textarea || !jsonInput) return;
 
     try {
-      const targetQ = parsedQuestions[qIndex];
+      // 1. Precise count/index-based lookup in the JSON structure
+      const location = findQuestionRangeInJson(jsonInput, qIndex);
+
       let targetIndex = -1;
+      let targetLine = 1;
 
-      if (targetQ) {
-        // Method 1: Search by question English or Hindi text snippet
-        const rawEn = (targetQ.content.en || "").replace(/^#####\s*/, "").trim();
-        const rawHi = (targetQ.content.hi || "").replace(/^#####\s*/, "").trim();
-        const snippet = (rawEn || rawHi).slice(0, 25);
-
-        if (snippet) {
-          targetIndex = jsonInput.indexOf(snippet);
-        }
-      }
-
-      // Method 2: Fallback to finding the N-th occurrence of "text": or "question":
-      if (targetIndex === -1) {
-        let count = 0;
-        const regex = /"(?:text|content|question)"\s*:/g;
-        let match;
-        while ((match = regex.exec(jsonInput)) !== null) {
-          if (count === qIndex) {
-            targetIndex = match.index;
-            break;
+      if (location) {
+        targetIndex = location.targetIndex;
+        targetLine = location.line;
+      } else {
+        // Fallback: search for escaped snippet of question content if structural parse couldn't find it
+        const targetQ = parsedQuestions[qIndex];
+        if (targetQ) {
+          const rawEn = (targetQ.content.en || "").replace(/^#####\s*/, "").trim();
+          const rawHi = (targetQ.content.hi || "").replace(/^#####\s*/, "").trim();
+          const rawSnippet = (rawEn || rawHi).slice(0, 30);
+          if (rawSnippet) {
+            // Strip outer quotes from stringify to get JSON-escaped representation
+            const escaped = JSON.stringify(rawSnippet).slice(1, -1);
+            targetIndex = jsonInput.indexOf(escaped);
+            if (targetIndex !== -1) {
+              targetLine = jsonInput.substring(0, targetIndex).split("\n").length;
+            }
           }
-          count++;
         }
       }
 
       if (targetIndex !== -1) {
-        textarea.focus();
-        const endIndex = Math.min(jsonInput.length, targetIndex + 45);
-        textarea.setSelectionRange(targetIndex, endIndex);
+        setFocusedLocation({ qNum: qIndex + 1, line: targetLine });
 
-        // Scroll textarea smoothly to the question position
-        const textBefore = jsonInput.substring(0, targetIndex);
-        const linesBefore = textBefore.split("\n").length;
-        const approxLineHeight = 18;
+        // Highlight the question's text property line cleanly
+        const lineEndIndex = jsonInput.indexOf("\n", targetIndex);
+        const selEnd = lineEndIndex !== -1 ? lineEndIndex : Math.min(jsonInput.length, targetIndex + 65);
+
+        // Measure the EXACT pixel position of targetIndex using DOM mirror (zero cumulative drift)
+        const caretTop = getTextareaCaretPixelTop(textarea, targetIndex);
+        const viewportHeight = textarea.clientHeight;
+
+        // Position the question in the vertical middle of the textarea viewport
+        const targetScrollTop = Math.max(0, caretTop - (viewportHeight / 2) + 20);
+
+        // Focus without default browser scroll, set selection, and scroll to center
+        textarea.focus({ preventScroll: true });
+        textarea.setSelectionRange(targetIndex, selEnd);
+
         textarea.scrollTo({
-          top: Math.max(0, (linesBefore - 4) * approxLineHeight),
+          top: targetScrollTop,
           behavior: "smooth",
         });
+
+        requestAnimationFrame(() => {
+          textarea.scrollTo({
+            top: targetScrollTop,
+            behavior: "smooth",
+          });
+        });
+
+        // Also smoothly center the clicked card strictly within the preview container (WITHOUT scrolling window)
+        const cardEl = cardRefs.current[qIndex];
+        const containerEl = previewContainerRef.current;
+        if (cardEl && containerEl) {
+          const cardTop = cardEl.offsetTop;
+          const cardHeight = cardEl.offsetHeight;
+          const containerHeight = containerEl.clientHeight;
+          const targetCardScrollTop = Math.max(0, cardTop - (containerHeight / 2) + (cardHeight / 2));
+
+          containerEl.scrollTo({
+            top: targetCardScrollTop,
+            behavior: "smooth",
+          });
+        }
       }
     } catch (err) {
       console.error("Failed to focus JSON location:", err);
@@ -614,6 +700,17 @@ export default function TestDetailPage({ params }: PageProps) {
                   type="button"
                   variant="outline"
                   size="sm"
+                  onClick={() => setShuffleMarksDialogOpen(true)}
+                  className="text-[11px] h-7 px-2 gap-1 text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-800/60 hover:bg-purple-50 dark:hover:bg-purple-950/40 font-semibold"
+                  title="Shuffle answer distribution & bulk configure marks"
+                >
+                  <SparklesIcon className="h-3 w-3" />
+                  Shuffle & Marks
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
                   onClick={handleFormatJSON}
                   className="text-[11px] h-7 px-2"
                   title="Auto-format and beautify JSON"
@@ -639,7 +736,14 @@ export default function TestDetailPage({ params }: PageProps) {
             {/* JSON Textarea with Cursor Ref */}
             <div className="relative rounded-xl border border-border/80 bg-card shadow-sm p-3 flex flex-col gap-2">
               <div className="flex items-center justify-between text-[11px] text-muted-foreground pb-1 border-b border-border/50">
-                <span>Click any question in right preview to jump cursor here</span>
+                {focusedLocation ? (
+                  <span className="text-primary font-semibold flex items-center gap-1.5 transition-colors">
+                    <span className="inline-block w-2 h-2 rounded-full bg-primary animate-pulse" />
+                    Focused Question {focusedLocation.qNum} (Line {focusedLocation.line})
+                  </span>
+                ) : (
+                  <span>Click any question in right preview to jump cursor here</span>
+                )}
                 <span className="font-mono text-[10px]">{parsedQuestions.length} Questions</span>
               </div>
 
@@ -737,7 +841,10 @@ export default function TestDetailPage({ params }: PageProps) {
             </div>
 
             {/* Scrollable Question Cards with Click-to-Jump Indicator */}
-            <div className="flex flex-col gap-4 max-h-[calc(100vh-220px)] overflow-y-auto pr-1 pb-16">
+            <div
+              ref={previewContainerRef}
+              className="relative flex flex-col gap-4 max-h-[calc(100vh-220px)] overflow-y-auto pr-1 pb-16"
+            >
               {parsedQuestions.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-20 text-center text-muted-foreground bg-card border rounded-xl shadow-sm">
                   <HelpCircleIcon className="h-10 w-10 stroke-1 mb-2 text-muted-foreground/60" />
@@ -755,6 +862,9 @@ export default function TestDetailPage({ params }: PageProps) {
                   return (
                     <div
                       key={idx}
+                      ref={(el) => {
+                        cardRefs.current[idx] = el;
+                      }}
                       onClick={() => handleJumpToJsonQuestion(idx)}
                       className={cn(
                         "rounded-xl border bg-card shadow-sm flex flex-col transition-all cursor-pointer group",
@@ -1235,6 +1345,17 @@ export default function TestDetailPage({ params }: PageProps) {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Shuffle Answer Distribution & Bulk Marks Dialog */}
+      <ShuffleMarksDialog
+        open={shuffleMarksDialogOpen}
+        onOpenChange={setShuffleMarksDialogOpen}
+        jsonInput={jsonInput}
+        onApplyJson={(newJson, message) => {
+          setJsonInput(newJson);
+          setSaveStatus({ success: true, message });
+        }}
+      />
     </div>
   );
 }
