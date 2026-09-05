@@ -2,21 +2,13 @@
 
 import { ActionError, actionWrapper } from "@/lib/action-response";
 import { prisma } from "@/lib/db";
-import { auth } from "@/lib/auth";
 import { ErrorTypes } from "@/lib/error-type";
-import { headers } from "next/headers";
 
 export async function getResultAction({ attemptId }: { attemptId: string }) {
   return actionWrapper(async () => {
-    const session = await auth.api.getSession({ headers: await headers() });
-    if (!session?.user?.id) {
-      throw new ActionError("User not authenticated", ErrorTypes.UNAUTHORIZED);
-    }
-
-    const attempt = await prisma.testAttempt.findFirst({
+    const attempt = await prisma.testAttempt.findUnique({
       where: {
         id: attemptId,
-        userId: session.user.id,
       },
       include: {
         user: {
@@ -109,8 +101,8 @@ export async function getResultAction({ attemptId }: { attemptId: string }) {
 
     return {
       user: attempt.user || {
-        name: session.user.name || "Student",
-        email: session.user.email || "",
+        name: "Student",
+        email: "",
       },
       attempt: {
         id: attempt.id,

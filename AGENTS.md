@@ -37,7 +37,7 @@ This file is the cross-agent source of truth. For quick reference and editor-nat
   - success: `{ success: true, data: T }`
   - failure: `{ success: false, error: string, errorCode?: string }`
 - Prefer object params for actions (not positional args) for easier evolution.
-- For attempt-linked actions, always enforce auth + ownership (`attempt.userId === session.user.id`).
+- For attempt-linked mutation actions (submit, sync, pause), always enforce auth + ownership (`attempt.userId === session.user.id`). Note: `getResultAction` (`/result/<id>`) is intentionally public so results and report cards can be viewed or shared by anyone with the link/QR code.
 
 ### Query hooks (TanStack)
 - Query hooks (`hooks/query/get/**`) must:
