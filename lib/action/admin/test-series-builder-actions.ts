@@ -125,7 +125,7 @@ export async function createTestSeriesWithQuestionsAction({
     });
 
     revalidatePath("/admin");
-    revalidatePath("/home");
+    revalidatePath("/home", "layout");
 
     return {
       success: true,
@@ -251,7 +251,7 @@ export async function addQuestionsToTestAction({
 
     revalidatePath("/admin");
     revalidatePath(`/admin/tests/${testId}`);
-    revalidatePath("/home");
+    revalidatePath("/home", "layout");
 
     return { success: true, addedCount: questions.length };
   });
@@ -423,7 +423,7 @@ export async function updateQuestionDetailAction(input: UpdateQuestionInput) {
       revalidatePath(`/admin/tests/${input.testPaperId}`);
     }
     revalidatePath("/admin");
-    revalidatePath("/home");
+    revalidatePath("/home", "layout");
 
     return updated;
   });
@@ -531,7 +531,7 @@ export async function syncAllTestQuestionsAction({
 
     revalidatePath("/admin");
     revalidatePath(`/admin/tests/${testPaperId}`);
-    revalidatePath("/home");
+    revalidatePath("/home", "layout");
 
     return { success: true, count: questions.length };
   });

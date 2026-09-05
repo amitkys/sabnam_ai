@@ -175,7 +175,7 @@ export async function createCategoryAction({
     });
 
     revalidatePath("/admin");
-    revalidatePath("/home");
+    revalidatePath("/home", "layout");
 
     return created;
   });
@@ -248,7 +248,7 @@ export async function updateCategoryAction({
     });
 
     revalidatePath("/admin");
-    revalidatePath("/home");
+    revalidatePath("/home", "layout");
 
     return updated;
   });
@@ -424,7 +424,7 @@ export async function deleteCategoryAction({ id }: { id: string }) {
     });
 
     revalidatePath("/admin");
-    revalidatePath("/home");
+    revalidatePath("/home", "layout");
 
     return {
       success: true,

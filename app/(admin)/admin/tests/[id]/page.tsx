@@ -28,6 +28,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import { toast } from "@/components/ui/toast";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -48,7 +49,10 @@ import {
   removeQuestionFromTestAction,
   syncAllTestQuestionsAction,
 } from "@/lib/action/admin/test-series-builder-actions";
-import { deleteTestPaperAction } from "@/lib/action/admin/test-paper-actions";
+import {
+  deleteTestPaperAction,
+  toggleTestPaperPublishAction,
+} from "@/lib/action/admin/test-paper-actions";
 import { getAllCategoriesFlatAction } from "@/lib/action/admin/category-actions";
 import {
   parseMarkdownJSON,
@@ -222,6 +226,42 @@ export default function TestDetailPage({ params }: PageProps) {
       console.error("Failed to load test details:", err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const [togglingPublish, setTogglingPublish] = useState(false);
+
+  const handleTogglePublish = async () => {
+    if (!testData || togglingPublish) return;
+    const newStatus = !testData.isPublished;
+    setTogglingPublish(true);
+    try {
+      const res = await toggleTestPaperPublishAction({
+        id: testData.id,
+        isPublished: newStatus,
+      });
+      if (res.success) {
+        toast.add({
+          type: "success",
+          title: newStatus ? "Test Series Live" : "Test Series Set to Draft",
+          description: `"${testData.title}" is now ${newStatus ? "live and visible to students" : "hidden as draft (not visible to students)"}.`,
+        });
+        await fetchDetail();
+      } else {
+        toast.add({
+          type: "error",
+          title: "Update Failed",
+          description: res.error || "Could not update test status.",
+        });
+      }
+    } catch (err: any) {
+      toast.add({
+        type: "error",
+        title: "Error",
+        description: err?.message || "Failed to update test status.",
+      });
+    } finally {
+      setTogglingPublish(false);
     }
   };
 
@@ -511,16 +551,25 @@ export default function TestDetailPage({ params }: PageProps) {
           <div>
             <div className="flex items-center gap-2">
               <h1 className="text-xl font-bold tracking-tight text-foreground">{testData.title}</h1>
-              <Badge
-                variant="outline"
+              <button
+                type="button"
+                onClick={handleTogglePublish}
+                disabled={togglingPublish}
+                title={testData.isPublished ? "Click to disable Live (set to Draft & hide from students)" : "Click to enable Live (publish test series)"}
                 className={cn(
-                  "text-[10px] font-semibold px-2 py-0.5",
+                  "inline-flex items-center text-[10px] font-semibold px-2.5 py-0.5 rounded-full border transition-all cursor-pointer active:scale-95 select-none",
                   testData.isPublished
-                    ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30"
-                    : "bg-muted text-muted-foreground border-border"
+                    ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30 hover:bg-emerald-500/20"
+                    : "bg-muted text-muted-foreground border-border hover:bg-muted/80",
+                  togglingPublish && "opacity-60 cursor-not-allowed"
                 )}
               >
-                {testData.isPublished ? (
+                {togglingPublish ? (
+                  <span className="flex items-center gap-1">
+                    <Loader2Icon className="h-3 w-3 animate-spin" />
+                    Updating...
+                  </span>
+                ) : testData.isPublished ? (
                   <span className="flex items-center gap-1">
                     <CheckCircle2Icon className="h-3 w-3" /> Live
                   </span>
@@ -529,7 +578,7 @@ export default function TestDetailPage({ params }: PageProps) {
                     <EyeOffIcon className="h-3 w-3" /> Draft
                   </span>
                 )}
-              </Badge>
+              </button>
             </div>
 
             {category && (

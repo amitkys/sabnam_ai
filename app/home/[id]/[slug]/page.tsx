@@ -13,6 +13,8 @@ interface PageProps {
   params: Promise<{ id: string; slug: string }>;
 }
 
+export const dynamic = 'force-dynamic';
+
 // ── SEO metadata ───────────────────────────────────────────────
 export async function generateMetadata({ params }: PageProps) {
   const { id } = await params;

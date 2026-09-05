@@ -12,6 +12,8 @@ export const metadata = {
   description: 'Browse all exams by category — boards, entrance, competitive, and more.',
 };
 
+export const dynamic = 'force-dynamic';
+
 export default async function AppTestPage() {
   const rootCategories = await prisma.category.findMany({
     where: { level: 'ROOT', parentId: null },

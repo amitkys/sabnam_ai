@@ -127,7 +127,10 @@ export async function createTestPaperAction({
     });
 
     revalidatePath("/admin");
-    revalidatePath("/home");
+    revalidatePath("/home", "layout");
+    if (category) {
+      revalidatePath(`/home/${category.id}/${category.slug}`);
+    }
 
     return created;
   });
@@ -195,13 +198,65 @@ export async function updateTestPaperAction({
         duration: duration !== undefined ? Math.max(1, Number(duration)) : undefined,
         totalMarks: totalMarks !== undefined ? Math.max(0, Number(totalMarks)) : undefined,
         languages: languages && languages.length > 0 ? languages : undefined,
-        isPublished: isPublished !== undefined ? Boolean(isPublished) : undefined,
+        isPublished: typeof isPublished === "boolean" ? isPublished : undefined,
         categoryId: categoryId || undefined,
+      },
+      include: {
+        category: {
+          select: { id: true, slug: true },
+        },
       },
     });
 
     revalidatePath("/admin");
-    revalidatePath("/home");
+    revalidatePath(`/admin/tests/${id}`);
+    revalidatePath("/home", "layout");
+    if (updated.category) {
+      revalidatePath(`/home/${updated.category.id}/${updated.category.slug}`);
+    }
+
+    return updated;
+  });
+}
+
+/**
+ * Toggles the published/live status of a test paper
+ */
+export async function toggleTestPaperPublishAction({
+  id,
+  isPublished,
+}: {
+  id: string;
+  isPublished: boolean;
+}) {
+  return actionWrapper(async () => {
+    const isAuth = await isAdminAuthenticated();
+    if (!isAuth) {
+      throw new ActionError("Admin authorization required", ErrorTypes.UNAUTHORIZED);
+    }
+
+    if (!id) {
+      throw new ActionError("Test paper ID is required", ErrorTypes.MISSING_REQUIRED_FIELD);
+    }
+
+    const updated = await prisma.testPaper.update({
+      where: { id },
+      data: {
+        isPublished: Boolean(isPublished),
+      },
+      include: {
+        category: {
+          select: { id: true, slug: true },
+        },
+      },
+    });
+
+    revalidatePath("/admin");
+    revalidatePath(`/admin/tests/${id}`);
+    revalidatePath("/home", "layout");
+    if (updated.category) {
+      revalidatePath(`/home/${updated.category.id}/${updated.category.slug}`);
+    }
 
     return updated;
   });
@@ -232,7 +287,7 @@ export async function deleteTestPaperAction({ id }: { id: string }) {
     });
 
     revalidatePath("/admin");
-    revalidatePath("/home");
+    revalidatePath("/home", "layout");
 
     return { success: true, deletedId: id };
   });

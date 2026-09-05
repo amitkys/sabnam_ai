@@ -13,13 +13,17 @@ import {
   AlertCircleIcon,
   LayersIcon,
   SparklesIcon,
+  Loader2Icon,
 } from "lucide-react";
 import Link from "next/link";
 
 import { TestPaperItem, TestPaperDialog } from "./test-paper-dialog";
 import { FlatCategoryItem } from "./category-dialog";
 
-import { deleteTestPaperAction } from "@/lib/action/admin/test-paper-actions";
+import {
+  deleteTestPaperAction,
+  toggleTestPaperPublishAction,
+} from "@/lib/action/admin/test-paper-actions";
 import { toast } from "@/components/ui/toast";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -93,6 +97,43 @@ export function TestPaperManager({
     useState<TestPaperItem | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+
+  // Quick toggle publish state
+  const [togglingId, setTogglingId] = useState<string | null>(null);
+
+  const handleTogglePublish = async (test: TestPaperItem) => {
+    if (togglingId) return;
+    const newStatus = !test.isPublished;
+    setTogglingId(test.id);
+    try {
+      const res = await toggleTestPaperPublishAction({
+        id: test.id,
+        isPublished: newStatus,
+      });
+      if (res.success) {
+        toast.add({
+          type: "success",
+          title: newStatus ? "Test Series Live" : "Test Series Set to Draft",
+          description: `"${test.title}" is now ${newStatus ? "live and visible to students" : "hidden as draft (not visible to students)"}.`,
+        });
+        onRefresh();
+      } else {
+        toast.add({
+          type: "error",
+          title: "Update Failed",
+          description: res.error || "Could not update test status.",
+        });
+      }
+    } catch (err: any) {
+      toast.add({
+        type: "error",
+        title: "Error",
+        description: err?.message || "Failed to update test status.",
+      });
+    } finally {
+      setTogglingId(null);
+    }
+  };
 
   const handleOpenCreate = (categoryId?: string) => {
     setTestToEdit(null);
@@ -262,16 +303,28 @@ export function TestPaperManager({
             <CardContent className="p-4.5 flex flex-col gap-3 flex-1">
               {/* Header: Status Badge & Placement Path */}
               <div className="flex items-center justify-between gap-2">
-                <Badge
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleTogglePublish(test);
+                  }}
+                  disabled={togglingId === test.id}
+                  title={test.isPublished ? "Click to disable Live (set to Draft & hide from students)" : "Click to enable Live (publish test series)"}
                   className={cn(
-                    "text-[10px] font-semibold px-2 py-0.5",
+                    "inline-flex items-center text-[10px] font-semibold px-2.5 py-0.5 rounded-full border transition-all cursor-pointer active:scale-95 select-none",
                     test.isPublished
-                      ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30"
-                      : "bg-muted text-muted-foreground border-border",
+                      ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30 hover:bg-emerald-500/20"
+                      : "bg-muted text-muted-foreground border-border hover:bg-muted/80",
+                    togglingId === test.id && "opacity-60 cursor-not-allowed"
                   )}
-                  variant="outline"
                 >
-                  {test.isPublished ? (
+                  {togglingId === test.id ? (
+                    <span className="flex items-center gap-1">
+                      <Loader2Icon className="h-3 w-3 animate-spin" />
+                      Updating...
+                    </span>
+                  ) : test.isPublished ? (
                     <span className="flex items-center gap-1">
                       <CheckCircle2Icon className="h-3 w-3" /> Live
                     </span>
@@ -280,7 +333,7 @@ export function TestPaperManager({
                       <EyeOffIcon className="h-3 w-3" /> Draft
                     </span>
                   )}
-                </Badge>
+                </button>
 
                 {/* Category Link */}
                 {test.category && (
