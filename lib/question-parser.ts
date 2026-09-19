@@ -841,3 +841,52 @@ export function applyBulkMarksInJson(
     return { success: false, error: err.message || "Failed to parse JSON" };
   }
 }
+
+/**
+ * Shuffle the ORDER of questions in the JSON (Fisher-Yates).
+ * Does NOT touch answer options or marks — only reorders questions.
+ */
+export function shuffleQuestionsInJson(json: string): {
+  success: boolean;
+  newJson?: string;
+  count?: number;
+  error?: string;
+} {
+  if (!json || !json.trim()) {
+    return { success: false, error: "JSON input is empty" };
+  }
+
+  try {
+    const parsed = JSON.parse(json);
+    let questionsList: any[] = [];
+
+    if (Array.isArray(parsed)) {
+      questionsList = parsed;
+    } else if (parsed && typeof parsed === "object") {
+      if (Array.isArray(parsed.questions)) {
+        questionsList = parsed.questions;
+      } else if (parsed.testseries && Array.isArray(parsed.testseries.questions)) {
+        questionsList = parsed.testseries.questions;
+      }
+    }
+
+    if (questionsList.length <= 1) {
+      return { success: false, error: "Need at least 2 questions to shuffle" };
+    }
+
+    // Fisher-Yates shuffle (in-place)
+    for (let i = questionsList.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [questionsList[i], questionsList[j]] = [questionsList[j], questionsList[i]];
+    }
+
+    const newJson = JSON.stringify(parsed, null, 2);
+    return {
+      success: true,
+      newJson,
+      count: questionsList.length,
+    };
+  } catch (err: any) {
+    return { success: false, error: err.message || "Failed to parse JSON" };
+  }
+}

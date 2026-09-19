@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef, use } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useReactToPrint } from "react-to-print";
 import {
   ArrowLeftIcon,
   ClockIcon,
@@ -24,6 +25,8 @@ import {
   MousePointerClickIcon,
   LayoutListIcon,
   BookOpenIcon,
+  ShuffleIcon,
+  PrinterIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -60,11 +63,13 @@ import {
   NormalizedQuestion,
   SAMPLE_SINGLE_LANG_JSON,
   SAMPLE_BILINGUAL_JSON,
+  shuffleQuestionsInJson,
 } from "@/lib/question-parser";
 import { TestPaperDialog, TestPaperItem } from "../../_components/test-paper-dialog";
 import { FlatCategoryItem } from "../../_components/category-dialog";
 import { QuestionEditDialog } from "../../_components/question-edit-dialog";
 import { ShuffleMarksDialog } from "../../_components/shuffle-marks-dialog";
+import { TestPrintView } from "../../_components/test-print-view";
 import { cn } from "@/lib/utils";
 
 interface PageProps {
@@ -161,12 +166,30 @@ export default function TestDetailPage({ params }: PageProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
   const previewContainerRef = useRef<HTMLDivElement>(null);
+  const printRef = useRef<HTMLDivElement>(null);
 
   const [testData, setTestData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [categories, setCategories] = useState<FlatCategoryItem[]>([]);
   const [previewLanguage, setPreviewLanguage] = useState<"en" | "hi">("en");
   const [viewMode, setViewMode] = useState<"split" | "cards">("split");
+
+  // Print functionality — hook must be before any early returns
+  const printDocTitle = (() => {
+    const cat = testData?.category;
+    const path = cat
+      ? `${cat.parent ? cat.parent.name + " - " : ""}${cat.name}`
+      : "";
+    const title = testData?.title || "Question Paper";
+    return path ? `${path} - ${title}` : title;
+  })();
+
+  const handlePrint = useReactToPrint({
+    contentRef: printRef,
+    documentTitle: printDocTitle,
+  });
+
+
 
   // Full JSON Bulk Editor States
   const [jsonInput, setJsonInput] = useState("");
@@ -447,6 +470,22 @@ export default function TestDetailPage({ params }: PageProps) {
     setSaveStatus(null);
   };
 
+  const handleShuffleQuestions = () => {
+    const res = shuffleQuestionsInJson(jsonInput);
+    if (res.success && res.newJson) {
+      setJsonInput(res.newJson);
+      setSaveStatus({
+        success: true,
+        message: `Shuffled order of ${res.count} questions successfully!`,
+      });
+    } else {
+      setSaveStatus({
+        success: false,
+        message: res.error || "Failed to shuffle questions",
+      });
+    }
+  };
+
   const handleAddQuestionsSubmit = async () => {
     if (parsedImportQuestions.length === 0) return;
     setAddingQuestions(true);
@@ -638,6 +677,18 @@ export default function TestDetailPage({ params }: PageProps) {
           <Button
             size="sm"
             variant="outline"
+            onClick={() => handlePrint()}
+            disabled={parsedQuestions.length === 0}
+            className="text-xs h-8 gap-1.5 font-medium"
+            title="Print question paper (bilingual layout if test has both languages)"
+          >
+            <PrinterIcon className="h-3.5 w-3.5 text-primary" />
+            Print
+          </Button>
+
+          <Button
+            size="sm"
+            variant="outline"
             onClick={() => setEditDialogOpen(true)}
             className="text-xs h-8 gap-1.5 font-medium"
           >
@@ -749,9 +800,20 @@ export default function TestDetailPage({ params }: PageProps) {
                   type="button"
                   variant="outline"
                   size="sm"
+                  onClick={handleShuffleQuestions}
+                  className="text-[11px] h-7 px-2 gap-1 text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-800/60 hover:bg-purple-50 dark:hover:bg-purple-950/40 font-semibold"
+                  title="Fisher-Yates shuffle: randomly reorders question sequence. Does NOT touch options, answer keys, or marks — only the question order changes."
+                >
+                  <ShuffleIcon className="h-3 w-3" />
+                  Shuffle Questions
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
                   onClick={() => setShuffleMarksDialogOpen(true)}
                   className="text-[11px] h-7 px-2 gap-1 text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-800/60 hover:bg-purple-50 dark:hover:bg-purple-950/40 font-semibold"
-                  title="Shuffle answer distribution & bulk configure marks"
+                  title="Moves the correct answer around A/B/C/D so it's not always the same option. Also lets you set marks and negative marking for all questions at once."
                 >
                   <SparklesIcon className="h-3 w-3" />
                   Shuffle & Marks
@@ -1405,6 +1467,24 @@ export default function TestDetailPage({ params }: PageProps) {
           setSaveStatus({ success: true, message });
         }}
       />
+
+      {/* Hidden Print View — rendered off-screen, activated by react-to-print */}
+      {testData && (
+        <TestPrintView
+          ref={printRef}
+          testTitle={testData.title}
+          testDuration={testData.duration}
+          totalMarks={liveTotalMarks || testData.totalMarks}
+          totalQuestions={parsedQuestions.length}
+          languages={testData.languages || ["en"]}
+          questions={parsedQuestions}
+          categoryPath={
+            category
+              ? `${category.parent ? category.parent.name + " > " : ""}${category.name}`
+              : undefined
+          }
+        />
+      )}
     </div>
   );
 }
