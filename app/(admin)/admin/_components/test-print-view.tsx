@@ -265,11 +265,13 @@ export const TestPrintView = React.forwardRef<HTMLDivElement, TestPrintViewProps
                                 variant="question"
                               />
                             </div>
+                            {/*
                             <span className="print-question-marks">
                               [+{q.positiveMarks}
                               {q.negativeMarks > 0 ? ` / -${q.negativeMarks}` : ""}
                               {" "}mark{q.positiveMarks !== 1 ? "s" : ""}]
                             </span>
+                            */}
                           </div>
 
                           {/* English question below, indented */}
