@@ -38,6 +38,176 @@ export const TestPrintView = React.forwardRef<HTMLDivElement, TestPrintViewProps
     const isBilingual =
       languages.includes("en") && languages.includes("hi");
 
+    // Helper to normalize content and check equivalence between languages
+    const normalizeForComparison = (str?: string | null): string => {
+      if (!str) return "";
+      return str
+        .replace(/^#+\s*/gm, "") // remove markdown heading hashes like #####
+        .replace(/\s+/g, " ")    // normalize whitespace
+        .trim();
+    };
+
+    const areTextsEquivalent = (a?: string | null, b?: string | null): boolean => {
+      const normA = normalizeForComparison(a);
+      const normB = normalizeForComparison(b);
+      if (!normA || !normB) return false;
+      return normA === normB || normA.toLowerCase() === normB.toLowerCase();
+    };
+
+    const sanitizeOptionText = (text?: string | null): string => {
+      if (!text) return "";
+      // Escape leading '#' so react-markdown doesn't swallow it as an empty ATX heading
+      return text.replace(/(^|\n)(\s*)(#+)/g, (_m, p1, p2, p3) => `${p1}${p2}\\${p3}`);
+    };
+
+    // Extract unique subjects/sections
+    const rawSubjects: string[] = [];
+    questions.forEach((q) => {
+      const sec = q.section?.trim();
+      if (sec) {
+        const match = sec.match(/^section\s+[a-z0-9]+\s*[-:]?\s*(.*)$/i);
+        const cleaned = match && match[2] ? match[2].trim() : sec;
+        if (cleaned && !rawSubjects.includes(cleaned)) {
+          rawSubjects.push(cleaned);
+        }
+      }
+    });
+
+    const subjectsText =
+      rawSubjects.length > 0
+        ? rawSubjects.join(", ")
+        : categoryPath || testTitle || "All Subjects";
+
+    const totalQuestionsCount = totalQuestions || questions.length;
+    const calculatedMarks = questions.reduce(
+      (sum, q) => sum + (q.positiveMarks != null ? Number(q.positiveMarks) : 1),
+      0
+    );
+    const totalMarksCount = totalMarks || calculatedMarks || totalQuestionsCount;
+
+    let marksPerQuestionText = "1";
+    if (questions.length > 0) {
+      const firstMarks =
+        questions[0].positiveMarks != null ? Number(questions[0].positiveMarks) : 1;
+      const allSame = questions.every(
+        (q) =>
+          (q.positiveMarks != null ? Number(q.positiveMarks) : 1) === firstMarks
+      );
+      if (allSame) {
+        marksPerQuestionText = `${firstMarks}`;
+      } else if (
+        totalMarksCount &&
+        totalQuestionsCount &&
+        totalMarksCount % totalQuestionsCount === 0
+      ) {
+        marksPerQuestionText = `${totalMarksCount / totalQuestionsCount}`;
+      } else {
+        marksPerQuestionText = `${firstMarks}`;
+      }
+    }
+
+    const formatDuration = (minutes: number): string => {
+      if (!minutes || minutes <= 0) return "2 Hours";
+      if (minutes % 60 === 0) {
+        const hours = minutes / 60;
+        return `${hours} ${hours === 1 ? "Hour" : "Hours"}`;
+      }
+      if (minutes % 30 === 0) {
+        const hours = minutes / 60;
+        return `${hours} Hours`;
+      }
+      if (minutes < 60) {
+        return `${minutes} Minutes`;
+      }
+      const hrs = Math.floor(minutes / 60);
+      const mins = minutes % 60;
+      return `${hrs} ${hrs === 1 ? "Hour" : "Hours"} ${mins} Minutes`;
+    };
+
+    const durationText = formatDuration(testDuration);
+
+    const hasNegative = questions.some(
+      (q) => q.negativeMarks != null && Number(q.negativeMarks) > 0
+    );
+    let negativeMarkingText = "No";
+    if (hasNegative) {
+      const firstNeg = questions.find(
+        (q) => q.negativeMarks != null && Number(q.negativeMarks) > 0
+      )?.negativeMarks;
+      negativeMarkingText = firstNeg ? `${firstNeg}` : "Yes";
+    }
+
+    // Build section boundaries for headings and end dividers
+    interface SectionBoundary {
+      sectionName: string;
+      letter: string;
+      start: number; // 1-based
+      end: number;   // 1-based
+      title: string;
+    }
+
+    const buildSectionDisplayTitle = (
+      rawName: string,
+      secIdx: number,
+      start: number,
+      end: number
+    ): { letter: string; title: string } => {
+      const letter = String.fromCharCode(65 + (secIdx % 26));
+      const match = rawName.match(/^section\s+([a-z0-9]+)\s*[-:]?\s*(.*)$/i);
+      const effectiveLetter = match?.[1] ? match[1].toUpperCase() : letter;
+      const subject = match ? (match[2] ? match[2].trim() : "") : rawName;
+      const title = subject
+        ? `Section ${effectiveLetter} - ${subject} (${start}-${end})`
+        : `Section ${effectiveLetter} (${start}-${end})`;
+      return { letter: effectiveLetter, title };
+    };
+
+    const sectionBoundaries: SectionBoundary[] = [];
+    let currentSec = "";
+    let currentStart = 1;
+
+    for (let i = 0; i < questions.length; i++) {
+      const sec = questions[i].section?.trim() || "";
+      if (i === 0) {
+        currentSec = sec;
+        currentStart = 1;
+      } else if (sec !== currentSec) {
+        if (currentSec) {
+          const { letter, title } = buildSectionDisplayTitle(
+            currentSec,
+            sectionBoundaries.length,
+            currentStart,
+            i
+          );
+          sectionBoundaries.push({
+            sectionName: currentSec,
+            letter,
+            start: currentStart,
+            end: i,
+            title,
+          });
+        }
+        currentSec = sec;
+        currentStart = i + 1;
+      }
+    }
+
+    if (currentSec) {
+      const { letter, title } = buildSectionDisplayTitle(
+        currentSec,
+        sectionBoundaries.length,
+        currentStart,
+        questions.length
+      );
+      sectionBoundaries.push({
+        sectionName: currentSec,
+        letter,
+        start: currentStart,
+        end: questions.length,
+        title,
+      });
+    }
+
     return (
       <div ref={ref} className="test-print-root">
         {/* Inline print styles */}
@@ -219,7 +389,12 @@ export const TestPrintView = React.forwardRef<HTMLDivElement, TestPrintViewProps
             }
 
             .print-option-text p,
+            .print-option-text h1,
+            .print-option-text h2,
+            .print-option-text h3,
+            .print-option-text h4,
             .print-option-text h5,
+            .print-option-text h6,
             .print-option-text div {
               margin: 0;
               display: inline;
@@ -239,16 +414,46 @@ export const TestPrintView = React.forwardRef<HTMLDivElement, TestPrintViewProps
               margin: 4pt 0 !important;
             }
 
-            /* Section description header */
-            .print-section-description {
+            /* Test Header & Meta Info Block (matching official exam format) */
+            .print-header-block {
+              margin-bottom: 10pt;
+              page-break-inside: avoid;
+              break-inside: avoid;
+            }
+
+            .print-meta-header {
+              font-size: 10.5pt;
+              line-height: 1.45;
+              margin-bottom: 8pt;
+            }
+
+            .print-meta-row {
+              margin-bottom: 2pt;
+            }
+
+            .print-meta-label {
+              font-weight: 700;
+            }
+
+            .print-meta-val {
+              font-weight: 400;
+            }
+
+            /* Section title (no top or bottom horizontal lines) */
+            .print-section-title {
               text-align: center;
               font-size: 12pt;
               font-weight: 700;
-              margin: 10pt 0 14pt 0;
-              padding: 6pt 0;
-              border-top: 1pt solid #000;
+              margin: 14pt 0 10pt 0;
+              page-break-after: avoid;
+              break-after: avoid;
+            }
+
+            /* Horizontal line after section questions finish */
+            .print-section-divider {
               border-bottom: 1pt solid #000;
-              letter-spacing: 0.5pt;
+              margin: 14pt 0 16pt 0;
+              width: 100%;
             }
           }
         `}</style>
@@ -264,118 +469,176 @@ export const TestPrintView = React.forwardRef<HTMLDivElement, TestPrintViewProps
           <tbody>
             <tr>
               <td>
-                {/* Section description */}
-                {testDescription && (
-                  <div className="print-section-description">
-                    {testDescription}
+                {/* First page header: Meta details from official exam spec */}
+                <div className="print-header-block">
+                  <div className="print-meta-header">
+                    <div className="print-meta-row">
+                      <span className="print-meta-label">Subjects:</span>{" "}
+                      <span className="print-meta-val">{subjectsText}</span>
+                    </div>
+                    <div className="print-meta-row">
+                      <span className="print-meta-label">Total Questions:</span>{" "}
+                      <span className="print-meta-val">{totalQuestionsCount}</span>
+                    </div>
+                    <div className="print-meta-row">
+                      <span className="print-meta-label">Total Marks:</span>{" "}
+                      <span className="print-meta-val">{totalMarksCount}</span>
+                    </div>
+                    <div className="print-meta-row">
+                      <span className="print-meta-label">Marks per Question:</span>{" "}
+                      <span className="print-meta-val">{marksPerQuestionText}</span>
+                    </div>
+                    <div className="print-meta-row">
+                      <span className="print-meta-label">Time:</span>{" "}
+                      <span className="print-meta-val">{durationText}</span>
+                    </div>
+                    <div className="print-meta-row">
+                      <span className="print-meta-label">Negative Marking:</span>{" "}
+                      <span className="print-meta-val">{negativeMarkingText}</span>
+                    </div>
                   </div>
+                </div>
+
+                {/* If non-sectional test, render a divider before questions start */}
+                {sectionBoundaries.length === 0 && (
+                  <div className="print-section-divider" style={{ marginTop: "4pt", marginBottom: "14pt" }} />
                 )}
 
                 {/* Questions */}
-                {questions.map((q, idx) => (
-                  <React.Fragment key={idx}>
-                    <div className="print-question">
-                      {isBilingual ? (
-                        <>
-                          {/* Hindi question first */}
-                          <div className="print-question-row">
-                            <span className="q-num">Q.{idx + 1}</span>
-                            <div className="print-question-text">
-                              <MarkdownRenderer
-                                content={q.content.hi || q.content.en || ""}
-                                variant="question"
-                              />
-                            </div>
-                            {/*
-                            <span className="print-question-marks">
-                              [+{q.positiveMarks}
-                              {q.negativeMarks > 0 ? ` / -${q.negativeMarks}` : ""}
-                              {" "}mark{q.positiveMarks !== 1 ? "s" : ""}]
-                            </span>
-                            */}
-                          </div>
+                {questions.map((q, idx) => {
+                  const qNum = idx + 1;
+                  const boundaryStart = sectionBoundaries.find((b) => b.start === qNum);
+                  const boundaryEnd = sectionBoundaries.find((b) => b.end === qNum);
 
-                          {/* English question below, indented */}
-                          <div className="print-english-line">
-                            <MarkdownRenderer
-                              content={q.content.en || ""}
-                              variant="question"
-                            />
-                          </div>
-
-                          {/* Options: (A) hindi / english — vertical list */}
-                          {q.options.length > 0 && (
-                            <div className="print-options-list">
-                              {q.options.map((opt) => (
-                                <div key={opt.id} className="print-option">
-                                  <span className="print-option-label">
-                                    ({opt.id})
-                                  </span>
-                                  <span className="print-option-text">
-                                    <MarkdownRenderer
-                                      content={opt.text.hi || opt.text.en || ""}
-                                      variant="option"
-                                    />
-                                    {/* Show english only if different from hindi */}
-                                    {opt.text.hi && opt.text.en && opt.text.hi !== opt.text.en && (
-                                      <>
-                                        <span className="print-option-separator">/</span>
-                                        <MarkdownRenderer
-                                          content={opt.text.en}
-                                          variant="option"
-                                        />
-                                      </>
-                                    )}
-                                  </span>
-                                </div>
-                              ))}
-                            </div>
-                          )}
-                        </>
-                      ) : (
-                        /* Single language */
-                        <div className="print-lang-section">
-                          <div className="print-question-row">
-                            <span className="q-num">Q.{idx + 1}</span>
-                            <div className="print-question-text">
-                              <MarkdownRenderer
-                                content={
-                                  q.content[
-                                  languages.includes("hi") ? "hi" : "en"
-                                  ] || q.content.en || ""
-                                }
-                                variant="question"
-                              />
-                            </div>
-                            <span className="print-question-marks">
-                              [+{q.positiveMarks}
-                              {q.negativeMarks > 0 ? ` / -${q.negativeMarks}` : ""}
-                              {" "}mark{q.positiveMarks !== 1 ? "s" : ""}]
-                            </span>
-                          </div>
-                          {q.options.length > 0 && (
-                            <div className="print-options-list">
-                              {q.options.map((opt) => (
-                                <div key={opt.id} className="print-option">
-                                  <span className="print-option-label">
-                                    ({opt.id})
-                                  </span>
-                                  <span className="print-option-text">
-                                    <MarkdownRenderer
-                                      content={
-                                        opt.text[
-                                        languages.includes("hi") ? "hi" : "en"
-                                        ] || opt.text.en || ""
-                                      }
-                                      variant="option"
-                                    />
-                                  </span>
-                                </div>
-                              ))}
-                            </div>
-                          )}
+                  return (
+                    <React.Fragment key={idx}>
+                      {boundaryStart && (
+                        <div
+                          className="print-section-title"
+                          style={{ marginTop: idx > 0 ? "16pt" : "10pt" }}
+                        >
+                          {boundaryStart.title}
                         </div>
                       )}
+                      <div className="print-question">
+                        {isBilingual ? (
+                          <>
+                            {(() => {
+                              const hiContent = q.content.hi?.trim();
+                              const enContent = q.content.en?.trim();
+                              const hasBoth = Boolean(hiContent && enContent);
+                              const areSame = hasBoth && areTextsEquivalent(hiContent, enContent);
+                              const primaryContent = hiContent || enContent || "";
+                              const showEnglishLine = hasBoth && !areSame;
+
+                              return (
+                                <>
+                                  {/* Primary question text (Hindi if available, else English) */}
+                                  <div className="print-question-row">
+                                    <span className="q-num">Q.{idx + 1}</span>
+                                    <div className="print-question-text">
+                                      <MarkdownRenderer
+                                        content={primaryContent}
+                                        variant="question"
+                                      />
+                                    </div>
+                                  </div>
+
+                                  {/* English question below, indented — ONLY IF DIFFERENT from Hindi */}
+                                  {showEnglishLine && (
+                                    <div className="print-english-line">
+                                      <MarkdownRenderer
+                                        content={enContent!}
+                                        variant="question"
+                                      />
+                                    </div>
+                                  )}
+                                </>
+                              );
+                            })()}
+
+                            {/* Options: (A) hindi / english — vertical list */}
+                            {q.options.length > 0 && (
+                              <div className="print-options-list">
+                                {q.options.map((opt) => {
+                                  const hiOpt = opt.text.hi?.trim();
+                                  const enOpt = opt.text.en?.trim();
+                                  const hasBothOpts = Boolean(hiOpt && enOpt);
+                                  const areOptsSame = hasBothOpts && areTextsEquivalent(hiOpt, enOpt);
+                                  const primaryOpt = hiOpt || enOpt || "";
+                                  const showEnglishOpt = hasBothOpts && !areOptsSame;
+
+                                  return (
+                                    <div key={opt.id} className="print-option">
+                                      <span className="print-option-label">
+                                        ({opt.id})
+                                      </span>
+                                      <span className="print-option-text">
+                                        <MarkdownRenderer
+                                          content={sanitizeOptionText(primaryOpt)}
+                                          variant="option"
+                                        />
+                                        {/* Show english only if different from hindi */}
+                                        {showEnglishOpt && (
+                                          <>
+                                            <span className="print-option-separator">/</span>
+                                            <MarkdownRenderer
+                                              content={sanitizeOptionText(enOpt)}
+                                              variant="option"
+                                            />
+                                          </>
+                                        )}
+                                      </span>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            )}
+                          </>
+                        ) : (
+                          /* Single language */
+                          <div className="print-lang-section">
+                            <div className="print-question-row">
+                              <span className="q-num">Q.{idx + 1}</span>
+                              <div className="print-question-text">
+                                <MarkdownRenderer
+                                  content={
+                                    q.content[
+                                      languages.includes("hi") ? "hi" : "en"
+                                    ] || q.content.en || ""
+                                  }
+                                  variant="question"
+                                />
+                              </div>
+                              <span className="print-question-marks">
+                                [+{q.positiveMarks}
+                                {q.negativeMarks > 0 ? ` / -${q.negativeMarks}` : ""}
+                                {" "}mark{q.positiveMarks !== 1 ? "s" : ""}]
+                              </span>
+                            </div>
+                            {q.options.length > 0 && (
+                              <div className="print-options-list">
+                                {q.options.map((opt) => (
+                                  <div key={opt.id} className="print-option">
+                                    <span className="print-option-label">
+                                      ({opt.id})
+                                    </span>
+                                    <span className="print-option-text">
+                                      <MarkdownRenderer
+                                        content={sanitizeOptionText(
+                                          opt.text[
+                                            languages.includes("hi") ? "hi" : "en"
+                                          ] || opt.text.en || ""
+                                        )}
+                                        variant="option"
+                                      />
+                                    </span>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        )}
 
                       {/* Numerical/Integer answer placeholder */}
                       {q.options.length === 0 && (
@@ -392,8 +655,13 @@ export const TestPrintView = React.forwardRef<HTMLDivElement, TestPrintViewProps
                         </div>
                       )}
                     </div>
+
+                    {boundaryEnd && (
+                      <div className="print-section-divider" />
+                    )}
                   </React.Fragment>
-                ))}
+                );
+              })}
               </td>
             </tr>
           </tbody>

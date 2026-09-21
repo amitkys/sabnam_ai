@@ -45,8 +45,9 @@ import { cn } from "@/lib/utils";
 interface QuestionEditDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  questionWrapper: any; // { id, testPaperId, positiveMarks, negativeMarks, question: {...} }
+  questionWrapper: any; // { id, testPaperId, positiveMarks, negativeMarks, sectionId, section, question: {...} }
   testPaperId?: string;
+  sections?: Array<{ id: string; name: string }>;
   onSuccess: () => void;
 }
 
@@ -55,6 +56,7 @@ export function QuestionEditDialog({
   onOpenChange,
   questionWrapper,
   testPaperId,
+  sections = [],
   onSuccess,
 }: QuestionEditDialogProps) {
   const q = questionWrapper?.question || questionWrapper;
@@ -68,6 +70,7 @@ export function QuestionEditDialog({
   const [difficulty, setDifficulty] = useState<Difficulty>(Difficulty.MEDIUM);
   const [positiveMarks, setPositiveMarks] = useState<number>(1);
   const [negativeMarks, setNegativeMarks] = useState<number>(0);
+  const [sectionId, setSectionId] = useState<string | null>(null);
   const [options, setOptions] = useState<NormalizedOption[]>([]);
   const [correctValue, setCorrectValue] = useState<string>("");
 
@@ -104,6 +107,7 @@ export function QuestionEditDialog({
 
       setPositiveMarks(pos);
       setNegativeMarks(neg);
+      setSectionId(questionWrapper?.sectionId || questionWrapper?.section?.id || null);
 
       // Options
       const rawOpts = Array.isArray(q.options) ? q.options : [];
@@ -228,6 +232,7 @@ export function QuestionEditDialog({
         },
         positiveMarks: Number(positiveMarks),
         negativeMarks: Number(negativeMarks),
+        sectionId: sectionId || null,
       });
 
       if (res.success) {
@@ -390,6 +395,28 @@ export function QuestionEditDialog({
                 }
               />
             </div>
+
+            {sections.length > 0 && (
+              <div className="space-y-1 col-span-2 sm:col-span-4 pt-1">
+                <Label className="text-[11px] font-semibold">Assign to Section</Label>
+                <Select
+                  value={sectionId || "NONE"}
+                  onValueChange={(val) => setSectionId(val === "NONE" ? null : val)}
+                >
+                  <SelectTrigger className="text-xs h-8">
+                    <SelectValue placeholder="Select Section" />
+                  </SelectTrigger>
+                  <SelectContent className="text-xs">
+                    <SelectItem value="NONE">No Section (General / Unassigned)</SelectItem>
+                    {sections.map((sec) => (
+                      <SelectItem key={sec.id} value={sec.id}>
+                        {sec.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
           </div>
 
           {/* Live Preview Mode or Edit Mode */}

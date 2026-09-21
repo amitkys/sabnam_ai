@@ -33,6 +33,9 @@ export async function getAnalysisAction({ attemptId }: { attemptId: string }) {
             title: true,
             totalMarks: true,
             duration: true,
+            sections: {
+              orderBy: { orderIndex: "asc" },
+            },
           },
         },
         responses: {
@@ -66,6 +69,14 @@ export async function getAnalysisAction({ attemptId }: { attemptId: string }) {
         positiveMarks: true,
         negativeMarks: true,
         orderIndex: true,
+        sectionId: true,
+        section: {
+          select: {
+            id: true,
+            name: true,
+            orderIndex: true,
+          },
+        },
         question: {
           select: {
             id: true,

@@ -182,6 +182,7 @@ model TestPaper {
   categoryId String
   category   Category @relation(fields: [categoryId], references: [id])
 
+  sections  TestSection[]
   questions TestQuestion[]
   attempts  TestAttempt[]
 
@@ -189,17 +190,40 @@ model TestPaper {
   updatedAt DateTime? @updatedAt
 }
 
+model TestSection {
+  id          String   @id @default(cuid())
+  name        String   // e.g. "Mathematics", "Science", "Reasoning"
+  orderIndex  Int      @default(1)
+  description String?  // Optional instructions for this section
+  duration    Int?     // Optional sectional timer in minutes (null = uses shared test duration)
+
+  testPaperId String
+  testPaper   TestPaper @relation(fields: [testPaperId], references: [id], onDelete: Cascade)
+
+  questions   TestQuestion[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([testPaperId])
+}
+
 model TestQuestion {
-  id            String    @id @default(cuid())
+  id            String       @id @default(cuid())
   testPaperId   String
-  testPaper     TestPaper @relation(fields: [testPaperId], references: [id])
+  testPaper     TestPaper    @relation(fields: [testPaperId], references: [id])
   questionId    String
-  question      Question  @relation(fields: [questionId], references: [id])
+  question      Question     @relation(fields: [questionId], references: [id])
   positiveMarks Float
   negativeMarks Float
   orderIndex    Int
 
+  // Optional section grouping (null for legacy/un-sectioned tests)
+  sectionId     String?
+  section       TestSection? @relation(fields: [sectionId], references: [id], onDelete: SetNull)
+
   @@unique([testPaperId, questionId])
+  @@index([sectionId])
 }
 
 // ==========================================

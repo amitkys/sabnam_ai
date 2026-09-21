@@ -32,9 +32,26 @@ export async function getAttemptAction({ attemptId }: { attemptId: string }) {
             description: true,
             totalMarks: true,
             languages: true,
+            sections: {
+              orderBy: { orderIndex: "asc" },
+              select: {
+                id: true,
+                name: true,
+                orderIndex: true,
+                description: true,
+                duration: true,
+              }
+            },
             questions: {
               orderBy: { orderIndex: "asc" },
               include: {
+                section: {
+                  select: {
+                    id: true,
+                    name: true,
+                    orderIndex: true,
+                  }
+                },
                 question: {
                   select: {
                     id: true,

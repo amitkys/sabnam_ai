@@ -4,6 +4,7 @@ import { Check, Clock } from "lucide-react";
 import { useParams } from "next/navigation";
 
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { useNewTestAttemptStore } from "@/lib/store/new-attempt-store";
@@ -91,6 +92,14 @@ export function QuestionCard() {
               <span className="font-bold text-sm text-foreground font-mono">
                 Q. {formattedOrder}/{formattedTotal}
               </span>
+              {(currentQuestion as any).section?.name && (
+                <Badge
+                  variant="outline"
+                  className="text-[11px] font-semibold bg-purple-500/10 text-purple-700 dark:text-purple-300 border-purple-500/30"
+                >
+                  {(currentQuestion as any).section.name}
+                </Badge>
+              )}
               <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-muted/80 text-xs font-mono font-medium text-muted-foreground border border-border/50 shadow-2xs">
                 <Clock className="w-3.5 h-3.5 text-primary" />
                 <span>{formatQuestionTime(questionTime)}</span>

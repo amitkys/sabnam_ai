@@ -238,6 +238,11 @@ function QuestionCardItem({
           >
             {q.question.type}
           </Badge>
+          {(q as any).section?.name && (
+            <Badge variant="outline" className="text-[10px] font-semibold bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/30">
+              {(q as any).section.name}
+            </Badge>
+          )}
           <Badge
             className={cn(
               "text-[10px] font-semibold",

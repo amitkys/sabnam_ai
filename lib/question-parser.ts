@@ -26,6 +26,17 @@ export interface NormalizedQuestion {
   negativeMarks: number;
   imageUrl?: string | null;
   tags?: string[];
+  section?: string | null; // e.g. "Mathematics", "Science", "Reasoning"
+  sectionId?: string | null; // Database ID if linked to an existing TestSection
+}
+
+export interface NormalizedSection {
+  id?: string;
+  name: string;
+  orderIndex: number;
+  description?: string | null;
+  duration?: number | null;
+  questions: NormalizedQuestion[];
 }
 
 export interface ParsedJSONResult {
@@ -39,6 +50,7 @@ export interface ParsedJSONResult {
     isPublic?: boolean;
     level?: string;
   };
+  sections?: NormalizedSection[];
   questions: NormalizedQuestion[];
 }
 
@@ -227,6 +239,16 @@ export function normalizeSingleQuestion(rawQ: Record<string, unknown>, index: nu
     negativeMarks: Math.max(0, negativeMarks),
     imageUrl: typeof rawQ.imageUrl === "string" ? rawQ.imageUrl : null,
     tags: Array.isArray(rawQ.tags) ? rawQ.tags.map(String) : [],
+    section:
+      typeof rawQ.section === "string" && rawQ.section.trim()
+        ? rawQ.section.trim()
+        : typeof rawQ.sectionName === "string" && rawQ.sectionName.trim()
+        ? rawQ.sectionName.trim()
+        : null,
+    sectionId:
+      typeof rawQ.sectionId === "string" && rawQ.sectionId.trim()
+        ? rawQ.sectionId.trim()
+        : null,
   };
 }
 
@@ -271,9 +293,10 @@ export function parseMarkdownJSON(input: string): ParsedJSONResult {
   }
 
   let metadata: ParsedJSONResult["metadata"] = undefined;
+  let rawSectionsList: any[] = [];
   let rawQuestionsList: any[] = [];
 
-  // Shape 1: { testseries: { ... }, questions: [...] }
+  // Shape 1: { testseries: { ... }, sections: [...], questions: [...] }
   if (parsedObject && typeof parsedObject === "object" && !Array.isArray(parsedObject)) {
     if (parsedObject.testseries && typeof parsedObject.testseries === "object") {
       const ts = parsedObject.testseries;
@@ -285,14 +308,18 @@ export function parseMarkdownJSON(input: string): ParsedJSONResult {
         isPublic: typeof ts.isPublic === "boolean" ? ts.isPublic : true,
       };
 
-      if (Array.isArray(ts.questions)) {
+      if (Array.isArray(ts.sections)) {
+        rawSectionsList = ts.sections;
+      } else if (Array.isArray(ts.questions)) {
         rawQuestionsList = ts.questions;
       }
     }
 
-    if (Array.isArray(parsedObject.questions)) {
+    if (Array.isArray(parsedObject.sections)) {
+      rawSectionsList = parsedObject.sections;
+    } else if (Array.isArray(parsedObject.questions)) {
       rawQuestionsList = parsedObject.questions;
-    } else if (rawQuestionsList.length === 0 && (parsedObject.text || parsedObject.content)) {
+    } else if (rawQuestionsList.length === 0 && rawSectionsList.length === 0 && (parsedObject.text || parsedObject.content)) {
       // Single question object
       rawQuestionsList = [parsedObject];
     }
@@ -301,10 +328,60 @@ export function parseMarkdownJSON(input: string): ParsedJSONResult {
     rawQuestionsList = parsedObject;
   }
 
+  // Branch A: Sectional JSON provided ({ sections: [ { name, questions: [...] } ] })
+  if (rawSectionsList.length > 0) {
+    const normalizedSections: NormalizedSection[] = [];
+    const allQuestions: NormalizedQuestion[] = [];
+
+    rawSectionsList.forEach((rawSec, secIdx) => {
+      if (!rawSec || typeof rawSec !== "object") return;
+      const secName = String(rawSec.name || rawSec.title || `Section ${secIdx + 1}`).trim();
+      const secDesc = typeof rawSec.description === "string" ? rawSec.description : null;
+      const secDuration = typeof rawSec.duration === "number" ? rawSec.duration : null;
+      const secRawQs = Array.isArray(rawSec.questions) ? rawSec.questions : [];
+
+      const secQuestions: NormalizedQuestion[] = secRawQs
+        .filter((q: any) => q && typeof q === "object")
+        .map((q: any, qIdx: number) => {
+          const normQ = normalizeSingleQuestion(q, qIdx);
+          normQ.section = normQ.section || secName;
+          if (rawSec.id) normQ.sectionId = normQ.sectionId || String(rawSec.id);
+          return normQ;
+        });
+
+      normalizedSections.push({
+        id: typeof rawSec.id === "string" ? rawSec.id : undefined,
+        name: secName,
+        orderIndex: secIdx + 1,
+        description: secDesc,
+        duration: secDuration,
+        questions: secQuestions,
+      });
+
+      allQuestions.push(...secQuestions);
+    });
+
+    if (allQuestions.length === 0) {
+      return {
+        success: false,
+        error: "No question objects found inside the sections. Make sure each section contains a questions array.",
+        questions: [],
+      };
+    }
+
+    return {
+      success: true,
+      metadata,
+      sections: normalizedSections,
+      questions: allQuestions,
+    };
+  }
+
+  // Branch B: Flat questions list
   if (rawQuestionsList.length === 0) {
     return {
       success: false,
-      error: "No question objects found in the JSON. Make sure your JSON contains an array of questions.",
+      error: "No question objects found in the JSON. Make sure your JSON contains an array of questions or sections.",
       questions: [],
     };
   }
@@ -314,9 +391,25 @@ export function parseMarkdownJSON(input: string): ParsedJSONResult {
     .filter((q) => q && typeof q === "object")
     .map((q, idx) => normalizeSingleQuestion(q, idx));
 
+  // Check if any questions have section specified
+  const distinctSections = Array.from(new Set(questions.map((q) => q.section).filter(Boolean))) as string[];
+  let sections: NormalizedSection[] | undefined = undefined;
+
+  if (distinctSections.length > 0) {
+    sections = distinctSections.map((secName, idx) => {
+      const secQuestions = questions.filter((q) => q.section === secName);
+      return {
+        name: secName,
+        orderIndex: idx + 1,
+        questions: secQuestions,
+      };
+    });
+  }
+
   return {
     success: true,
     metadata,
+    sections,
     questions,
   };
 }
@@ -462,6 +555,167 @@ export const SAMPLE_SINGLE_LANG_JSON = JSON.stringify(
   2
 );
 
+/**
+ * Sectional sample template JSON (Math, Science, Reasoning with LaTeX math & bilingual content)
+ */
+export const SAMPLE_SECTIONAL_JSON = JSON.stringify(
+  {
+    testseries: {
+      title: "Combined Sectional Mock Test (Math, Science & Reasoning)",
+      duration: 90,
+      description: "Full multi-section practice test with Quantitative Aptitude, General Science, and Logical Reasoning.",
+    },
+    sections: [
+      {
+        name: "General Intelligence & Reasoning",
+        description: "Logical and analytical reasoning problems.",
+        questions: [
+          {
+            text: {
+              en: "##### Select the related word from the given alternatives:\n\n**Book : Author :: Film : ?**",
+              hi: "##### दिए गए विकल्पों में से संबंधित शब्द चुनिए:\n\n**पुस्तक : लेखक :: फिल्म : ?**",
+            },
+            answerIndex: 1,
+            options: [
+              { en: "Actor", hi: "अभिनेता" },
+              { en: "Director", hi: "निर्देशक" },
+              { en: "Producer", hi: "निर्माता" },
+              { en: "Screenplay", hi: "पटकथा" },
+            ],
+            solution: {
+              en: "An author creates a book; similarly, a director directs a film.",
+              hi: "जिस प्रकार लेखक पुस्तक की रचना करता है, उसी प्रकार निर्देशक फिल्म का निर्देशन करता है।",
+            },
+            marks: 2,
+            negativeMarks: 0.5,
+            type: "MCQ_SINGLE",
+            difficulty: "EASY",
+          },
+          {
+            text: {
+              en: "##### If $\\text{CAT} = 24$ and $\\text{BAT} = 23$, then find the numerical value of $\\text{DOG}$.",
+              hi: "##### यदि $\\text{CAT} = 24$ और $\\text{BAT} = 23$ हो, तो $\\text{DOG}$ का मान ज्ञात कीजिए।",
+            },
+            answerIndex: 0,
+            options: [
+              { en: "$26$", hi: "$26$" },
+              { en: "$27$", hi: "$27$" },
+              { en: "$25$", hi: "$25$" },
+              { en: "$28$", hi: "$28$" },
+            ],
+            solution: {
+              en: "Sum of alphabetical positions:\n- $\\text{C}(3) + \\text{A}(1) + \\text{T}(20) = 24$\n- $\\text{D}(4) + \\text{O}(15) + \\text{G}(7) = 26$",
+              hi: "वर्णमाला क्रम के अनुसार योग:\n- $\\text{C}(3) + \\text{A}(1) + \\text{T}(20) = 24$\n- $\\text{D}(4) + \\text{O}(15) + \\text{G}(7) = 26$",
+            },
+            marks: 2,
+            negativeMarks: 0.5,
+            type: "MCQ_SINGLE",
+            difficulty: "EASY",
+          },
+        ],
+      },
+      {
+        name: "Quantitative Aptitude & Mathematics",
+        description: "Arithmetic, Algebra, and Geometry questions.",
+        questions: [
+          {
+            text: {
+              en: "##### If $x + \\dfrac{1}{x} = 5$, then find the value of $x^2 + \\dfrac{1}{x^2}$.",
+              hi: "##### यदि $x + \\dfrac{1}{x} = 5$ हो, तो $x^2 + \\dfrac{1}{x^2}$ का मान ज्ञात कीजिए।",
+            },
+            answerIndex: 1,
+            options: [
+              { en: "$25$", hi: "$25$" },
+              { en: "$23$", hi: "$23$" },
+              { en: "$27$", hi: "$27$" },
+              { en: "$21$", hi: "$21$" },
+            ],
+            solution: {
+              en: "Squaring both sides:\n$$\\left(x + \\frac{1}{x}\\right)^2 = 5^2 \\implies x^2 + \\frac{1}{x^2} + 2 = 25 \\implies x^2 + \\frac{1}{x^2} = 23$$",
+              hi: "दोनों पक्षों का वर्ग करने पर:\n$$\\left(x + \\frac{1}{x}\\right)^2 = 5^2 \\implies x^2 + \\frac{1}{x^2} + 2 = 25 \\implies x^2 + \\frac{1}{x^2} = 23$$",
+            },
+            marks: 2,
+            negativeMarks: 0.5,
+            type: "MCQ_SINGLE",
+            difficulty: "MEDIUM",
+          },
+          {
+            text: {
+              en: "##### What is the value of $\\sin^2(30^\\circ) + \\cos^2(30^\\circ)$?",
+              hi: "##### $\\sin^2(30^\\circ) + \\cos^2(30^\\circ)$ का मान क्या है?",
+            },
+            answerIndex: 0,
+            options: [
+              { en: "$1$", hi: "$1$" },
+              { en: "$0$", hi: "$0$" },
+              { en: "$\\dfrac{1}{2}$", hi: "$\\dfrac{1}{2}$" },
+              { en: "$\\dfrac{3}{4}$", hi: "$\\dfrac{3}{4}$" },
+            ],
+            solution: {
+              en: "By fundamental trigonometric identity:\n$$\\sin^2(\\theta) + \\cos^2(\\theta) = 1 \\quad \\forall \\, \\theta$$",
+              hi: "त्रिकोणमितीय सर्वसमिका के अनुसार:\n$$\\sin^2(\\theta) + \\cos^2(\\theta) = 1$$",
+            },
+            marks: 2,
+            negativeMarks: 0.5,
+            type: "MCQ_SINGLE",
+            difficulty: "EASY",
+          },
+        ],
+      },
+      {
+        name: "General Science",
+        description: "Physics, Chemistry, and Biology questions.",
+        questions: [
+          {
+            text: {
+              en: "##### Which chemical element has the symbol **Fe**?",
+              hi: "##### किस रासायनिक तत्व का प्रतीक **Fe** है?",
+            },
+            answerIndex: 2,
+            options: [
+              { en: "Lead", hi: "सीसा (Lead)" },
+              { en: "Fluorine", hi: "फ्लोरीन (Fluorine)" },
+              { en: "Iron", hi: "लोहा (Iron)" },
+              { en: "Gold", hi: "सोना (Gold)" },
+            ],
+            solution: {
+              en: "**Fe** comes from the Latin word *Ferrum*, which is Iron.",
+              hi: "**Fe** लैटिन शब्द *Ferrum* से लिया गया है, जिसका अर्थ लोहा (Iron) है।",
+            },
+            marks: 2,
+            negativeMarks: 0.5,
+            type: "MCQ_SINGLE",
+            difficulty: "EASY",
+          },
+          {
+            text: {
+              en: "##### What is the acceleration due to gravity on Earth's surface approximately?",
+              hi: "##### पृथ्वी की सतह पर गुरुत्वीय त्वरण ($g$) का मान लगभग कितना होता है?",
+            },
+            answerIndex: 1,
+            options: [
+              { en: "$8.9 \\text{ m/s}^2$", hi: "$8.9 \\text{ m/s}^2$" },
+              { en: "$9.8 \\text{ m/s}^2$", hi: "$9.8 \\text{ m/s}^2$" },
+              { en: "$10.8 \\text{ m/s}^2$", hi: "$10.8 \\text{ m/s}^2$" },
+              { en: "$9.0 \\text{ m/s}^2$", hi: "$9.0 \\text{ m/s}^2$" },
+            ],
+            solution: {
+              en: "Standard gravity on Earth's surface is approximately $9.8 \\text{ m/s}^2$.",
+              hi: "पृथ्वी की सतह पर मानक गुरुत्वीय त्वरण लगभग $9.8 \\text{ m/s}^2$ होता है।",
+            },
+            marks: 2,
+            negativeMarks: 0.5,
+            type: "MCQ_SINGLE",
+            difficulty: "EASY",
+          },
+        ],
+      },
+    ],
+  },
+  null,
+  2
+);
+
 export const SAMPLE_QUESTION_JSON = SAMPLE_BILINGUAL_JSON;
 
 export interface QuestionJsonLocation {
@@ -476,80 +730,111 @@ export interface QuestionJsonLocation {
  * Uses structural bracket scanning (immune to LaTeX/markdown formatting differences)
  * to count question objects directly in the JSON.
  */
+function extractRawQuestionsList(parsed: any): any[] {
+  if (Array.isArray(parsed)) return parsed;
+  if (!parsed || typeof parsed !== "object") return [];
+  if (Array.isArray(parsed.sections)) {
+    return parsed.sections.flatMap((s: any) => (Array.isArray(s?.questions) ? s.questions : []));
+  }
+  if (Array.isArray(parsed.questions)) {
+    return parsed.questions;
+  }
+  if (parsed.testseries) {
+    if (Array.isArray(parsed.testseries.sections)) {
+      return parsed.testseries.sections.flatMap((s: any) => (Array.isArray(s?.questions) ? s.questions : []));
+    }
+    if (Array.isArray(parsed.testseries.questions)) {
+      return parsed.testseries.questions;
+    }
+  }
+  return [];
+}
+
+/**
+ * Accurately finds the character offset and line number of the N-th question in a JSON string.
+ * Uses structural bracket scanning (immune to LaTeX/markdown formatting differences)
+ * to count question objects directly in the JSON, across flat questions or multi-section arrays.
+ */
 export function findQuestionRangeInJson(
   json: string,
   questionIndex: number
 ): QuestionJsonLocation | null {
   if (!json || questionIndex < 0) return null;
 
-  // 1. Locate the questions array start if wrapped in { questions: [ ... ] } or { testseries: { questions: [ ... ] } }
-  let arrayStart = -1;
-  const qMatch = /"questions"\s*:\s*\[/.exec(json);
-  if (qMatch) {
-    arrayStart = qMatch.index + qMatch[0].length - 1;
-  } else {
-    // Check if JSON root starts with [ (e.g. array of questions)
+  // Find all "questions": [ occurrences across flat or sectional JSON
+  const arrayStarts: number[] = [];
+  const regex = /"questions"\s*:\s*\[/g;
+  let match: RegExpExecArray | null;
+  while ((match = regex.exec(json)) !== null) {
+    arrayStarts.push(match.index + match[0].length - 1);
+  }
+
+  // If no "questions": [ found, check if JSON root starts with [
+  if (arrayStarts.length === 0) {
     let idx = 0;
     while (idx < json.length && /\s/.test(json[idx])) idx++;
     if (json[idx] === "[") {
-      arrayStart = idx;
+      arrayStarts.push(idx);
     }
   }
 
-  const scanStart = arrayStart !== -1 ? arrayStart + 1 : 0;
-  let inString = false;
-  let isEscaped = false;
-  let depth = 0;
-  let currentStart = -1;
+  if (arrayStarts.length === 0) return null;
+
   let currentIdx = 0;
 
-  for (let i = scanStart; i < json.length; i++) {
-    const char = json[i];
+  for (const arrayStart of arrayStarts) {
+    let inString = false;
+    let isEscaped = false;
+    let depth = 0;
+    let currentStart = -1;
 
-    if (inString) {
-      if (isEscaped) {
-        isEscaped = false;
-      } else if (char === "\\") {
-        isEscaped = true;
-      } else if (char === '"') {
-        inString = false;
-      }
-      continue;
-    }
+    for (let i = arrayStart + 1; i < json.length; i++) {
+      const char = json[i];
 
-    if (char === '"') {
-      inString = true;
-      continue;
-    }
-
-    if (char === "{") {
-      if (depth === 0) {
-        currentStart = i;
-      }
-      depth++;
-    } else if (char === "}") {
-      depth--;
-      if (depth === 0 && currentStart !== -1) {
-        if (currentIdx === questionIndex) {
-          const end = i + 1;
-          const qSlice = json.slice(currentStart, end);
-          // Look for "text" or "content" or "question" property start
-          const textMatch = /"(?:text|content|question)"\s*:\s*/.exec(qSlice);
-          const textPropIndex = textMatch ? currentStart + textMatch.index : currentStart;
-          const line = json.substring(0, textPropIndex).split("\n").length;
-          return {
-            startIndex: currentStart,
-            endIndex: end,
-            targetIndex: textPropIndex,
-            line,
-          };
+      if (inString) {
+        if (isEscaped) {
+          isEscaped = false;
+        } else if (char === "\\") {
+          isEscaped = true;
+        } else if (char === '"') {
+          inString = false;
         }
-        currentIdx++;
-        currentStart = -1;
+        continue;
       }
-    } else if (char === "]" && depth === 0 && arrayStart !== -1) {
-      // Reached the end of questions array
-      break;
+
+      if (char === '"') {
+        inString = true;
+        continue;
+      }
+
+      if (char === "{") {
+        if (depth === 0) {
+          currentStart = i;
+        }
+        depth++;
+      } else if (char === "}") {
+        depth--;
+        if (depth === 0 && currentStart !== -1) {
+          if (currentIdx === questionIndex) {
+            const end = i + 1;
+            const qSlice = json.slice(currentStart, end);
+            const textMatch = /"(?:text|content|question)"\s*:\s*/.exec(qSlice);
+            const textPropIndex = textMatch ? currentStart + textMatch.index : currentStart;
+            const line = json.substring(0, textPropIndex).split("\n").length;
+            return {
+              startIndex: currentStart,
+              endIndex: end,
+              targetIndex: textPropIndex,
+              line,
+            };
+          }
+          currentIdx++;
+          currentStart = -1;
+        }
+      } else if (char === "]" && depth === 0) {
+        // Finished this questions array, break to next section if needed
+        break;
+      }
     }
   }
 
@@ -572,17 +857,7 @@ export function getAnswerDistributionInJson(json: string): {
 
   try {
     const parsed = JSON.parse(json);
-    let questionsList: any[] = [];
-
-    if (Array.isArray(parsed)) {
-      questionsList = parsed;
-    } else if (parsed && typeof parsed === "object") {
-      if (Array.isArray(parsed.questions)) {
-        questionsList = parsed.questions;
-      } else if (parsed.testseries && Array.isArray(parsed.testseries.questions)) {
-        questionsList = parsed.testseries.questions;
-      }
-    }
+    const questionsList = extractRawQuestionsList(parsed);
 
     questionsList.forEach((q) => {
       if (!q || typeof q !== "object") return;
@@ -648,17 +923,7 @@ export function shuffleAnswersInJson(
 
   try {
     const parsed = JSON.parse(json);
-    let questionsList: any[] = [];
-
-    if (Array.isArray(parsed)) {
-      questionsList = parsed;
-    } else if (parsed && typeof parsed === "object") {
-      if (Array.isArray(parsed.questions)) {
-        questionsList = parsed.questions;
-      } else if (parsed.testseries && Array.isArray(parsed.testseries.questions)) {
-        questionsList = parsed.testseries.questions;
-      }
-    }
+    const questionsList = extractRawQuestionsList(parsed);
 
     if (questionsList.length === 0) {
       return { success: false, error: "No questions found in JSON" };
@@ -801,17 +1066,7 @@ export function applyBulkMarksInJson(
 
   try {
     const parsed = JSON.parse(json);
-    let questionsList: any[] = [];
-
-    if (Array.isArray(parsed)) {
-      questionsList = parsed;
-    } else if (parsed && typeof parsed === "object") {
-      if (Array.isArray(parsed.questions)) {
-        questionsList = parsed.questions;
-      } else if (parsed.testseries && Array.isArray(parsed.testseries.questions)) {
-        questionsList = parsed.testseries.questions;
-      }
-    }
+    const questionsList = extractRawQuestionsList(parsed);
 
     if (questionsList.length === 0) {
       return { success: false, error: "No questions found in JSON" };
@@ -844,6 +1099,7 @@ export function applyBulkMarksInJson(
 
 /**
  * Shuffle the ORDER of questions in the JSON (Fisher-Yates).
+ * If sections are present, shuffles questions within each section.
  * Does NOT touch answer options or marks — only reorders questions.
  */
 export function shuffleQuestionsInJson(json: string): {
@@ -858,17 +1114,42 @@ export function shuffleQuestionsInJson(json: string): {
 
   try {
     const parsed = JSON.parse(json);
-    let questionsList: any[] = [];
 
-    if (Array.isArray(parsed)) {
-      questionsList = parsed;
-    } else if (parsed && typeof parsed === "object") {
-      if (Array.isArray(parsed.questions)) {
-        questionsList = parsed.questions;
-      } else if (parsed.testseries && Array.isArray(parsed.testseries.questions)) {
-        questionsList = parsed.testseries.questions;
+    // If sections exist, shuffle within each section
+    if (parsed && typeof parsed === "object") {
+      const sections = Array.isArray(parsed.sections)
+        ? parsed.sections
+        : parsed.testseries && Array.isArray(parsed.testseries.sections)
+        ? parsed.testseries.sections
+        : null;
+
+      if (sections && sections.length > 0) {
+        let totalCount = 0;
+        sections.forEach((sec: any) => {
+          if (Array.isArray(sec?.questions) && sec.questions.length > 1) {
+            for (let i = sec.questions.length - 1; i > 0; i--) {
+              const j = Math.floor(Math.random() * (i + 1));
+              [sec.questions[i], sec.questions[j]] = [sec.questions[j], sec.questions[i]];
+            }
+            totalCount += sec.questions.length;
+          } else if (Array.isArray(sec?.questions)) {
+            totalCount += sec.questions.length;
+          }
+        });
+
+        if (totalCount <= 1) {
+          return { success: false, error: "Need at least 2 questions across sections to shuffle" };
+        }
+
+        return {
+          success: true,
+          newJson: JSON.stringify(parsed, null, 2),
+          count: totalCount,
+        };
       }
     }
+
+    const questionsList = extractRawQuestionsList(parsed);
 
     if (questionsList.length <= 1) {
       return { success: false, error: "Need at least 2 questions to shuffle" };

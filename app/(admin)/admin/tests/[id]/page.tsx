@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef, use } from "react";
+import React, { useState, useEffect, useRef, use, useMemo } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useReactToPrint } from "react-to-print";
@@ -61,8 +61,10 @@ import {
   parseMarkdownJSON,
   findQuestionRangeInJson,
   NormalizedQuestion,
+  NormalizedSection,
   SAMPLE_SINGLE_LANG_JSON,
   SAMPLE_BILINGUAL_JSON,
+  SAMPLE_SECTIONAL_JSON,
   shuffleQuestionsInJson,
 } from "@/lib/question-parser";
 import { TestPaperDialog, TestPaperItem } from "../../_components/test-paper-dialog";
@@ -70,6 +72,12 @@ import { FlatCategoryItem } from "../../_components/category-dialog";
 import { QuestionEditDialog } from "../../_components/question-edit-dialog";
 import { ShuffleMarksDialog } from "../../_components/shuffle-marks-dialog";
 import { TestPrintView } from "../../_components/test-print-view";
+import {
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+  TooltipProvider,
+} from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 
 interface PageProps {
@@ -77,14 +85,15 @@ interface PageProps {
 }
 
 /**
- * Converts test question records into clean formatted JSON for bulk editing
+ * Converts test question records into clean formatted JSON for bulk editing,
+ * grouping by sections if the test series has defined sections.
  */
-function convertQuestionsToJSON(testQuestions: any[]): string {
+function convertQuestionsToJSON(testQuestions: any[], testSections?: any[]): string {
   if (!testQuestions || testQuestions.length === 0) {
     return JSON.stringify({ questions: [] }, null, 2);
   }
 
-  const formatted = testQuestions.map((tq) => {
+  const formatOneQuestion = (tq: any) => {
     const q = tq.question || tq;
     const content = typeof q.content === "object" && q.content !== null ? q.content : { en: String(q.content || "") };
     const solution = typeof q.solution === "object" && q.solution !== null ? q.solution : { en: String(q.solution || "") };
@@ -106,8 +115,58 @@ function convertQuestionsToJSON(testQuestions: any[]): string {
       correctValue: q.correctValue || (options.find((o: any) => o.isCorrect)?.id || ""),
       solution,
     };
-  });
+  };
 
+  // 1. If test has sections defined, output structured sections
+  if (testSections && testSections.length > 0) {
+    const sectionsPayload = testSections.map((sec) => {
+      const secQuestions = testQuestions.filter(
+        (tq) => tq.sectionId === sec.id || (tq.section && tq.section.id === sec.id)
+      );
+      return {
+        name: sec.name,
+        description: sec.description || undefined,
+        duration: sec.duration || undefined,
+        questions: secQuestions.map(formatOneQuestion),
+      };
+    });
+
+    // Also include any questions without a section if any exist
+    const unsectioned = testQuestions.filter(
+      (tq) => !tq.sectionId && (!tq.section || !testSections.some((s) => s.id === tq.section.id))
+    );
+    if (unsectioned.length > 0) {
+      sectionsPayload.push({
+        name: "General",
+        description: undefined,
+        duration: undefined,
+        questions: unsectioned.map(formatOneQuestion),
+      });
+    }
+
+    return JSON.stringify({ sections: sectionsPayload }, null, 2);
+  }
+
+  // 2. Check if questions have section relation attached
+  const hasSections = testQuestions.some((tq) => tq.section || tq.sectionId);
+  if (hasSections) {
+    const sectionMap = new Map<string, any[]>();
+    testQuestions.forEach((tq) => {
+      const secName = tq.section?.name || "General";
+      if (!sectionMap.has(secName)) sectionMap.set(secName, []);
+      sectionMap.get(secName)!.push(formatOneQuestion(tq));
+    });
+
+    const sectionsPayload = Array.from(sectionMap.entries()).map(([name, qs]) => ({
+      name,
+      questions: qs,
+    }));
+
+    return JSON.stringify({ sections: sectionsPayload }, null, 2);
+  }
+
+  // 3. Fallback to flat list
+  const formatted = testQuestions.map(formatOneQuestion);
   return JSON.stringify({ questions: formatted }, null, 2);
 }
 /**
@@ -195,7 +254,36 @@ export default function TestDetailPage({ params }: PageProps) {
   const [jsonInput, setJsonInput] = useState("");
   const [originalJson, setOriginalJson] = useState("");
   const [parsedQuestions, setParsedQuestions] = useState<NormalizedQuestion[]>([]);
+  const [parsedSections, setParsedSections] = useState<NormalizedSection[]>([]);
+  const [selectedSectionFilter, setSelectedSectionFilter] = useState<string>("all");
+  const [previewSectionFilter, setPreviewSectionFilter] = useState<string>("all");
   const [jsonError, setJsonError] = useState<string | null>(null);
+
+  const availableSectionNames = useMemo(() => {
+    const set = new Set<string>();
+    parsedSections.forEach((s) => {
+      if (s.name?.trim()) set.add(s.name.trim());
+    });
+    parsedQuestions.forEach((q) => {
+      if (q.section?.trim()) set.add(q.section.trim());
+    });
+    return Array.from(set);
+  }, [parsedSections, parsedQuestions]);
+
+  useEffect(() => {
+    if (previewSectionFilter !== "all" && !availableSectionNames.includes(previewSectionFilter)) {
+      setPreviewSectionFilter("all");
+    }
+  }, [availableSectionNames, previewSectionFilter]);
+
+  const displayedPreviewQuestions = useMemo(() => {
+    return parsedQuestions
+      .map((q, originalIdx) => ({ q, originalIdx }))
+      .filter(({ q }) => {
+        if (previewSectionFilter === "all") return true;
+        return q.section === previewSectionFilter;
+      });
+  }, [parsedQuestions, previewSectionFilter]);
   const [savingAll, setSavingAll] = useState(false);
   const [saveStatus, setSaveStatus] = useState<{ success: boolean; message: string } | null>(null);
   const [highlightedQuestionIdx, setHighlightedQuestionIdx] = useState<number | null>(null);
@@ -233,13 +321,14 @@ export default function TestDetailPage({ params }: PageProps) {
 
       if (detailRes.success) {
         setTestData(detailRes.data);
-        const formatted = convertQuestionsToJSON(detailRes.data.questions || []);
+        const formatted = convertQuestionsToJSON(detailRes.data.questions || [], detailRes.data.sections || []);
         setJsonInput(formatted);
         setOriginalJson(formatted);
 
         const parsed = parseMarkdownJSON(formatted);
         if (parsed.success) {
           setParsedQuestions(parsed.questions);
+          setParsedSections(parsed.sections || []);
         }
       }
       if (catRes.success) {
@@ -303,6 +392,7 @@ export default function TestDetailPage({ params }: PageProps) {
     const result = parseMarkdownJSON(jsonInput);
     if (result.success) {
       setParsedQuestions(result.questions);
+      setParsedSections(result.sections || []);
       setJsonError(null);
     } else {
       setJsonError(result.error || "Invalid JSON syntax");
@@ -429,6 +519,7 @@ export default function TestDetailPage({ params }: PageProps) {
       const res = await syncAllTestQuestionsAction({
         testPaperId: testId,
         questions: parsedQuestions,
+        sections: parsedSections.length > 0 ? parsedSections : undefined,
       });
 
       if (res.success) {
@@ -795,53 +886,91 @@ export default function TestDetailPage({ params }: PageProps) {
                 )}
               </div>
 
-              <div className="flex items-center gap-1.5">
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={handleShuffleQuestions}
-                  className="text-[11px] h-7 px-2 gap-1 text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-800/60 hover:bg-purple-50 dark:hover:bg-purple-950/40 font-semibold"
-                  title="Fisher-Yates shuffle: randomly reorders question sequence. Does NOT touch options, answer keys, or marks — only the question order changes."
-                >
-                  <ShuffleIcon className="h-3 w-3" />
-                  Shuffle Questions
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setShuffleMarksDialogOpen(true)}
-                  className="text-[11px] h-7 px-2 gap-1 text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-800/60 hover:bg-purple-50 dark:hover:bg-purple-950/40 font-semibold"
-                  title="Moves the correct answer around A/B/C/D so it's not always the same option. Also lets you set marks and negative marking for all questions at once."
-                >
-                  <SparklesIcon className="h-3 w-3" />
-                  Shuffle & Marks
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={handleFormatJSON}
-                  className="text-[11px] h-7 px-2"
-                  title="Auto-format and beautify JSON"
-                >
-                  Format
-                </Button>
-                {hasChanges && (
+              <TooltipProvider delay={100}>
+                <div className="flex items-center gap-1.5">
+                  <Tooltip>
+                    <TooltipTrigger
+                      render={
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={handleShuffleQuestions}
+                          className="text-[11px] h-7 px-2 gap-1 text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-800/60 hover:bg-purple-50 dark:hover:bg-purple-950/40 font-semibold cursor-pointer"
+                          title="Shuffle Questions: Randomly reorders questions (within each section if sections exist)"
+                        >
+                          <ShuffleIcon className="h-3 w-3" />
+                          Shuffle Questions
+                        </Button>
+                      }
+                    />
+                    <TooltipContent side="top" className="max-w-xs p-3 text-xs shadow-lg bg-popover text-popover-foreground border border-border">
+                      <div className="space-y-1">
+                        <p className="font-bold text-foreground flex items-center gap-1.5 text-xs">
+                          <ShuffleIcon className="h-3.5 w-3.5 text-purple-500" />
+                          Shuffle Question Order
+                        </p>
+                        <p className="text-[11px] text-muted-foreground leading-relaxed">
+                          Randomly reorders questions sequence using Fisher-Yates. If your test has sections (e.g. Reasoning, Math, Science), questions are shuffled <strong>within their own sections</strong> without crossing section boundaries. Options, marks, and formulas stay 100% preserved.
+                        </p>
+                      </div>
+                    </TooltipContent>
+                  </Tooltip>
+
+                  <Tooltip>
+                    <TooltipTrigger
+                      render={
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setShuffleMarksDialogOpen(true)}
+                          className="text-[11px] h-7 px-2 gap-1 text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-800/60 hover:bg-purple-50 dark:hover:bg-purple-950/40 font-semibold cursor-pointer"
+                          title="Shuffle & Marks: Balances correct answers across A/B/C/D and sets marks & negative marking"
+                        >
+                          <SparklesIcon className="h-3 w-3" />
+                          Shuffle & Marks
+                        </Button>
+                      }
+                    />
+                    <TooltipContent side="top" className="max-w-xs p-3 text-xs shadow-lg bg-popover text-popover-foreground border border-border">
+                      <div className="space-y-1">
+                        <p className="font-bold text-foreground flex items-center gap-1.5 text-xs">
+                          <SparklesIcon className="h-3.5 w-3.5 text-amber-500" />
+                          Shuffle Answer Keys & Set Marks
+                        </p>
+                        <p className="text-[11px] text-muted-foreground leading-relaxed">
+                          Opens a dialog to balance correct answers evenly across A, B, C, D (e.g. 25% each) so the answer isn&apos;t always option A or B. Also lets you bulk update positive marks (+2, +4) and negative penalties for all questions across all sections.
+                        </p>
+                      </div>
+                    </TooltipContent>
+                  </Tooltip>
+
                   <Button
                     type="button"
-                    variant="ghost"
+                    variant="outline"
                     size="sm"
-                    onClick={handleResetToOriginal}
-                    className="text-[11px] h-7 px-2 text-muted-foreground hover:text-foreground gap-1"
-                    title="Revert edits to saved database state"
+                    onClick={handleFormatJSON}
+                    className="text-[11px] h-7 px-2"
+                    title="Auto-format and beautify JSON indentation"
                   >
-                    <RotateCcwIcon className="h-3 w-3" />
-                    Reset
+                    Format
                   </Button>
-                )}
-              </div>
+                  {hasChanges && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleResetToOriginal}
+                      className="text-[11px] h-7 px-2 text-muted-foreground hover:text-foreground gap-1"
+                      title="Revert edits to saved database state"
+                    >
+                      <RotateCcwIcon className="h-3 w-3" />
+                      Reset
+                    </Button>
+                  )}
+                </div>
+              </TooltipProvider>
             </div>
 
             {/* JSON Textarea with Cursor Ref */}
@@ -912,42 +1041,77 @@ export default function TestDetailPage({ params }: PageProps) {
 
           {/* RIGHT COLUMN (6 Cols): Live KaTeX Visual Preview with Click-to-Jump */}
           <div className="lg:col-span-6 flex flex-col gap-3">
-            {/* Preview Header & Language Switch */}
-            <div className="flex items-center justify-between bg-card p-3 rounded-xl border shadow-sm">
-              <div className="flex items-center gap-2">
+            {/* Preview Header & Section Dropdown & Language Switch */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 bg-card p-3 rounded-xl border shadow-sm">
+              <div className="flex items-center gap-2 flex-wrap">
                 <EyeIcon className="h-4 w-4 text-primary" />
                 <span className="text-xs font-bold text-foreground">Live Visual Preview</span>
                 <Badge variant="outline" className="text-[11px] font-semibold bg-primary/10 text-primary border-primary/30">
-                  {parsedQuestions.length} Questions
+                  {previewSectionFilter === "all"
+                    ? `${parsedQuestions.length} Questions`
+                    : `${displayedPreviewQuestions.length} of ${parsedQuestions.length} Questions`}
                 </Badge>
+                {parsedSections.length > 0 && (
+                  <Badge variant="outline" className="text-[11px] font-semibold bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/30">
+                    {parsedSections.length} Sections
+                  </Badge>
+                )}
               </div>
 
-              {/* Language Switch */}
-              <div className="flex items-center gap-1 bg-muted p-0.5 rounded-lg">
-                <button
-                  type="button"
-                  onClick={() => setPreviewLanguage("en")}
-                  className={cn(
-                    "text-xs font-medium px-2.5 py-0.5 rounded-md transition-colors",
-                    previewLanguage === "en"
-                      ? "bg-background text-foreground shadow-xs font-semibold"
-                      : "text-muted-foreground hover:text-foreground"
-                  )}
-                >
-                  English
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setPreviewLanguage("hi")}
-                  className={cn(
-                    "text-xs font-medium px-2.5 py-0.5 rounded-md transition-colors",
-                    previewLanguage === "hi"
-                      ? "bg-background text-foreground shadow-xs font-semibold"
-                      : "text-muted-foreground hover:text-foreground"
-                  )}
-                >
-                  हिंदी (Hindi)
-                </button>
+              <div className="flex items-center gap-2 flex-wrap">
+                {/* Section Selector Dropdown */}
+                {availableSectionNames.length > 0 && (
+                  <div className="flex items-center gap-1.5 bg-muted/60 p-0.5 px-2 rounded-lg border border-border/80">
+                    <LayersIcon className="h-3.5 w-3.5 text-purple-600 dark:text-purple-400 shrink-0" />
+                    <span className="text-[11px] font-semibold text-muted-foreground shrink-0">Section:</span>
+                    <select
+                      value={previewSectionFilter}
+                      onChange={(e) => setPreviewSectionFilter(e.target.value)}
+                      className="text-xs bg-transparent text-foreground font-medium focus:outline-none cursor-pointer py-1 pr-1"
+                      title="Filter preview questions by section"
+                    >
+                      <option value="all" className="bg-popover text-popover-foreground">
+                        All Sections ({parsedQuestions.length})
+                      </option>
+                      {availableSectionNames.map((secName) => {
+                        const count = parsedQuestions.filter((q) => q.section === secName).length;
+                        return (
+                          <option key={secName} value={secName} className="bg-popover text-popover-foreground">
+                            {secName} ({count})
+                          </option>
+                        );
+                      })}
+                    </select>
+                  </div>
+                )}
+
+                {/* Language Switch */}
+                <div className="flex items-center gap-1 bg-muted p-0.5 rounded-lg">
+                  <button
+                    type="button"
+                    onClick={() => setPreviewLanguage("en")}
+                    className={cn(
+                      "text-xs font-medium px-2.5 py-0.5 rounded-md transition-colors",
+                      previewLanguage === "en"
+                        ? "bg-background text-foreground shadow-xs font-semibold"
+                        : "text-muted-foreground hover:text-foreground"
+                    )}
+                  >
+                    English
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPreviewLanguage("hi")}
+                    className={cn(
+                      "text-xs font-medium px-2.5 py-0.5 rounded-md transition-colors",
+                      previewLanguage === "hi"
+                        ? "bg-background text-foreground shadow-xs font-semibold"
+                        : "text-muted-foreground hover:text-foreground"
+                    )}
+                  >
+                    हिंदी (Hindi)
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -964,36 +1128,76 @@ export default function TestDetailPage({ params }: PageProps) {
                     Edit the JSON on the left to add questions or import a sample template.
                   </p>
                 </div>
+              ) : displayedPreviewQuestions.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-16 text-center text-muted-foreground bg-card border rounded-xl shadow-sm">
+                  <LayersIcon className="h-9 w-9 stroke-1 mb-2 text-purple-500" />
+                  <p className="text-sm font-semibold text-foreground">No questions found in section &ldquo;{previewSectionFilter}&rdquo;</p>
+                  <p className="text-xs text-muted-foreground mt-1 mb-3">
+                    No questions currently match the selected section filter.
+                  </p>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setPreviewSectionFilter("all")}
+                    className="text-xs"
+                  >
+                    Show All Sections
+                  </Button>
+                </div>
               ) : (
-                parsedQuestions.map((q, idx) => {
+                displayedPreviewQuestions.map(({ q, originalIdx }, loopIdx) => {
                   const questionText = q.content[previewLanguage] || q.content.en || "";
                   const solutionText = q.solution[previewLanguage] || q.solution.en || "";
-                  const isHighlighted = highlightedQuestionIdx === idx;
+                  const isHighlighted = highlightedQuestionIdx === originalIdx;
+                  const isFirstOfSection = Boolean(
+                    q.section && (loopIdx === 0 || displayedPreviewQuestions[loopIdx - 1]?.q.section !== q.section)
+                  );
+                  const sectionQuestionsCount = q.section
+                    ? parsedQuestions.filter((item) => item.section === q.section).length
+                    : 0;
 
                   return (
-                    <div
-                      key={idx}
-                      ref={(el) => {
-                        cardRefs.current[idx] = el;
-                      }}
-                      onClick={() => handleJumpToJsonQuestion(idx)}
-                      className={cn(
-                        "rounded-xl border bg-card shadow-sm flex flex-col transition-all cursor-pointer group",
-                        isHighlighted
-                          ? "border-primary ring-2 ring-primary/40 shadow-md"
-                          : "border-border/80 hover:border-primary/50"
-                      )}
-                      title="Click anywhere to focus and jump to this question in the JSON editor"
-                    >
-                      {/* Header */}
-                      <div className="flex items-center justify-between px-4 py-2.5 bg-muted/40 border-b border-border/50 rounded-t-xl">
-                        <div className="flex items-center gap-2">
-                          <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[11px] font-bold text-primary-foreground">
-                            {idx + 1}
+                    <React.Fragment key={originalIdx}>
+                      {/* Section Header Divider */}
+                      {isFirstOfSection && (
+                        <div className="flex items-center justify-between px-4 py-2 bg-purple-500/10 border border-purple-500/30 rounded-xl text-xs text-purple-700 dark:text-purple-300 font-bold shadow-xs">
+                          <div className="flex items-center gap-2">
+                            <LayersIcon className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+                            <span>Section: {q.section}</span>
+                          </div>
+                          <span className="text-[11px] font-normal opacity-85">
+                            {sectionQuestionsCount} {sectionQuestionsCount === 1 ? "Question" : "Questions"}
                           </span>
-                          <Badge variant="outline" className="text-[10px] uppercase font-semibold">
-                            {q.type}
-                          </Badge>
+                        </div>
+                      )}
+
+                      <div
+                        ref={(el) => {
+                          cardRefs.current[originalIdx] = el;
+                        }}
+                        onClick={() => handleJumpToJsonQuestion(originalIdx)}
+                        className={cn(
+                          "rounded-xl border bg-card shadow-sm flex flex-col transition-all cursor-pointer group",
+                          isHighlighted
+                            ? "border-primary ring-2 ring-primary/40 shadow-md"
+                            : "border-border/80 hover:border-primary/50"
+                        )}
+                        title="Click anywhere to focus and jump to this question in the JSON editor"
+                      >
+                        {/* Header */}
+                        <div className="flex items-center justify-between px-4 py-2.5 bg-muted/40 border-b border-border/50 rounded-t-xl">
+                          <div className="flex items-center gap-2">
+                            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[11px] font-bold text-primary-foreground">
+                              {originalIdx + 1}
+                            </span>
+                            <Badge variant="outline" className="text-[10px] uppercase font-semibold">
+                              {q.type}
+                            </Badge>
+                            {q.section && (
+                              <Badge variant="outline" className="text-[10px] font-semibold bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/30">
+                                {q.section}
+                              </Badge>
+                            )}
                           <Badge
                             variant="secondary"
                             className={cn(
@@ -1102,6 +1306,7 @@ export default function TestDetailPage({ params }: PageProps) {
                         )}
                       </div>
                     </div>
+                  </React.Fragment>
                   );
                 })
               )}
@@ -1111,7 +1316,7 @@ export default function TestDetailPage({ params }: PageProps) {
       ) : (
         /* VIEW MODE 2: INDIVIDUAL CARD LIST VIEW */
         <div className="flex flex-col gap-4">
-          <div className="flex items-center justify-between pb-2 border-b">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b">
             <div className="flex items-center gap-2">
               <FileTextIcon className="h-4 w-4 text-primary" />
               <h2 className="text-sm font-bold text-foreground">
@@ -1119,7 +1324,7 @@ export default function TestDetailPage({ params }: PageProps) {
               </h2>
             </div>
 
-            <div className="flex items-center gap-1 bg-muted p-0.5 rounded-lg text-xs">
+            <div className="flex items-center gap-1 bg-muted p-0.5 rounded-lg text-xs self-start sm:self-auto">
               <button
                 type="button"
                 onClick={() => setPreviewLanguage("en")}
@@ -1143,12 +1348,57 @@ export default function TestDetailPage({ params }: PageProps) {
             </div>
           </div>
 
+          {/* Section Filter Pills if sections exist */}
+          {testData.sections && testData.sections.length > 0 && (
+            <div className="flex items-center gap-2 overflow-x-auto pb-1">
+              <span className="text-xs text-muted-foreground font-semibold flex items-center gap-1 shrink-0">
+                <LayersIcon className="h-3.5 w-3.5 text-primary" /> Sections:
+              </span>
+              <button
+                type="button"
+                onClick={() => setSelectedSectionFilter("all")}
+                className={cn(
+                  "text-xs px-3 py-1 rounded-full font-medium transition-all shrink-0 border",
+                  selectedSectionFilter === "all"
+                    ? "bg-primary text-primary-foreground border-primary shadow-xs font-semibold"
+                    : "bg-muted text-muted-foreground border-border hover:bg-muted/80"
+                )}
+              >
+                All ({questionsList.length})
+              </button>
+              {testData.sections.map((sec: any) => {
+                const count = questionsList.filter((tq: any) => tq.sectionId === sec.id || tq.section?.id === sec.id).length;
+                return (
+                  <button
+                    key={sec.id}
+                    type="button"
+                    onClick={() => setSelectedSectionFilter(sec.id)}
+                    className={cn(
+                      "text-xs px-3 py-1 rounded-full font-medium transition-all shrink-0 border",
+                      selectedSectionFilter === sec.id
+                        ? "bg-purple-600 text-white border-purple-600 shadow-xs font-semibold"
+                        : "bg-purple-500/10 text-purple-700 dark:text-purple-300 border-purple-500/30 hover:bg-purple-500/20"
+                    )}
+                  >
+                    {sec.name} ({count})
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
           <div className="space-y-4">
-            {questionsList.map((tq: any, idx: number) => {
+            {questionsList
+              .filter((tq: any) => {
+                if (selectedSectionFilter === "all") return true;
+                return tq.sectionId === selectedSectionFilter || tq.section?.id === selectedSectionFilter;
+              })
+              .map((tq: any, idx: number) => {
               const q = tq.question;
               const questionText = q.content[previewLanguage] || q.content.en || "";
               const solutionText = q.solution ? q.solution[previewLanguage] || q.solution.en || "" : "";
               const rawOptions = Array.isArray(q.options) ? q.options : [];
+              const sectionName = tq.section?.name || (testData.sections?.find((s: any) => s.id === tq.sectionId)?.name);
 
               return (
                 <div key={tq.id} className="rounded-xl border border-border/80 bg-card shadow-sm flex flex-col transition-all">
@@ -1161,6 +1411,11 @@ export default function TestDetailPage({ params }: PageProps) {
                       <Badge variant="outline" className="text-[10px] uppercase font-semibold">
                         {q.type}
                       </Badge>
+                      {sectionName && (
+                        <Badge variant="outline" className="text-[10px] font-semibold bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/30">
+                          {sectionName}
+                        </Badge>
+                      )}
                       <Badge
                         variant="secondary"
                         className={cn(
@@ -1335,6 +1590,16 @@ export default function TestDetailPage({ params }: PageProps) {
                 <SparklesIcon className="h-3 w-3 text-amber-500" />
                 Sample: Bilingual (EN + HI)
               </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setImportJsonInput(SAMPLE_SECTIONAL_JSON)}
+                className="text-[11px] h-7 px-2.5 gap-1.5 bg-purple-500/5 text-purple-600 border-purple-500/30"
+              >
+                <LayersIcon className="h-3 w-3 text-purple-500" />
+                Sample: Sectional (Math, Science, Reasoning)
+              </Button>
             </div>
 
             {importJsonError ? (
@@ -1397,6 +1662,7 @@ export default function TestDetailPage({ params }: PageProps) {
           onOpenChange={(open) => !open && setEditingQuestion(null)}
           questionWrapper={editingQuestion}
           testPaperId={testId}
+          sections={testData.sections || []}
           onSuccess={fetchDetail}
         />
       )}

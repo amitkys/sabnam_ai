@@ -626,6 +626,15 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
     );
   }, [variant, className, content]);
 
+  // Process content (e.g. escape leading '#' in option variant so markdown doesn't parse it as an empty ATX heading)
+  const processedContent = useMemo(() => {
+    if (!content) return "";
+    if (variant === "option") {
+      return content.replace(/(^|\n)(\s*)(#+)/g, (_m, p1, p2, p3) => `${p1}${p2}\\${p3}`);
+    }
+    return content;
+  }, [content, variant]);
+
   // Prevent hydration mismatch by not rendering theme-dependent content until mounted
   if (!mounted) {
     return (
@@ -635,7 +644,7 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
           rehypePlugins={[rehypeKatex]}
           remarkPlugins={[remarkMath, remarkGfm]}
         >
-          {content}
+          {processedContent}
         </Markdown>
       </div>
     );
@@ -648,7 +657,7 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
         rehypePlugins={[rehypeKatex]}
         remarkPlugins={[remarkMath, remarkGfm]}
       >
-        {content}
+        {processedContent}
       </Markdown>
     </div>
   );

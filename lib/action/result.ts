@@ -26,6 +26,9 @@ export async function getResultAction({ attemptId }: { attemptId: string }) {
             slug: true,
             totalMarks: true,
             duration: true,
+            sections: {
+              orderBy: { orderIndex: "asc" },
+            },
             category: {
               select: {
                 id: true,
@@ -74,6 +77,7 @@ export async function getResultAction({ attemptId }: { attemptId: string }) {
     const testQuestions = await prisma.testQuestion.findMany({
       where: { testPaperId: attempt.testPaperId },
       include: {
+        section: true,
         question: true,
       },
       orderBy: {

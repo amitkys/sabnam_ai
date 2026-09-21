@@ -10,6 +10,7 @@ async function main() {
   await prisma.studentResponse.deleteMany();
   await prisma.testAttempt.deleteMany();
   await prisma.testQuestion.deleteMany();
+  await prisma.testSection.deleteMany();
   await prisma.testPaper.deleteMany();
   await prisma.question.deleteMany();
   await prisma.category.deleteMany();
