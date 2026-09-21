@@ -1483,6 +1483,7 @@ export default function TestDetailPage({ params }: PageProps) {
               ? `${category.parent ? category.parent.name + " > " : ""}${category.name}`
               : undefined
           }
+          testDescription={testData.description}
         />
       )}
     </div>

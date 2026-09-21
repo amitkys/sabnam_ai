@@ -12,6 +12,7 @@ interface TestPrintViewProps {
   languages: string[];
   questions: NormalizedQuestion[];
   categoryPath?: string;
+  testDescription?: string | null;
 }
 
 /**
@@ -30,6 +31,7 @@ export const TestPrintView = React.forwardRef<HTMLDivElement, TestPrintViewProps
       languages,
       questions,
       categoryPath,
+      testDescription,
     },
     ref
   ) {
@@ -236,6 +238,18 @@ export const TestPrintView = React.forwardRef<HTMLDivElement, TestPrintViewProps
             .katex-display {
               margin: 4pt 0 !important;
             }
+
+            /* Section description header */
+            .print-section-description {
+              text-align: center;
+              font-size: 12pt;
+              font-weight: 700;
+              margin: 10pt 0 14pt 0;
+              padding: 6pt 0;
+              border-top: 1pt solid #000;
+              border-bottom: 1pt solid #000;
+              letter-spacing: 0.5pt;
+            }
           }
         `}</style>
 
@@ -250,6 +264,13 @@ export const TestPrintView = React.forwardRef<HTMLDivElement, TestPrintViewProps
           <tbody>
             <tr>
               <td>
+                {/* Section description */}
+                {testDescription && (
+                  <div className="print-section-description">
+                    {testDescription}
+                  </div>
+                )}
+
                 {/* Questions */}
                 {questions.map((q, idx) => (
                   <React.Fragment key={idx}>
