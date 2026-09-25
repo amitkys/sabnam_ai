@@ -149,27 +149,33 @@ export const TestPrintView = React.forwardRef<HTMLDivElement, TestPrintViewProps
             }
 
             /*
-             * BROWSER HEADER/FOOTER SUPPRESSION TECHNIQUE
-             * ============================================
-             * Problem: Browsers auto-insert header (page title, URL) and footer
-             * (page number, date) in the @page margin area when printing.
-             * Setting @page { margin: 15mm } gives nice per-page margins but
-             * also brings back these browser-generated texts.
+             * BROWSER HEADER/FOOTER SUPPRESSION
+             * ==================================
+             * @page margin-top: 0 suppresses the browser's default header.
+             * @page margin-bottom: 14mm provides space for page numbers.
+             * All margin boxes are explicitly set to content:none to override
+             * Chrome's default footer (date, time, URL, page numbers).
+             * Only @bottom-center renders our custom "Page X of Y".
              *
-             * Solution: @page { margin: 0 } removes the margin area entirely,
-             * which kills the browser header/footer since there's no space for it.
-             *
-             * But then we lose per-page margins... so we use the TABLE TRICK:
-             * - Wrap content in a <table> with an empty <thead> and <tfoot>
-             * - thead has display:table-header-group → repeats on TOP of every page
-             * - tfoot has display:table-footer-group → repeats on BOTTOM of every page
-             * - These contain empty divs with fixed height (15mm) acting as margins
-             * - The <td> padding provides left/right margins
-             *
-             * Result: No browser text, consistent margins on every printed page.
+             * The TABLE TRICK handles content-level margins:
+             * - thead repeats on TOP of every page (15mm spacer)
+             * - tfoot repeats on BOTTOM of every page (5mm spacer above page number)
+             * - <td> padding provides left/right margins
              */
             @page {
-              margin: 0;
+              margin: 0 0 14mm 0;
+
+              @top-left { content: none; }
+              @top-center { content: none; }
+              @top-right { content: none; }
+              @bottom-left { content: none; }
+              @bottom-right { content: none; }
+              @bottom-center {
+                content: "Page " counter(page) " of " counter(pages);
+                font-family: 'Times New Roman', 'Noto Serif Devanagari', serif;
+                font-size: 9pt;
+                color: #555;
+              }
             }
 
             /* Table layout for repeating per-page margins (see technique above) */
@@ -192,9 +198,9 @@ export const TestPrintView = React.forwardRef<HTMLDivElement, TestPrintViewProps
               height: 15mm;
             }
 
-            /* Repeating spacer on every page bottom (acts as bottom margin) */
+            /* Repeating spacer on every page bottom (content padding above page number) */
             .print-margin-bottom {
-              height: 15mm;
+              height: 5mm;
             }
 
             thead { display: table-header-group; }
