@@ -60,82 +60,7 @@ export const TestPrintView = React.forwardRef<HTMLDivElement, TestPrintViewProps
       return text.replace(/(^|\n)(\s*)(#+)/g, (_m, p1, p2, p3) => `${p1}${p2}\\${p3}`);
     };
 
-    // Extract unique subjects/sections
-    const rawSubjects: string[] = [];
-    questions.forEach((q) => {
-      const sec = q.section?.trim();
-      if (sec) {
-        const match = sec.match(/^section\s+[a-z0-9]+\s*[-:]?\s*(.*)$/i);
-        const cleaned = match && match[2] ? match[2].trim() : sec;
-        if (cleaned && !rawSubjects.includes(cleaned)) {
-          rawSubjects.push(cleaned);
-        }
-      }
-    });
 
-    const subjectsText =
-      rawSubjects.length > 0
-        ? rawSubjects.join(", ")
-        : categoryPath || testTitle || "All Subjects";
-
-    const totalQuestionsCount = totalQuestions || questions.length;
-    const calculatedMarks = questions.reduce(
-      (sum, q) => sum + (q.positiveMarks != null ? Number(q.positiveMarks) : 1),
-      0
-    );
-    const totalMarksCount = totalMarks || calculatedMarks || totalQuestionsCount;
-
-    let marksPerQuestionText = "1";
-    if (questions.length > 0) {
-      const firstMarks =
-        questions[0].positiveMarks != null ? Number(questions[0].positiveMarks) : 1;
-      const allSame = questions.every(
-        (q) =>
-          (q.positiveMarks != null ? Number(q.positiveMarks) : 1) === firstMarks
-      );
-      if (allSame) {
-        marksPerQuestionText = `${firstMarks}`;
-      } else if (
-        totalMarksCount &&
-        totalQuestionsCount &&
-        totalMarksCount % totalQuestionsCount === 0
-      ) {
-        marksPerQuestionText = `${totalMarksCount / totalQuestionsCount}`;
-      } else {
-        marksPerQuestionText = `${firstMarks}`;
-      }
-    }
-
-    const formatDuration = (minutes: number): string => {
-      if (!minutes || minutes <= 0) return "2 Hours";
-      if (minutes % 60 === 0) {
-        const hours = minutes / 60;
-        return `${hours} ${hours === 1 ? "Hour" : "Hours"}`;
-      }
-      if (minutes % 30 === 0) {
-        const hours = minutes / 60;
-        return `${hours} Hours`;
-      }
-      if (minutes < 60) {
-        return `${minutes} Minutes`;
-      }
-      const hrs = Math.floor(minutes / 60);
-      const mins = minutes % 60;
-      return `${hrs} ${hrs === 1 ? "Hour" : "Hours"} ${mins} Minutes`;
-    };
-
-    const durationText = formatDuration(testDuration);
-
-    const hasNegative = questions.some(
-      (q) => q.negativeMarks != null && Number(q.negativeMarks) > 0
-    );
-    let negativeMarkingText = "No";
-    if (hasNegative) {
-      const firstNeg = questions.find(
-        (q) => q.negativeMarks != null && Number(q.negativeMarks) > 0
-      )?.negativeMarks;
-      negativeMarkingText = firstNeg ? `${firstNeg}` : "Yes";
-    }
 
     // Build section boundaries for headings and end dividers
     interface SectionBoundary {
@@ -414,30 +339,6 @@ export const TestPrintView = React.forwardRef<HTMLDivElement, TestPrintViewProps
               margin: 4pt 0 !important;
             }
 
-            /* Test Header & Meta Info Block (matching official exam format) */
-            .print-header-block {
-              margin-bottom: 10pt;
-              page-break-inside: avoid;
-              break-inside: avoid;
-            }
-
-            .print-meta-header {
-              font-size: 10.5pt;
-              line-height: 1.45;
-              margin-bottom: 8pt;
-            }
-
-            .print-meta-row {
-              margin-bottom: 2pt;
-            }
-
-            .print-meta-label {
-              font-weight: 700;
-            }
-
-            .print-meta-val {
-              font-weight: 400;
-            }
 
             /* Section title (no top or bottom horizontal lines) */
             .print-section-title {
@@ -469,40 +370,7 @@ export const TestPrintView = React.forwardRef<HTMLDivElement, TestPrintViewProps
           <tbody>
             <tr>
               <td>
-                {/* First page header: Meta details from official exam spec */}
-                <div className="print-header-block">
-                  <div className="print-meta-header">
-                    <div className="print-meta-row">
-                      <span className="print-meta-label">Subjects:</span>{" "}
-                      <span className="print-meta-val">{subjectsText}</span>
-                    </div>
-                    <div className="print-meta-row">
-                      <span className="print-meta-label">Total Questions:</span>{" "}
-                      <span className="print-meta-val">{totalQuestionsCount}</span>
-                    </div>
-                    <div className="print-meta-row">
-                      <span className="print-meta-label">Total Marks:</span>{" "}
-                      <span className="print-meta-val">{totalMarksCount}</span>
-                    </div>
-                    <div className="print-meta-row">
-                      <span className="print-meta-label">Marks per Question:</span>{" "}
-                      <span className="print-meta-val">{marksPerQuestionText}</span>
-                    </div>
-                    <div className="print-meta-row">
-                      <span className="print-meta-label">Time:</span>{" "}
-                      <span className="print-meta-val">{durationText}</span>
-                    </div>
-                    <div className="print-meta-row">
-                      <span className="print-meta-label">Negative Marking:</span>{" "}
-                      <span className="print-meta-val">{negativeMarkingText}</span>
-                    </div>
-                  </div>
-                </div>
 
-                {/* If non-sectional test, render a divider before questions start */}
-                {sectionBoundaries.length === 0 && (
-                  <div className="print-section-divider" style={{ marginTop: "4pt", marginBottom: "14pt" }} />
-                )}
 
                 {/* Questions */}
                 {questions.map((q, idx) => {
